@@ -3,7 +3,6 @@ import 'react-toastify/dist/ReactToastify.css'
 import { SessionProvider, useSession } from 'next-auth/react'
 import { SWRConfig } from 'swr'
 import { ToastContainer } from 'react-toastify'
-import { GlobalStoreProvider } from 'archive/index'
 import { ThemeProvider } from 'styled-components'
 import Head from 'next/head'
 
@@ -44,7 +43,6 @@ export default function MyApp({
               fetch(resource, init).then((res) => res.json())
           }}
         >
-          <GlobalStoreProvider>
             <GlobalStyle/>
             <Head>
               <title>BitCoin website</title>
@@ -65,7 +63,6 @@ export default function MyApp({
             </Background>
 
 
-          </GlobalStoreProvider>
         </SWRConfig>
       </ThemeProvider>
     </SessionProvider>
