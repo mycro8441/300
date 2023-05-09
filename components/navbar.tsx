@@ -5,7 +5,7 @@ import { useState } from "react";
 const Container = styled.div`
     left:0;
     width:100%;
-    height:80px;
+    height:50px;
     padding: 0 20px;
     box-shadow: 0 0px 10px 2px #bbb;
     display:flex;
@@ -16,7 +16,7 @@ const InputContainer = styled.form`
     position: absolute;
     left:50%;
     transform:translateX(-50%);
-    height:35px;
+    height:30px;
     width:400px;
     max-width:35%;
     div > svg {
