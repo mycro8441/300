@@ -22,8 +22,7 @@ const Background = styled.div`
   position:relative;
   width:100vw;
   height:100vh;
-  background-color: ${p=>p.theme.bgColor};
-  background: black;
+  background: ${p=>p.theme.colors.bgColor};
 `
 export default function MyApp({
   Component,
@@ -57,7 +56,6 @@ export default function MyApp({
               </Auth>       
               <ToastContainer
                   autoClose={3000}
-                  hideProgressBar
                   draggable={false}
                 />               
             </Background>

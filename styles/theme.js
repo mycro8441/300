@@ -12,7 +12,6 @@ const colors = {
     yellow:"#EDE51E"
 }
 
-
 export const dark = {
     fontSizes,
     colors : {
@@ -20,6 +19,7 @@ export const dark = {
         titleColor:'#B0C7EA',
         textColor:'#B0C7EA',
         bgColor:'#F5E2F8',
+        textMild:'#fff',
     }
 }
 export const light = {
@@ -28,6 +28,7 @@ export const light = {
         ...colors,
         titleColor: "#0B2068",
         textColor: "#0B2068",
-        bgColor:'#F5E2F8',
+        bgColor:'#F5E2F8a2',
+        textMild:'#000',
     }
 }

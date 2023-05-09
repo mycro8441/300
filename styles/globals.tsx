@@ -20,8 +20,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-h1, h2, h3, h4, h5, h6, text, label{
+h1, h2, h3, h4, h5, h6, text, label, button{
   font-family:"Pretendard-Regular";
+  // @ts-ignore
 }
 `;
 export default GlobalStyle;
