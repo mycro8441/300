@@ -69,7 +69,7 @@ export default function MyApp({
 
 function Auth({ children }) {
   const { status } = useSession()
-
+  //DEV
   if (status === "loading") {
     return <div>Loading...</div>
   } else if(status==="unauthenticated") {

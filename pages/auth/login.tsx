@@ -174,6 +174,8 @@ export default function Login({}) {
         setIsChanging(true);
         setTimeout(()=>{
             setMode(val=>val === "login" ? "signin" : "login");
+            setIsSubmitting(false);
+            setInput({email:'', password:'', passwordConfirm:''})
             setIsChanging(false);
         }, 400);
     }
