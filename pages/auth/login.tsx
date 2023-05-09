@@ -90,7 +90,7 @@ const ChangeButton = styled.button<{isDisabled:boolean}>`
     position:relative;
     margin:20px auto;
     height:${p=>p.isDisabled ? "25px" : "30px"};
-    width:${p=>p.isDisabled ? "25%" : "30%"};
+    width:${p=>p.isDisabled ? "150px" : "200px"};
     background-color: ${p=>p.isDisabled ? "gray" : p.theme.colors.yellow};
     transition:0.3s ease;
     border:none;
