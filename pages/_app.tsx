@@ -12,11 +12,11 @@ import {dark, light} from "../styles/theme"
 import { useState } from 'react'
 import useStore from '../store/store';
 const Container = styled.div`
-  max-width:36rem;
+  /* max-width:36rem;
   margin-left:auto;
   margin-right:auto;
   padding-left:1rem;
-  padding-right:1rem;
+  padding-right:1rem; */
 `
 const Background = styled.div`
   position:relative;
@@ -70,6 +70,7 @@ export default function MyApp({
 function Auth({ children }) {
   const { status } = useSession()
   //DEV
+  return children;
   if (status === "loading") {
     return <div>Loading...</div>
   } else if(status==="unauthenticated") {
