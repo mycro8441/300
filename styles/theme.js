@@ -28,7 +28,7 @@ export const light = {
         ...colors,
         titleColor: "#0B2068",
         textColor: "#0B2068",
-        bgColor:'#F5E2F8a2',
+        bgColor:'#35a2F832',
         textMild:'#000',
     }
 }

@@ -10,7 +10,7 @@ import styled from 'styled-components'
 import Login from './auth/login'
 import {dark, light} from "../styles/theme"
 import { useState } from 'react'
-import useStore from '../store/store';
+import useStore from '../store';
 const Container = styled.div`
   /* max-width:36rem;
   margin-left:auto;
@@ -29,12 +29,13 @@ export default function MyApp({
   pageProps: { session, ...pageProps }
 }) {
   const {themeMode} = useStore();
-  const theme = themeMode === 'light' ? light : dark;
+  const themeTray = [light, dark]; // 라이트, 다크 테마 이외의 테마 추가 대비
+  const theme = themeTray[+themeMode];
 
   
   return (
     <SessionProvider session={session}>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme ?? light}>
         <SWRConfig
           value={{
             revalidateOnFocus: false,
@@ -45,6 +46,7 @@ export default function MyApp({
             <GlobalStyle/>
             <Head>
               <title>BitCoin website</title>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </Head>
             <Background>
               <Auth>

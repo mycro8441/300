@@ -1,15 +1,19 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { Search } from "@mui/icons-material";
-import { useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
+import { Avatar } from "@mui/material";
+import PrettySwitch from "./switch";
+import useStore from "../store";
+import shallow from "zustand";
 const Container = styled.div`
     left:0;
     width:100%;
     height:50px;
-    padding: 0 20px;
+    padding: 0 40px;
     box-shadow: 0 0px 10px 2px #bbb;
     display:flex;
     align-items: center;
+    justify-content: space-between;
     background-color: white;
 `
 const InputContainer = styled.form`
@@ -43,7 +47,35 @@ const SearchBar = styled.input`
 `
 const RightSide = styled.div`
     display:flex;
-    gap:10px;
+    align-items: center;
+`
+
+const HoverMenuAdjust = styled.div`
+    position:absolute;
+    right:10px;
+    z-index:2;
+    top:50px;
+
+`
+const HoverMenuContainer = styled.div<{active:boolean}>`
+    
+
+    margin-top:10px;
+    width:${p=>p.active ? "400px" : "0px"};
+    height:${p=>p.active ? "300px" : "0px"};
+    background-color: ${p=>p.theme.colors.bgColor};
+    transition: 0.3s ease;
+    border-radius:30px;
+    pointer-events: ${p=>p.active ? "all" : "none"};
+    animation-direction: ${p=>p.active ? "normal" : "reverse"};
+    box-shadow: 0 0 10px 2px #888;
+    opacity:${p=>p.active ? 1 : 0};
+`
+const AvatarContainer = styled.div`
+    width:auto;
+    height:100%;
+    margin:0;
+    padding:5px;
 `
 const SearchComponent = () => {
     const [value, setValue] = useState<string>('');
@@ -60,14 +92,39 @@ const SearchComponent = () => {
 
 }
 
+const HoverMenu = ({active} : {active:boolean})=> {
+    const [menuHover, setMenuHover] = useState<boolean>(false);
+    return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
+
+            <HoverMenuContainer  active={active || menuHover}>
+            
+            </HoverMenuContainer>
+
+    </HoverMenuAdjust>
+}
 const NavBar = () => {
+    const [isHover, setIsHover] = useState<boolean>(false);
+    const {themeMode, setThemeMode} = useStore();
 
     return <Container>
         <h2>LOGO</h2>
         <SearchComponent/>
         <RightSide>
-        
+            <PrettySwitch state={themeMode} setfunc={setThemeMode}/>
+            <AvatarContainer onMouseEnter={()=>{
+                setIsHover(true)
+            }}
+                onMouseLeave={()=>{
+                setIsHover(false)
+                }}
+                style={{margin:"5px"}}
+            >
+                <Avatar/>
+            </AvatarContainer>
+
+            <HoverMenu active={isHover}/>            
         </RightSide>
+
     </Container>
 }
 

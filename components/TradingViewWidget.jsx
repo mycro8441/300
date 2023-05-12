@@ -30,7 +30,9 @@ export default function TradingViewWidget() {
       function createWidget() {
         if (document.getElementById('tradingview_5a8ce') && 'TradingView' in window) {
           new window.TradingView.widget({
-            autosize: true,
+            autosize: false,
+            width:"auto",
+            height:"400px",
             symbol: "NASDAQ:AAPL",
             interval: "D",
             timezone: "Asia/Seoul",
@@ -51,9 +53,6 @@ export default function TradingViewWidget() {
   return (
     <div className='tradingview-widget-container'>
       <div id='tradingview_5a8ce' />
-      <div className="tradingview-widget-copyright">
-        트레이딩뷰 제공 <a href="https://kr.tradingview.com/symbols/NASDAQ-AAPL/" rel="noopener" target="_blank"><span className="blue-text">AAPL 주식 차트</span></a>
-      </div>
     </div>
   );
 }
