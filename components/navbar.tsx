@@ -5,6 +5,12 @@ import { Avatar } from "@mui/material";
 import PrettySwitch from "./switch";
 import useStore from "../store";
 import shallow from "zustand";
+
+const Padding = styled.div`
+    position:relative;
+    width:100%;
+    height:50px;
+`
 const Container = styled.div`
     position:fixed;
     left:0;
@@ -110,7 +116,9 @@ const NavBar = () => {
     useEffect(()=>{
         console.log(themeMode)
     }, [themeMode])
-    return <Container>
+    return <>
+
+    <Container>
         <h2>LOGO</h2>
         <SearchComponent/>
         <RightSide>
@@ -130,6 +138,8 @@ const NavBar = () => {
         </RightSide>
 
     </Container>
+    <Padding/>
+    </>
 }
 
 export default NavBar;

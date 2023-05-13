@@ -11,8 +11,8 @@ const Adjuster = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    width:100%;
-    height:100%;
+    width:100vw;
+    height:100vh;
 
 `
 const GoLeft = keyframes`

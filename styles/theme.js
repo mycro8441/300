@@ -23,7 +23,7 @@ export const dark = {
         titleColor:'#B0C7EA',
         textColor:'#B0C7EA',
         bgColor:'#242424',
-        invertColor:'#e2e3f0',
+        invertColor:'#f2f3ffee',
         textMild:'#fff',
     }
 }

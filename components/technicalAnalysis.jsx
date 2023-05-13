@@ -12,7 +12,7 @@ export default function TradingViewTechWidget() {
 
       function createWidget() {
         if (document.getElementById('tradingview_tech-ihsle') && 'TradingView' in window) {
-          new window.TradingView.widget({
+          new window.TradingViewT.widget({
             "interval": "1m",
             "width": 425,
             "isTransparent": false,

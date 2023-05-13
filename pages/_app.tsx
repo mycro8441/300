@@ -19,12 +19,6 @@ const Container = styled.div`
   padding-left:1rem;
   padding-right:1rem; */
 `
-const Background = styled.div`
-  position:relative;
-  width:100vw;
-  height:100%;
-  background: ${p=>p.theme.colors.bgColor};
-`
 export default function MyApp({
   Component,
   pageProps: { session, ...pageProps }
@@ -33,10 +27,10 @@ export default function MyApp({
   const themeTray = [light, dark]; // 라이트, 다크 테마 이외의 테마 추가 대비
   const theme = themeTray[+themeMode];
 
-  
+  const [isLogined, setIslogined] = useState<boolean>(false); // dev
   return (
     <SessionProvider session={session}>
-      <ThemeProvider theme={theme ?? light}>
+      <ThemeProvider theme={theme || light}>
         <SWRConfig
           value={{
             revalidateOnFocus: false,
@@ -49,20 +43,28 @@ export default function MyApp({
               <title>BitCoin website</title>
               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </Head>
-            <Background>
-              <Auth>
+            <button style={{position:"fixed"}} onClick={()=>setIslogined(true)}>메인으로</button>
+              {isLogined ? <>
                 <Container>
                   <main>
-                    <NavBar/>
-                    <Component {...pageProps} />
+                  <NavBar/>
+                  <Component {...pageProps} />
                   </main>
-                </Container>      
-              </Auth>       
+                </Container>  
+              </>:<Login/>}
+               {/* <Auth>
+                <Container>
+                 <main>
+                    <NavBar/>
+                 <Component {...pageProps} />
+              </main>
+              </Container>      
+              </Auth>        */}
               <ToastContainer
                   autoClose={3000}
                   draggable={false}
                 />               
-            </Background>
+
 
 
         </SWRConfig>
@@ -74,7 +76,7 @@ export default function MyApp({
 function Auth({ children }) {
   const { status } = useSession()
   //DEV
-  return children;
+  //return children;
   if (status === "loading") {
     return <div>Loading...</div>
   } else if(status==="unauthenticated") {

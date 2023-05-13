@@ -2,6 +2,11 @@ import styled from 'styled-components';
 import { useSession } from 'next-auth/react'
 import TradingViewWidget from "../components/TradingViewWidget"
 import TradingViewTechWidget from "../components/technicalAnalysis";
+import {AdvancedRealTimeChart, TechnicalAnalysis, MarketData} from "react-ts-tradingview-widgets";
+import useStore from '../store';
+import { useEffect } from 'react';
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 const Container = styled.div`
   width:100%;
   height:auto;
@@ -10,21 +15,38 @@ const Container = styled.div`
 `
 const Adjuster = styled.div`
   
-  width:1200px;
-  max-width:90%;
+  width:100%;
+  
   height:auto;
   display:flex;
-  padding:10px;
+  justify-content: center;
+  padding:30px;
   flex-wrap: nowrap;
   gap:10px;
 `
 const Main = styled.div`
-  width:80%;
+
+  width:100%;
   height:100%;
+  justify-content:center;
+
+  display: flex;
+  flex-direction: column;
+  gap:10px;
 `
 const Sidebar = styled.div`
   width:20%;
   height:100%;
+  background-color: white;
+  border-radius:20px;
+
+  @media screen and (max-width:800px) {
+    display:none;
+  }
+`
+const TableContainer = styled.div`
+  width:100%;
+  height:200px;
   background-color: white;
   border-radius:20px;
 `
@@ -34,19 +56,35 @@ const Widget = styled.div`
   background-color:white;
   border-radius:20px;
   overflow: hidden;
+  display:flex;
+
+  div {
+    height:100%;flex-grow: 1;
+
+  }
+  div:nth-child(2) {
+    flex:1;
+    overflow-y: hidden;
+    
+  }
 `
 function Home() {
   const {data:session, status}= useSession();
-  
+  const {themeMode} = useStore();
+
   return (
     <>
       <Container>
         <Adjuster>
           <Main>
             <Widget>
-              <TradingViewWidget/> 
-              <TradingViewTechWidget/>
-            </Widget>          
+              <AdvancedRealTimeChart autosize symbol='BTCUSDT' theme={themeMode ? "dark" : "light"}/>
+              <TechnicalAnalysis autosize symbol='BTCUSDT' colorTheme={themeMode ? "dark" : "light"}/>
+            </Widget>    
+            <TableContainer>
+              
+            </TableContainer>
+
           </Main>
           <Sidebar>
             dd
