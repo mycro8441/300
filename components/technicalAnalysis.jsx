@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
+import useStore from '../store';
 
 let tvScriptLoadingPromise;
 
 export default function TradingViewTechWidget() {
   const onLoadScriptRef = useRef();
-
+  const {themeMode} = useStore();
   useEffect(
     () => {
       onLoadScriptRef.current = createWidget;

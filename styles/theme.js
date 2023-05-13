@@ -9,7 +9,11 @@ const fontSizes = {
 }
 
 const colors = {
-    yellow:"#EDE51E"
+    yellow:"#EDE51E",
+    pointColor1:'#fabd86',
+    pointColor2:'#5f6f9a',
+    pointColor3:'#b44c34',
+    pointColor4: '#c17065',
 }
 
 export const dark = {
@@ -18,7 +22,8 @@ export const dark = {
         ...colors,
         titleColor:'#B0C7EA',
         textColor:'#B0C7EA',
-        bgColor:'#F5E2F8',
+        bgColor:'#242424',
+        invertColor:'#e2e3f0',
         textMild:'#fff',
     }
 }
@@ -29,6 +34,7 @@ export const light = {
         titleColor: "#0B2068",
         textColor: "#0B2068",
         bgColor:'#35a2F832',
+        invertColor:'#cacaca',
         textMild:'#000',
     }
 }

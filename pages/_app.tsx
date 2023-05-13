@@ -11,6 +11,7 @@ import Login from './auth/login'
 import {dark, light} from "../styles/theme"
 import { useState } from 'react'
 import useStore from '../store';
+import NavBar from '@/components/navbar'
 const Container = styled.div`
   /* max-width:36rem;
   margin-left:auto;
@@ -21,7 +22,7 @@ const Container = styled.div`
 const Background = styled.div`
   position:relative;
   width:100vw;
-  height:100vh;
+  height:100%;
   background: ${p=>p.theme.colors.bgColor};
 `
 export default function MyApp({
@@ -52,6 +53,7 @@ export default function MyApp({
               <Auth>
                 <Container>
                   <main>
+                    <NavBar/>
                     <Component {...pageProps} />
                   </main>
                 </Container>      

@@ -2,8 +2,6 @@ import styled from 'styled-components';
 import { useSession } from 'next-auth/react'
 import TradingViewWidget from "../components/TradingViewWidget"
 import TradingViewTechWidget from "../components/technicalAnalysis";
-import NavBar from '@/components/navbar';
-import PrettySwitch from '@/components/switch';
 const Container = styled.div`
   width:100%;
   height:auto;
@@ -42,7 +40,6 @@ function Home() {
   
   return (
     <>
-      <NavBar/>
       <Container>
         <Adjuster>
           <Main>

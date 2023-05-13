@@ -6,6 +6,7 @@ import PrettySwitch from "./switch";
 import useStore from "../store";
 import shallow from "zustand";
 const Container = styled.div`
+    position:fixed;
     left:0;
     width:100%;
     height:50px;
@@ -15,6 +16,7 @@ const Container = styled.div`
     align-items: center;
     justify-content: space-between;
     background-color: white;
+    z-index:1000;
 `
 const InputContainer = styled.form`
     position: absolute;
@@ -105,7 +107,9 @@ const HoverMenu = ({active} : {active:boolean})=> {
 const NavBar = () => {
     const [isHover, setIsHover] = useState<boolean>(false);
     const {themeMode, setThemeMode} = useStore();
-
+    useEffect(()=>{
+        console.log(themeMode)
+    }, [themeMode])
     return <Container>
         <h2>LOGO</h2>
         <SearchComponent/>

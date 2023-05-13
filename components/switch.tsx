@@ -21,7 +21,7 @@ const Ball = styled.div<{active:boolean}>`
 `
 const PrettySwitch = ({state, setfunc} : {state:boolean, setfunc:Dispatch<SetStateAction<boolean>>}) => {
 return <>
-        <Container onClick={()=>setfunc(val=>!val)}>
+        <Container onClick={()=>setfunc(!state)}>
             <Ball active={state}>
 
             </Ball>
