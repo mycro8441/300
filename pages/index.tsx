@@ -12,6 +12,7 @@ const Container = styled.div`
   height:auto;
   display: flex;
   justify-content: center;
+  overflow-x:hidden;
 `
 const Adjuster = styled.div`
   
@@ -26,7 +27,7 @@ const Adjuster = styled.div`
 `
 const Main = styled.div`
 
-  width:100%;
+  flex:0.8;
   height:100%;
   justify-content:center;
 
@@ -35,7 +36,7 @@ const Main = styled.div`
   gap:10px;
 `
 const Sidebar = styled.div`
-  width:20%;
+  flex:0.2;
   height:100%;
   background-color: white;
   border-radius:20px;
@@ -45,7 +46,6 @@ const Sidebar = styled.div`
   }
 `
 const TableContainer = styled.div`
-  width:100%;
   height:200px;
   background-color: white;
   border-radius:20px;

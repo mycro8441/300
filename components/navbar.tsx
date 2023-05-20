@@ -7,12 +7,11 @@ import useStore from "../store";
 import shallow from "zustand";
 
 const Padding = styled.div`
-    position:relative;
+
     width:100%;
     height:50px;
 `
 const Container = styled.div`
-    position:fixed;
     left:0;
     width:100%;
     height:50px;
@@ -138,7 +137,6 @@ const NavBar = () => {
         </RightSide>
 
     </Container>
-    <Padding/>
     </>
 }
 

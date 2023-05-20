@@ -25,6 +25,7 @@ export const dark = {
         bgColor:'#242424',
         invertColor:'#f2f3ffee',
         textMild:'#fff',
+        blockColor:"#353535",
     }
 }
 export const light = {
@@ -36,5 +37,6 @@ export const light = {
         bgColor:'#35a2F832',
         invertColor:'#cacaca',
         textMild:'#000',
+        blockColor:"#d7d7d7",
     }
 }

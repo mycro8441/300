@@ -13,11 +13,12 @@ import { useState } from 'react'
 import useStore from '../store';
 import NavBar from '@/components/navbar'
 const Container = styled.div`
-  /* max-width:36rem;
-  margin-left:auto;
-  margin-right:auto;
-  padding-left:1rem;
-  padding-right:1rem; */
+
+  width:100vw;
+  height:100vh;
+  display:flex;
+  flex-direction: column;
+
 `
 export default function MyApp({
   Component,
@@ -46,10 +47,10 @@ export default function MyApp({
             <button style={{position:"fixed"}} onClick={()=>setIslogined(true)}>메인으로</button>
               {isLogined ? <>
                 <Container>
-                  <main>
+
                   <NavBar/>
                   <Component {...pageProps} />
-                  </main>
+
                 </Container>  
               </>:<Login/>}
                {/* <Auth>
