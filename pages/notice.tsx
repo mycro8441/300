@@ -282,8 +282,15 @@ export default function Notice() {
             </Slider>    
         </>
     }
+
+    const isAdmin = useRef<boolean>(false);
     const [inited, setInited] = useState(false); // hydration 오류 해결
-    useEffect(()=>setInited(true), []);
+    useEffect(()=>{
+        isAdmin.current =true;
+        setInited(true);
+        
+    }
+    , []);
 
     const topRef = useRef<HTMLDivElement>(null); // 맨 위로 가기를 위한 ref
     const onTopBtnClick = () => {

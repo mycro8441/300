@@ -80,6 +80,12 @@ const HoverMenuContainer = styled.div<{active:boolean}>`
     animation-direction: ${p=>p.active ? "normal" : "reverse"};
     box-shadow: 0 0 10px 2px #888;
     opacity:${p=>p.active ? 1 : 0};
+    padding:10px 20px;
+    div {
+        text-align:center;
+        padding:10px;
+        white-space: nowrap;
+    }
 `
 const AvatarContainer = styled.div`
     width:auto;
@@ -123,31 +129,22 @@ const NotLoginContainer = styled.div`
     align-items: center;
 
 `
-const NotLogined = () => {
 
-    return <>
-        <NotLoginContainer>
-            <p>로그인 해주세요.</p>
-            
-            <PrettyButton color="#2f48ba">
-                로그인
-            </PrettyButton>
-
-        </NotLoginContainer>
-    </>
-}
+const HoverMenuOption = styled.div`
+    width:100%;
+    height:5em;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+`
 
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
-    const [isLogined, setIsLogined] = useState<boolean>(false);
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
             <HoverMenuContainer  active={active || menuHover}>
-                {isLogined ? <>
-
-                </>:<>
-                    <NotLogined/>
-                </>}
+                <div>Good to see you, {"nickname"}.</div>
+                <HoverMenuOption><div>Point:</div><div>1000</div></HoverMenuOption>
             </HoverMenuContainer>
 
     </HoverMenuAdjust>
