@@ -169,6 +169,51 @@ const TopButton  =styled.div`
     align-items: center;
     justify-content: center;
 `
+
+
+
+const AdminBlock = () => {
+    const [description, setDescription] = useState('')
+
+    return <>
+        <AdminBlockContainer>
+            <div style={{display:"flex", gap:"1em"}}>
+                <PrettyInput>
+                    <p>Title</p>
+                    <input value={description} onChange={e=>setDescription(e.target.value)}/>
+                </PrettyInput>
+                <PrettyInput>
+
+                </PrettyInput>
+            </div>
+            <PrettyInput/>
+        </AdminBlockContainer>
+    </>
+}
+const AdminBlockContainer = styled.div`
+    width:100%;
+    height:auto;
+    background-color: ${p=>p.theme.colors.invertColor};
+    border-radius: 20px;
+    padding:30px;
+    margin-bottom:10px;
+`
+const PrettyInput = styled.div`
+    height:2.5em;
+    flex:1;
+    width:100%;
+    margin-bottom:10px;
+    p {
+        margin:0;
+    }
+    input {
+        border:1px solid gray;
+        border-radius:15px;
+        width:100%;
+
+    }
+`
+
 export default function Notice() {
     const [blockList, setBlockList] = useState<BlockType[]>([
         {
@@ -237,8 +282,15 @@ export default function Notice() {
             </Slider>    
         </>
     }
+
+    const isAdmin = useRef<boolean>(false);
     const [inited, setInited] = useState(false); // hydration 오류 해결
-    useEffect(()=>setInited(true), []);
+    useEffect(()=>{
+        isAdmin.current =true;
+        setInited(true);
+        
+    }
+    , []);
 
     const topRef = useRef<HTMLDivElement>(null); // 맨 위로 가기를 위한 ref
     const onTopBtnClick = () => {
@@ -251,6 +303,9 @@ export default function Notice() {
                 <BlockAdjuster>
                     <BlockSlider>
                         <div ref={topRef}/>
+                        {isAdmin.current && <>
+                            <AdminBlock/>
+                        </>}
                         {blockList.map((obj, i)=>(
 
                                 <Block key={i}>

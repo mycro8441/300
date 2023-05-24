@@ -7,29 +7,30 @@ import useStore from '../store';
 import { useEffect } from 'react';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import Chat from '@/components/Chat';
 const Container = styled.div`
   width:100%;
-  height:auto;
+  height:100%;
   display: flex;
   justify-content: center;
-  overflow-x:hidden;
+  
 `
 const Adjuster = styled.div`
   
   width:100%;
   
-  height:auto;
+  height:100%;
   display:flex;
   justify-content: center;
   padding:30px;
-  flex-wrap: nowrap;
+
   gap:10px;
 `
 const Main = styled.div`
 
-  flex:0.8;
+  flex:1;
   height:100%;
-  justify-content:center;
+
 
   display: flex;
   flex-direction: column;
@@ -40,19 +41,25 @@ const Sidebar = styled.div`
   height:100%;
   background-color: white;
   border-radius:20px;
-
   @media screen and (max-width:800px) {
     display:none;
   }
 `
-const TableContainer = styled.div`
-  height:200px;
+const MediaHidden = styled.div`
+  height:100%;
+    @media screen and (max-width:800px) {
+    display:none;
+  }
+  
+`
+const ChatContainer = styled.div`
+  flex:0.4;
   background-color: white;
   border-radius:20px;
 `
 const Widget = styled.div`
   width:100%;
-  height:400px;
+  flex:0.8;
   background-color:white;
   border-radius:20px;
   overflow: hidden;
@@ -79,16 +86,20 @@ function Home() {
           <Main>
             <Widget>
               <AdvancedRealTimeChart autosize symbol='BTCUSDT' theme={themeMode ? "dark" : "light"}/>
-              <TechnicalAnalysis autosize symbol='BTCUSDT' colorTheme={themeMode ? "dark" : "light"}/>
-            </Widget>    
-            <TableContainer>
+              <MediaHidden>
+                <TechnicalAnalysis autosize symbol='BTCUSDT' colorTheme={themeMode ? "dark" : "light"}/>
+              </MediaHidden>
               
-            </TableContainer>
+            </Widget>    
+            <ChatContainer>
+              <Chat/>
+            </ChatContainer>
 
           </Main>
-          <Sidebar>
-            dd
-          </Sidebar>
+            <Sidebar>
+              dd
+            </Sidebar>            
+
         </Adjuster>
 
       </Container>    
