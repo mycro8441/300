@@ -5,6 +5,7 @@ import { Avatar } from "@mui/material";
 import PrettySwitch from "./switch";
 import useStore from "../store";
 import shallow from "zustand";
+import Link from "next/link";
 
 const Padding = styled.div`
 
@@ -20,8 +21,9 @@ const Container = styled.div`
     display:flex;
     align-items: center;
     justify-content: space-between;
-    background-color: white;
+    background-color: ${p=>p.theme.colors.blockColor};
     z-index:1000;
+
 `
 const InputContainer = styled.form`
     position: absolute;
@@ -47,7 +49,8 @@ const SearchBar = styled.input`
     padding-right:35px;
     border-radius: 30px;
     border:none;
-    box-shadow: 0px 0px 10px 1px #bbb;
+    box-shadow: 0px 0px 10px 1px #bbbbbb35;
+    background-color: ${p=>p.theme.colors.bgColor};
     &:focus {
         outline:none;
     }
@@ -84,6 +87,17 @@ const AvatarContainer = styled.div`
     margin:0;
     padding:5px;
 `
+
+const PrettyButton = styled.div<{color:string}>`
+    width:auto;
+    height:2em;
+    border-radius: 0.2em;
+    background-color: ${p=>p.color};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`
+
 const SearchComponent = () => {
     const [value, setValue] = useState<string>('');
 
@@ -99,12 +113,41 @@ const SearchComponent = () => {
 
 }
 
+
+const NotLoginContainer = styled.div`
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+`
+const NotLogined = () => {
+
+    return <>
+        <NotLoginContainer>
+            <p>로그인 해주세요.</p>
+            
+            <PrettyButton color="#2f48ba">
+                로그인
+            </PrettyButton>
+
+        </NotLoginContainer>
+    </>
+}
+
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
+    const [isLogined, setIsLogined] = useState<boolean>(false);
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
             <HoverMenuContainer  active={active || menuHover}>
-            
+                {isLogined ? <>
+
+                </>:<>
+                    <NotLogined/>
+                </>}
             </HoverMenuContainer>
 
     </HoverMenuAdjust>
@@ -112,13 +155,11 @@ const HoverMenu = ({active} : {active:boolean})=> {
 const NavBar = () => {
     const [isHover, setIsHover] = useState<boolean>(false);
     const {themeMode, setThemeMode} = useStore();
-    useEffect(()=>{
-        console.log(themeMode)
-    }, [themeMode])
     return <>
 
     <Container>
-        <h2>LOGO</h2>
+        <Link href="/"><h2>LOGO</h2></Link>
+       
         <SearchComponent/>
         <RightSide>
             <PrettySwitch state={themeMode} setfunc={setThemeMode}/>
