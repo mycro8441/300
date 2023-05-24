@@ -1,10 +1,10 @@
 import { ArrowUpward } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 
-type sliderType = 0|1|2;
+type sliderType = 0|1;
 const abs = (n:number) => n < 0 ? -n : n;
 const Container = styled.div`
     width:100%;
@@ -13,28 +13,29 @@ const Container = styled.div`
 `
 const Slider = styled.div<{active:boolean}>`
     position:fixed;
-    top:70px;
+    top:${p=>p.active ? "70px" : "0px"};
+    opacity:${p=>p.active ? "1" : "0"};
     left:50%;
-    transform: ${p=>!p.active ? "translate(-50%, -50px);" : "translate(-50%, 0px);"};
-    transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transform: translateX(-50%);
+    transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
     height:25px;
     width:800px;
     max-width:60%;
     border-radius:1em;
-    background-color: ${p=>p.theme.colors.invertColor};
+    background-color: ${p=>p.theme.colors.blockColor};
     display:flex;
     overflow:hidden;
     z-index: 3;
 `
 const SliderPicker = styled.div<{mode:sliderType}>`
     position:absolute;
-    left:${p=>50 * p.mode + "%"};
+    left:${p=>75 * p.mode + "%"};
     transform: ${p=>`translateX(-${50*p.mode}%)`};  
-    width:250px;
-    max-width:30%;
+    width:500px;
+    max-width:50%;
     height:100%;
     transition:0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
-    background-color: ${p=>p.theme.colors[`pointColor${p.mode+1}`]};
+    background-color: ${p=>!p.mode ? p.theme.colors.signatureBlue : p.theme.colors.signatureRed};
     border-radius: 1em;
     text-align:center;
     display:flex;
@@ -45,7 +46,7 @@ const SliderPicker = styled.div<{mode:sliderType}>`
 const HiddenSliderButton = styled.div<{mode:sliderType, index:sliderType}>`
     flex:1;
     text-align: center;
-    opacity: ${p=>1-abs(p.index-p.mode)/3};
+    opacity: ${p=>1-abs(p.index-p.mode)/2};
     transition:0.4s cubic-bezier(0.645, 0.045, 0.355, 1);
     cursor:pointer;
     display:flex;
@@ -84,7 +85,7 @@ const Block = styled.div`
     width:100%;
     height:auto;
     max-height:900px;
-    background-color: ${p=>p.theme.colors.invertColor};
+    background-color: ${p=>p.theme.colors.blockColor};
     border-radius: 20px;
     padding:30px;
     margin-bottom:10px;
@@ -122,7 +123,6 @@ const BlockContent = styled.div`
     flex:1;
     width:100%;
     overflow-y: auto;
-    padding:10px;
     &::-webkit-scrollbar {
         width:10px;
     }
@@ -143,13 +143,9 @@ const SliderEnd = styled.div`
     height:60px;
 `
 type BlockType = {
-    profileURL?:string,
-    name:string,
-    email?:string,
-    photoURL?:string,
+    email:string,
     timeStamp:number,
     content:string,
-    type:"IMPORTANT" | "UPDATE" | "NOTICE",
 }
 
 const TopButtonAdjust = styled.div`
@@ -169,64 +165,113 @@ const TopButton  =styled.div`
     align-items: center;
     justify-content: center;
 `
+const AdminContainer = styled.div`
+    display:flex;
+    flex-direction: column;
+    width:100%;
+    height:10em;
+    gap:5px;
+    * {
+        border-radius: 1em;
+    }
+    textarea {
+        flex:1;
+        padding:5px;
+        resize:none;
+        background-color: ${p=>p.theme.colors.bgColor};
+        outline:none;
+        border:none;
+        &::-webkit-scrollbar {
+        width:10px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: ${p=>p.theme.colors.blockColor};
+            border-radius: 10px;
+            background-clip:padding-box;
+            border:2px solid ${p=>p.theme.colors.bgColor};
+            
+        }
+    }
+    button {
+        height:2em;
+        border:none;
+        cursor:pointer;
+        background-color: ${p=>p.theme.colors.signatureBlue};
+    }
+
+`
+
+
+const AdminInput = () => {
+    const [input, setInput] = useState<string>('');
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+
+    }
+
+    return <>
+        <Block>
+            <AdminContainer>
+                <textarea placeholder="내용을 입력해주세요." value={input} onChange={e=>setInput(e.target.value)}/>
+                <button onClick={onSubmit}>Shoot the bullet</button>
+            </AdminContainer>
+        </Block>
+    </>
+}
 export default function Notice() {
     const [blockList, setBlockList] = useState<BlockType[]>([
         {
-            name:"owner",
+            email:"owner",
             timeStamp: new Date().getTime(),
             content:"ㅎㅇㅎㅇㅇ",
-            type:"IMPORTANT",
 
         },
         {
-            name:"owner",
+            email:"owner",
             timeStamp: new Date().getTime(),
             content:"ㅎㅇ",
-            type:"NOTICE",
 
 
         },
         {
-            name:"owner",
+            email:"owner",
             timeStamp: new Date().getTime(),
             content:"ㅎㅇ",
-            type:"UPDATE"
-
-
         }
 
     ]);
 
 
     const SliderComponent =() => { // 모드가 변함에 따라 업데이트해주기 때문에 state를 밖으로 뺌
-        const content = ["IMPORTANT", "UPDATE", "NOTICE"];
+        const content = ["new", "old"];
         const [mode, setMode] = useState<sliderType>(0); // localStorage에 마지막 모드 저장 후 불러오기    
         // mode state를 바깥으로 뺄 경우 transition 적용 안됨 버그..
         // 이 블럭에서 외부 state 변경 함수를 실행하는 것으로 해결 예정
         const [isSliderVisible, setIsSliderVisible] = useState<boolean>(true);
         let lastScrollY = 0;
-        let lastDir = false;
+        let lastDir : boolean = false;
         useEffect(()=>{
             addEventListener("mousewheel", (e:WheelEvent) => {
-                
-                const scrollY = window.scrollY;
-                
+                //@ts-ignore
+                if(e.target.tagname === "TEXTAREA") return;
                 const dir = e.deltaY > 0;
                 
                 if(dir == lastDir) return;
+                lastDir = dir;
+
                 if(dir) {
+                    
                     setIsSliderVisible(false);
                 } else {
                     setIsSliderVisible(true);
                 }
                 
-                lastDir = dir;
-                lastScrollY = scrollY;
               });
         }, [])
         return <>
             <Slider active={isSliderVisible}>
-                {[...Array(3)].map((v, i:sliderType)=>(
+                {[...Array(2)].map((v, i:sliderType)=>(
                     <HiddenSliderButton key={i} mode={mode} index={i} onClick={()=>setMode(i)}>
                         {content[i]}
                     </HiddenSliderButton>
@@ -249,22 +294,17 @@ export default function Notice() {
             <Container>
                 <SliderComponent/>
                 <BlockAdjuster>
-                    <BlockSlider>
-                        <div ref={topRef}/>
+                    <BlockSlider ref={topRef}>
+                        <AdminInput/>
                         {blockList.map((obj, i)=>(
 
                                 <Block key={i}>
                                     <BlockHeader>
-                                        <Avatar/>
 
-                                            {obj.name}
-                                            {obj.timeStamp}   
-                                            {obj.type}                                     
+                                            {obj.email[0].toUpperCase() + obj.email.slice(1, obj.email.length)}
+                                            {obj.timeStamp}                                      
 
                                     </BlockHeader >
-                                    <BlockImage>
-                                        <Image width={0} height={0} sizes="100vw" style={{width:"100%", height:'auto'}} src="https://www.shutterstock.com/image-vector/sample-red-square-grunge-stamp-260nw-338250266.jpg" alt=""/>
-                                    </BlockImage>
                                     <BlockContent >
                                         {obj.content}
                                     </BlockContent>

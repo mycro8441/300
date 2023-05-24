@@ -38,7 +38,7 @@ const Main = styled.div`
 const Sidebar = styled.div`
   flex:0.2;
   height:100%;
-  background-color: white;
+  background-color: ${p=>p.theme.colors.blockColor};
   border-radius:20px;
 
   @media screen and (max-width:800px) {
@@ -47,13 +47,13 @@ const Sidebar = styled.div`
 `
 const TableContainer = styled.div`
   height:200px;
-  background-color: white;
+  background-color: ${p=>p.theme.colors.blockColor};
   border-radius:20px;
 `
 const Widget = styled.div`
   width:100%;
   height:400px;
-  background-color:white;
+  background-color:${p=>p.theme.colors.blockColor};
   border-radius:20px;
   overflow: hidden;
   display:flex;

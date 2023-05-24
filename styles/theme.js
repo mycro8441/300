@@ -14,6 +14,8 @@ const colors = {
     pointColor2:'#5f6f9a',
     pointColor3:'#b44c34',
     pointColor4: '#c17065',
+    signatureRed: '#db4c42',
+    signatureBlue: '#2f48ba',
 }
 
 export const dark = {
@@ -26,6 +28,7 @@ export const dark = {
         invertColor:'#f2f3ffee',
         textMild:'#fff',
         blockColor:"#353535",
+
     }
 }
 export const light = {
@@ -37,6 +40,6 @@ export const light = {
         bgColor:'#35a2F832',
         invertColor:'#cacaca',
         textMild:'#000',
-        blockColor:"#d7d7d7",
+        blockColor:"#fffcff",
     }
 }

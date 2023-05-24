@@ -21,11 +21,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: ${p=>p.theme.colors.bgColor};
 }
-h1, h2, h3, h4, h5, h6, text, label, button, div{
-  font-family:"Pretendard-Regular";
-}
+
 * {
   box-sizing: border-box;
+  user-select: none;
+  font-family:"Pretendard-Regular";
+  color:${p=>p.theme.colors.textMild};
 }
 `;
 export default GlobalStyle;
