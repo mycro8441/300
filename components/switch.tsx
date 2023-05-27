@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 const Container = styled.div`
     position:relative;
+    padding:0px !important;
     width: 35px;
     height: 15px; 
     background-color: brown;

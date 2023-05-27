@@ -14,8 +14,10 @@ const colors = {
     pointColor2:'#5f6f9a',
     pointColor3:'#b44c34',
     pointColor4: '#c17065',
-    signatureRed: '#db4c42',
+    signatureRed: '#F23645',
     signatureBlue: '#2f48ba',
+    signatureGreen: '#2cde47',
+    signatureMint: '#089981',
 }
 
 export const dark = {

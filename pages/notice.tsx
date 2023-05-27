@@ -219,6 +219,8 @@ const AdminInput = () => {
         </Block>
     </>
 }
+
+Notice.navbar=true;
 export default function Notice() {
     const [blockList, setBlockList] = useState<BlockType[]>([
         {

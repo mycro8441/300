@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import Chat from '@/components/Chat';
+import Signal from '@/components/Signal';
 const Container = styled.div`
   width:100%;
   height:100%;
@@ -26,7 +27,7 @@ const Adjuster = styled.div`
 
   gap:10px;
 `
-const Main = styled.div`
+const MainL = styled.div`
 
   flex:1;
   height:100%;
@@ -36,14 +37,26 @@ const Main = styled.div`
   flex-direction: column;
   gap:10px;
 `
-const Sidebar = styled.div`
-  flex:0.2;
+const MainR = styled.div`
+
+  flex:0.1;
   height:100%;
-  background-color: ${p=>p.theme.colors.blockColor};
-  border-radius:20px;
   @media screen and (max-width:800px) {
     display:none;
   }
+
+  display: flex;
+  flex-direction: column;
+  gap:10px;
+`
+const Sidebar = styled.div`
+  flex:1;
+  height:100%;
+  background-color: ${p=>p.theme.colors.blockColor};
+  border-radius:20px;
+  display:flex;
+  flex-direction: column;
+  overflow: hidden;
 `
 const MediaHidden = styled.div`
   height:100%;
@@ -59,7 +72,7 @@ const ChatContainer = styled.div`
 `
 const Widget = styled.div`
   width:100%;
-  flex:0.8;
+  flex:1;
   background-color:white;
   border-radius:20px;
   overflow: hidden;
@@ -75,6 +88,7 @@ const Widget = styled.div`
     
   }
 `
+
 function Home() {
   const {data:session, status}= useSession();
   const {themeMode} = useStore();
@@ -83,22 +97,30 @@ function Home() {
     <>
       <Container>
         <Adjuster>
-          <Main>
+          <MainL>
             <Widget>
               <AdvancedRealTimeChart autosize symbol='BTCUSDT' theme={themeMode ? "dark" : "light"}/>
               <MediaHidden>
                 <TechnicalAnalysis autosize symbol='BTCUSDT' colorTheme={themeMode ? "dark" : "light"}/>
               </MediaHidden>
               
-            </Widget>    
+            </Widget>  
+            <ChatContainer>
+              
+            </ChatContainer>             
+          </MainL>
+ 
+
+          <MainR>
+            <Sidebar>
+              <Signal/>
+            </Sidebar>
             <ChatContainer>
               <Chat/>
             </ChatContainer>
+          </MainR>
 
-          </Main>
-            <Sidebar>
-              dd
-            </Sidebar>            
+                      
 
         </Adjuster>
 
@@ -107,5 +129,5 @@ function Home() {
 
   )
 }
-
+Home.navbar = true;
 export default Home

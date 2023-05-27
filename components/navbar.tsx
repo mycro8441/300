@@ -137,22 +137,26 @@ const HoverMenuOption = styled.div`
     display:flex;
     align-items: center;
     justify-content: space-between;
+
+
 `
 
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
+    const {themeMode, setThemeMode} = useStore();
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
             <HoverMenuContainer  active={active || menuHover}>
                 <div>Good to see you, {"nickname"}.</div>
                 <HoverMenuOption><div>Point:</div><div>1000</div></HoverMenuOption>
+                <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={setThemeMode}/></HoverMenuOption>
             </HoverMenuContainer>
 
     </HoverMenuAdjust>
 }
 const NavBar = () => {
     const [isHover, setIsHover] = useState<boolean>(false);
-    const {themeMode, setThemeMode} = useStore();
+
     return <>
 
     <Container>
@@ -160,7 +164,7 @@ const NavBar = () => {
        
         <SearchComponent/>
         <RightSide>
-            <PrettySwitch state={themeMode} setfunc={setThemeMode}/>
+            
             <AvatarContainer onMouseEnter={()=>{
                 setIsHover(true)
             }}
@@ -178,5 +182,6 @@ const NavBar = () => {
     </Container>
     </>
 }
+
 
 export default NavBar;

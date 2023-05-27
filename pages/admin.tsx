@@ -11,19 +11,24 @@ const Container = styled.div`
     gap:10px;
     justify-content: center;
     div {
-        border-radius: 20px;
+        border-radius:20px;
     }
 `
 const Main = styled.div`
     flex:0.8;
     height:100%;
-    background-color: ${p=>p.theme.colors.blockColor};
+   
+    display:flex;
+    flex-direction: column;
+
+
 `
 const Sidebar = styled.div`
     flex:0.2;
     height:100%;
     background-color: ${p=>p.theme.colors.blockColor};
     overflow-x:hidden; 
+    
 `
 const SidebarOption = styled.div<{activated:boolean}>`
     width:100%;
@@ -32,7 +37,7 @@ const SidebarOption = styled.div<{activated:boolean}>`
     justify-content: center;
     align-items:center;
     border-radius:0px !important;
-    background-color: ${p=>p.activated ? p.theme.colors.invertColor : p.theme.colors.blockColor};
+    background-color: ${p=>p.activated ? p.theme.colors.signatureBlue : p.theme.colors.blockColor};
     cursor:pointer;
     &:hover {
         background-color: ${p=>p.theme.colors.invertColor};
@@ -42,6 +47,7 @@ const SidebarOption = styled.div<{activated:boolean}>`
 const IndexContainer=styled.div`
     display:flex;
     flex-direction:column;
+    background-color: ${p=>p.theme.colors.blockColor};
 `
 const BubbleBox = styled.div`
     width:100%;
@@ -96,7 +102,15 @@ const PrettyTable = styled.table`
 `
 
 
+const EditBtn = styled.div`
 
+    height:1em;
+    background-color: ${p=>p.theme.colors.signatureRed};
+    justify-content: center;
+    align-items: center;
+    display:flex;
+    border-radius: 5px !important;
+`
 
 
 const Index = () => {
@@ -121,14 +135,31 @@ const Index = () => {
       const columns = useMemo(
         () => [
           {
-            Header: 'Column 1',
+            Header: 'username',
             accessor: 'col1', // accessor is the "key" in the data
           },
           {
-            Header: 'Column 2',
+            Header: 'password',
             accessor: 'col2',
           },
-          
+          {
+            Header: 'point',
+            accessor: 'col3',
+          },
+          {
+            Header: '',
+            accessor: 'col4',
+            width:20,
+            Cell: () => (
+                <>
+                    <EditBtn>
+                        Edit
+                    </EditBtn>
+                </>
+
+
+            )
+          },
         ],
         []
       )
@@ -231,6 +262,9 @@ const Options = () => {
         <Switch state={on} setfunc={setOn}/>
     </>
 }
+
+
+Admin.navbar = false;
 export default function Admin() {
     
     
@@ -238,6 +272,7 @@ export default function Admin() {
     const [mode, setMode] = useState<boolean[]>([true, false, false]);
     const lastIndex = useRef<number>(0);
     const curpage = useRef<JSX.Element>(<Index/>); // 로직상으로 ref로 설정해도 setMode로 인해서 업데이트가 필연적임
+    const curpageName = useRef<string>('Dashboard');
     const Select = i => {
         const newArray = [...mode];
         newArray[lastIndex.current] = false;
@@ -250,16 +285,25 @@ export default function Admin() {
     return <>
         <Container>
             <Sidebar>
-                <SidebarOption activated={mode[0]} onClick={()=>{curpage.current=<Index/>;Select(0)}}>
-                    Main
+                <SidebarOption activated={mode[0]} onClick={()=>{curpage.current=<Index/>;curpageName.current = "DashBoard"; Select(0)}}>
+                    Dashboard
                 </SidebarOption>
-                <SidebarOption activated={mode[1]} onClick={()=>{curpage.current=<Options/>;Select(1)}}>
-                    Options
+                <SidebarOption activated={mode[1]} onClick={()=>{curpage.current=<Options/>;curpageName.current = "Config";Select(1)}}>
+                    Config
                 </SidebarOption>
             </Sidebar>
             <Main>
+                <PageTitle>
+                    {curpageName.current}
+                </PageTitle>
                 {curpage.current}
             </Main>
         </Container>
     </>
 }
+
+const PageTitle = styled.div`
+    padding:10px;
+    font-size:4em;
+
+`

@@ -47,8 +47,10 @@ export default function MyApp({
             <button style={{position:"fixed"}} onClick={()=>setIslogined(true)}>메인으로</button>
               {isLogined ? <>
                 <Container>
-
-                  <NavBar/>
+                  {
+                    Component.navbar && <NavBar/>
+                  }
+                  
                   <Component {...pageProps} />
 
                 </Container>  
