@@ -61,14 +61,14 @@ const RightSide = styled.div`
 `
 
 const HoverMenuAdjust = styled.div`
-    position:absolute;
-    right:10px;
+    position:fixed;
+    right:40px;
     z-index:2;
     top:50px;
 
 `
 const HoverMenuContainer = styled.div<{active:boolean}>`
-    
+    overflow:hidden;
 
     margin-top:10px;
     width:${p=>p.active ? "400px" : "0px"};
@@ -85,6 +85,7 @@ const HoverMenuContainer = styled.div<{active:boolean}>`
         text-align:center;
         padding:10px;
         white-space: nowrap;
+        transition: 0.2s ease;
     }
 `
 const AvatarContainer = styled.div`
