@@ -12,6 +12,7 @@ import {dark, light} from "../styles/theme"
 import { useState } from 'react'
 import useStore from '../store';
 import NavBar from '@/components/navbar'
+import { useRouter } from 'next/router'
 const Container = styled.div`
 
   width:100vw;
@@ -27,7 +28,7 @@ export default function MyApp({
   const {themeMode, isLogined, setIsLogined} = useStore();
   const themeTray = [light, dark]; // 라이트, 다크 테마 이외의 테마 추가 대비
   const theme = themeTray[+themeMode];
-
+  const {push} = useRouter();
   return (
 
       <ThemeProvider theme={theme || light}>
@@ -36,7 +37,7 @@ export default function MyApp({
               <title>BitCoin website</title>
               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </Head>
-            <button style={{position:"fixed", color:"black"}} onClick={()=>setIsLogined(true)}>메인으로</button>
+            <button style={{position:"fixed", color:"black"}} onClick={()=>{setIsLogined(true);push("/")}}>메인으로</button>
               {isLogined ? <>
                 <Container>
                   {
