@@ -14,6 +14,7 @@ import {
   } from '@tanstack/react-table';
 import { makeData, Person } from "utils/makeData";
 import Switch from "@/components/switch";
+import { toast } from "react-toastify";
 
 const Container = styled.div`
 
@@ -180,21 +181,23 @@ const PrettySelect = styled.select`
     }
     
 `
+
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends RowData> {
       updateData: (rowIndex: number, columnId: string, value: unknown) => void
     }
-  }
+}
   
   // Give our default column cell renderer editing superpowers!
-  const defaultColumn: Partial<ColumnDef<Person>> = {
-    cell: ({ getValue, row: { index }, column: { id }, table }) => {
+const defaultColumn: Partial<ColumnDef<Person>> = {
+    cell: ({ getValue, row: { index,original }, column: { id }, table }) => {
       const initialValue = getValue()
       // We need to keep and update the state of the cell normally
       const [value, setValue] = useState(initialValue)
   
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
+        toast.info(original.name + "의 정보를 수정함, id : " + original.id);
         table.options.meta?.updateData(index, id, value)
       }
   
@@ -213,7 +216,7 @@ declare module '@tanstack/react-table' {
     },
   }
   
-  function useSkipper() {
+function useSkipper() {
     const shouldSkipRef = useRef(true)
     const shouldSkip = shouldSkipRef.current
   
@@ -240,6 +243,7 @@ const Index = () => {
           header: 'Name',
           accessorKey:'name',
           footer: props => props.column.id,
+          
         },
         {
           header: 'Password',
@@ -284,7 +288,7 @@ const Index = () => {
             )
           },
         },
-        debugTable: true,
+        debugTable: false,
       })
 
 
