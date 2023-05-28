@@ -39,7 +39,7 @@ export const light = {
         ...colors,
         titleColor: "#0B2068",
         textColor: "#0B2068",
-        bgColor:'#35a2F832',
+        bgColor:'#efefef',
         invertColor:'#cacaca',
         textMild:'#000',
         blockColor:"#fffcff",
