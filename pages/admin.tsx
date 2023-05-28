@@ -1,8 +1,20 @@
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
-import {useTable} from "react-table";
+import {
+    Column,
+    Table,
+    ColumnDef,
+    useReactTable,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    flexRender,
+    RowData,
+  } from '@tanstack/react-table';
+import { makeData, Person } from "utils/makeData";
 import Switch from "@/components/switch";
+
 const Container = styled.div`
     width:100%;
     height:100%;
@@ -113,6 +125,56 @@ const EditBtn = styled.div`
 `
 
 
+declare module '@tanstack/react-table' {
+    interface TableMeta<TData extends RowData> {
+      updateData: (rowIndex: number, columnId: string, value: unknown) => void
+    }
+  }
+  
+  // Give our default column cell renderer editing superpowers!
+  const defaultColumn: Partial<ColumnDef<Person>> = {
+    cell: ({ getValue, row: { index }, column: { id }, table }) => {
+      const initialValue = getValue()
+      // We need to keep and update the state of the cell normally
+      const [value, setValue] = useState(initialValue)
+  
+      // When the input is blurred, we'll call our table meta's updateData function
+      const onBlur = () => {
+        table.options.meta?.updateData(index, id, value)
+      }
+  
+      // If the initialValue is changed external, sync it up with our state
+      useEffect(() => {
+        setValue(initialValue)
+      }, [initialValue])
+  
+      return (
+        <input
+          value={value as string}
+          onChange={e => setValue(e.target.value)}
+          onBlur={onBlur}
+        />
+      )
+    },
+  }
+  
+  function useSkipper() {
+    const shouldSkipRef = useRef(true)
+    const shouldSkip = shouldSkipRef.current
+  
+    // Wrap a function with this to skip a pagination reset temporarily
+    const skip = useCallback(() => {
+      shouldSkipRef.current = false
+    }, [])
+  
+    useEffect(() => {
+      shouldSkipRef.current = true
+    })
+  
+    return [shouldSkip, skip] as const
+  }
+  
+
 const Index = () => {
     const data = useMemo(
         () => [
@@ -134,32 +196,53 @@ const Index = () => {
     
       const columns = useMemo(
         () => [
-          {
-            Header: 'username',
-            accessor: 'col1', // accessor is the "key" in the data
-          },
-          {
-            Header: 'password',
-            accessor: 'col2',
-          },
-          {
-            Header: 'point',
-            accessor: 'col3',
-          },
-          {
-            Header: '',
-            accessor: 'col4',
-            width:20,
-            Cell: () => (
-                <>
-                    <EditBtn>
-                        Edit
-                    </EditBtn>
-                </>
-
-
-            )
-          },
+            {
+                header: 'name',
+                footer: props => props.column.id,
+                columns: [
+                  {
+                    accessorKey: 'firstName',
+                    footer: props => props.column.id,
+                  },
+                  {
+                    accessorFn: row => row.lastName,
+                    id: 'lastName',
+                    header: () => <span>Last Name</span>,
+                    footer: props => props.column.id,
+                  },
+                ],
+              },
+              {
+                header: 'Info',
+                footer: props => props.column.id,
+                columns: [
+                  {
+                    accessorKey: 'age',
+                    header: () => 'Age',
+                    footer: props => props.column.id,
+                  },
+                  {
+                    header: 'More Info',
+                    columns: [
+                      {
+                        accessorKey: 'visits',
+                        header: () => <span>Visits</span>,
+                        footer: props => props.column.id,
+                      },
+                      {
+                        accessorKey: 'status',
+                        header: 'Status',
+                        footer: props => props.column.id,
+                      },
+                      {
+                        accessorKey: 'progress',
+                        header: 'Profile Progress',
+                        footer: props => props.column.id,
+                      },
+                    ],
+                  },
+                ],
+              },
         ],
         []
       )
