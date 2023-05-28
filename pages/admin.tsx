@@ -197,7 +197,7 @@ const defaultColumn: Partial<ColumnDef<Person>> = {
   
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
-        toast.info(`${original.name}의 정보를 수정함\nid: ${original.id}\n${id}의 값을 ${value}으로 설정함`);
+        toast.info(<div><div>{original.name}의 정보를 수정함</div><br/><div>id: {original.id}</div><br/><div><>{id}의 값을</><br/><>{value}으로 설정함</></div></div>, {position:toast.POSITION.TOP_RIGHT});
         table.options.meta?.updateData(index, id, value)
       }
   
