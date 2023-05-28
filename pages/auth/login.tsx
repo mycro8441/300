@@ -40,13 +40,14 @@ const Container = styled.div<{isChanging:boolean}>`
     max-width:70%;
     height:auto;
     animation: ${p=>p.isChanging ? css`${GoLeft} 0.4s ease forwards` : css`${GoRight} 0.4s ease forwards`};
-    background-color: white;
+    background-color: ${p=>p.theme.colors.blockColor};
     border-radius: 50px;
     padding:30px;
     text-align:center;
 
     h1 {
         margin:10px;
+        color:${p=>p.theme.colors.textMild};
     }
 `
 const Input = styled.div`
@@ -72,14 +73,14 @@ const PrettyInput = styled.input`
     height:100%;
     border-radius: 15px;
     border:none;
-    background:#dfdfdf;
+    background:${p=>p.theme.colors.bgColor};
     box-sizing:border-box;
     padding-left:15px;
 `
 const SubmitButton = styled.button<{isDisabled:boolean}>`
     height:35px;
     width:${p=>p.isDisabled ? "50%" : "60%"};
-    background-color: ${p=>p.isDisabled ? "gray" : p.theme.colors.yellow};
+    background-color: ${p=>p.isDisabled ? "gray" : p.theme.colors.signatureBlue};
     transition:0.3s ease;
     border:none;
     border-radius:30px;
@@ -91,7 +92,7 @@ const ChangeButton = styled.button<{isDisabled:boolean}>`
     margin:20px auto;
     height:${p=>p.isDisabled ? "25px" : "30px"};
     width:${p=>p.isDisabled ? "150px" : "200px"};
-    background-color: ${p=>p.isDisabled ? "gray" : p.theme.colors.yellow};
+    background-color: ${p=>p.isDisabled ? "gray" : p.theme.colors.signatureBlue};
     transition:0.3s ease;
     border:none;
     border-radius:30px;

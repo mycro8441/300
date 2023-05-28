@@ -44,7 +44,7 @@ export default function MyApp({
               <title>BitCoin website</title>
               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </Head>
-            <button style={{position:"fixed"}} onClick={()=>setIslogined(true)}>메인으로</button>
+            <button style={{position:"fixed", color:"black"}} onClick={()=>setIslogined(true)}>메인으로</button>
               {isLogined ? <>
                 <Container>
                   {
@@ -66,6 +66,7 @@ export default function MyApp({
               <ToastContainer
                   autoClose={3000}
                   draggable={false}
+                  theme={themeMode == true ? "dark" : "light"}
                 />               
 
 
