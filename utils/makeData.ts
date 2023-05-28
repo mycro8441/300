@@ -17,7 +17,7 @@ const range = (len: number) => {
 
 const newPerson = (): Person => {
   return {
-    name:faker.string.alpha(),
+    name:faker.name.firstName(),
     password:faker.string.sample(),
     points:faker.number.int(),
   }

@@ -6,7 +6,8 @@ import PrettySwitch from "./switch";
 import useStore from "../store";
 import shallow from "zustand";
 import Link from "next/link";
-
+import Cookies from 'universal-cookie';
+const cookie = new Cookies();
 const Padding = styled.div`
 
     width:100%;
@@ -20,6 +21,7 @@ const Container = styled.div`
     box-shadow: 0 0px 10px 2px #bbb;
     display:flex;
     align-items: center;
+
     justify-content: space-between;
     background-color: ${p=>p.theme.colors.blockColor};
     z-index:1000;
@@ -58,6 +60,8 @@ const SearchBar = styled.input`
 const RightSide = styled.div`
     display:flex;
     align-items: center;
+
+    gap:10px;
 `
 
 const HoverMenuAdjust = styled.div`
@@ -95,14 +99,15 @@ const AvatarContainer = styled.div`
     padding:5px;
 `
 
-const PrettyButton = styled.div<{color:string}>`
+const PrettyButton = styled.div`
     width:auto;
     height:2em;
     border-radius: 0.2em;
-    background-color: ${p=>p.color};
+    background-color: ${p=>p.theme.colors.signatureRed};
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor:pointer;
 `
 
 const SearchComponent = () => {
@@ -143,13 +148,17 @@ const HoverMenuOption = styled.div`
 
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
-    const {themeMode, setThemeMode} = useStore();
+    const {themeMode, setThemeMode, setIsLogined} = useStore();
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
             <HoverMenuContainer  active={active || menuHover}>
                 <div>Good to see you, {"nickname"}.</div>
                 <HoverMenuOption><div>Point:</div><div>1000</div></HoverMenuOption>
                 <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={setThemeMode}/></HoverMenuOption>
+                <PrettyButton onClick={()=>{
+                    cookie.remove("jwt");
+                    setIsLogined(false);
+                }}>Logout</PrettyButton>
             </HoverMenuContainer>
 
     </HoverMenuAdjust>
@@ -164,7 +173,8 @@ const NavBar = () => {
        
         <SearchComponent/>
         <RightSide>
-            
+            <Link href="/admin">admin{"<dev>"}</Link>
+            <Link href="/notice">notice</Link>
             <AvatarContainer onMouseEnter={()=>{
                 setIsHover(true)
             }}

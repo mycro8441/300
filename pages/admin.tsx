@@ -1,5 +1,5 @@
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import styled from "styled-components";
 import {
     Column,
@@ -16,34 +16,38 @@ import { makeData, Person } from "utils/makeData";
 import Switch from "@/components/switch";
 
 const Container = styled.div`
+
+    overflow-y:auto;
     width:100%;
     height:100%;
     padding:20px;
+    padding-bottom:50px;
     display:flex;  
     gap:10px;
     justify-content: center;
     div {
         border-radius:20px;
     }
+
+
 `
 const Main = styled.div`
-    flex:0.8;
-    height:100%;
-   
+
+    flex:0.9;
+
     display:flex;
-    flex-direction: column;
-
-
+    flex-direction:column;
 `
 const Sidebar = styled.div`
-    flex:0.2;
+    flex:0.1;
+    
     height:100%;
     background-color: ${p=>p.theme.colors.blockColor};
-    overflow-x:hidden; 
+    overflow-x:hidden;
     
 `
 const SidebarOption = styled.div<{activated:boolean}>`
-    width:100%;
+
     height:2em;
     display:flex;
     justify-content: center;
@@ -62,9 +66,22 @@ const IndexContainer=styled.div`
     background-color: ${p=>p.theme.colors.blockColor};
 `
 const BubbleBox = styled.div`
-    width:100%;
-    height:auto;
-    padding:0.4em;
+    padding:10px;
+    background-color: ${p=>p.theme.colors.blockColor};
+
+`
+const PrettyButton = styled.button`
+    width:auto;
+    height:2em;
+    border-radius: 0.2em;
+    background-color: ${p=>p.theme.colors.signatureBlue};
+    border:none;
+    border-radius: 1em;
+    display: flex;
+    padding:5px;
+    justify-content: center;
+    align-items: center;
+    cursor:pointer;
 `
 const Searchbar = styled.div`
     width:100%;
@@ -89,31 +106,47 @@ const SubmitBtn = styled.div`
 const PrettyTable = styled.table`
     width:100%;
     height:auto;
+
     border-collapse: collapse;
     border-radius:10px;
     box-shadow: 0 0 0 2px #fff;
     thead > tr {
         border-bottom: 2px solid ${p=>p.theme.colors.invertColor};
 
-        th::after {
-            content:'';
-            width:1px;
-            position:absolute;
-            top:0;
-            left:0;
-            bottom:0;
-            background-color: white;
-        }
     }
     td {
             text-align:center;
     }
+    input {
+        width:100%;
+        max-height:2em;
+        border-radius: 15px;
+        border:none;
+        background:${p=>p.theme.colors.bgColor};
 
+        padding-left:15px;
+    }
+    input[type=number]::-webkit-inner-spin-button {
+    }
 
 
 `
 
+const MiniInput = styled.input`
+    min-width:10em;
+    width:auto;
+    height:2em;
+    margin:10px;
+    border-radius: 15px;
+    border:none;
+    background:${p=>p.theme.colors.bgColor};
+    box-sizing:border-box;
+    padding-left:15px;
 
+    &::-webkit-inner-spin-button {
+        display: none;
+    }
+`
 const EditBtn = styled.div`
 
     height:1em;
@@ -124,7 +157,29 @@ const EditBtn = styled.div`
     border-radius: 5px !important;
 `
 
-
+const ButtonPlate = styled.div`
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    gap:0.5rem;
+    
+`
+const PrettySpan = styled.span`
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    gap:1em;
+`
+const PrettySelect = styled.select`
+    background-color: ${p=>p.theme.colors.bgColor};
+    border:none;
+    border-radius: 1em;
+    padding:5px;
+    option {
+        border:none;
+    }
+    
+`
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends RowData> {
       updateData: (rowIndex: number, columnId: string, value: unknown) => void
@@ -176,167 +231,183 @@ declare module '@tanstack/react-table' {
   
 
 const Index = () => {
-    const data = useMemo(
-        () => [
-          {
-            col1: 'Hello',
-            col2: 'World',
+
+    const rerender = useReducer(() => ({}), {})[1]
+
+    const columns = useMemo<ColumnDef<Person>[]>(
+      () => [
+        {
+          header: 'Name',
+          accessorKey:'name',
+          footer: props => props.column.id,
+        },
+        {
+          header: 'Password',
+          accessorKey:'password',
+          footer: props => props.column.id,
+        },
+        {
+            header: 'Points',
+            accessorKey:'points',
+            footer: props => props.column.id,
+        },
+      ],
+      []
+    )
+    const [data, setData] = useState(() => makeData(1000))
+    const refreshData = () => setData(() => makeData(1000))
+  
+    const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper()
+    const table = useReactTable({
+        data,
+        columns,
+        defaultColumn,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        autoResetPageIndex,
+        // Provide our updateData function to our table meta
+        meta: {
+          updateData: (rowIndex, columnId, value) => {
+            // Skip page index reset until after next rerender
+            skipAutoResetPageIndex()
+            setData(old =>
+              old.map((row, index) => {
+                if (index === rowIndex) {
+                  return {
+                    ...old[rowIndex]!,
+                    [columnId]: value,
+                  }
+                }
+                return row
+              })
+            )
           },
-          {
-            col1: 'react-table',
-            col2: 'rocks',
-          },
-          {
-            col1: 'whatever',
-            col2: 'you want',
-          },
-        ],
-        []
-      )
-    
-      const columns = useMemo(
-        () => [
-            {
-                header: 'name',
-                footer: props => props.column.id,
-                columns: [
-                  {
-                    accessorKey: 'firstName',
-                    footer: props => props.column.id,
-                  },
-                  {
-                    accessorFn: row => row.lastName,
-                    id: 'lastName',
-                    header: () => <span>Last Name</span>,
-                    footer: props => props.column.id,
-                  },
-                ],
-              },
-              {
-                header: 'Info',
-                footer: props => props.column.id,
-                columns: [
-                  {
-                    accessorKey: 'age',
-                    header: () => 'Age',
-                    footer: props => props.column.id,
-                  },
-                  {
-                    header: 'More Info',
-                    columns: [
-                      {
-                        accessorKey: 'visits',
-                        header: () => <span>Visits</span>,
-                        footer: props => props.column.id,
-                      },
-                      {
-                        accessorKey: 'status',
-                        header: 'Status',
-                        footer: props => props.column.id,
-                      },
-                      {
-                        accessorKey: 'progress',
-                        header: 'Profile Progress',
-                        footer: props => props.column.id,
-                      },
-                    ],
-                  },
-                ],
-              },
-        ],
-        []
-      )
-    
-      const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-        //@ts-ignore
-      } = useTable({ columns, data })
+        },
+        debugTable: true,
+      })
 
 
-    return <>
-        <IndexContainer>
+      return (
+        <>
             <BubbleBox>
-                <Searchbar>
-                    <input placeholder="Search"/>
-                    <SubmitBtn>
-                        Search
-                    </SubmitBtn>
-                </Searchbar>
-            </BubbleBox>
-            <BubbleBox>
-                <PrettyTable {...getTableProps()}>
-                    <thead>
-                        {headerGroups.map(headerGroup=>(
-                            <tr {...headerGroup.getHeaderGroupProps()}>
-                                {headerGroup.headers.map(column=>(
-                                    <th {...column.getHeaderProps()}>
-                                        {column.render('Header')}
-                                    </th>
-                                ))}
-                            </tr>                            
-                        ))}
-
-                    </thead>
-                    <tbody {...getTableBodyProps()}>
-                        {rows.map(row=>{
-                            prepareRow(row);
-                            return (
-                                <tr {...row.getRowProps()}>
-                                    {row.cells.map(cell=> {
-                                        return (
-                                           <td {...cell.getCellProps()}>
-                                                {cell.render('Cell')}
-                                           </td> 
-                                        )
-                                    })}
-                                    
-                                </tr>                                
-                            )
+            <PrettyTable>
+                <thead>
+                {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                    {headerGroup.headers.map(header => {
+                        return (
+                        <th key={header.id} colSpan={header.colSpan}>
+                            {header.isPlaceholder ? null : (
+                            <div>
+                                {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                                )}
+                                {header.column.getCanFilter() ? (
+                                <div>
+                                    <Filter column={header.column} table={table} />
+                                </div>
+                                ) : null}
+                            </div>
+                            )}
+                        </th>
+                        )
+                    })}
+                    </tr>
+                ))}
+                </thead>
+                <tbody>
+                {table.getRowModel().rows.map(row => {
+                    return (
+                    <tr key={row.id}>
+                        {row.getVisibleCells().map(cell => {
+                        return (
+                            <td key={cell.id}>
+                            {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                            )}
+                            </td>
+                        )
                         })}
+                    </tr>
+                    )
+                })}
+                </tbody>
+            </PrettyTable>
+            <ButtonPlate>
+                <PrettyButton
+                onClick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
+                >
+                {'<<'}
+                </PrettyButton>
+                <PrettyButton
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                >
+                {'<'}
+                </PrettyButton>
+                <PrettyButton
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                >
+                {'>'}
+                </PrettyButton>
+                <PrettyButton
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+                >
+                {'>>'}
+                </PrettyButton>
+                <PrettySpan>
+                <div>Page</div>
+                <strong>
+                    {table.getState().pagination.pageIndex + 1} of{' '}
+                    {table.getPageCount()}
+                </strong>
+                </PrettySpan>
+                <PrettySpan>
+                | Go to page:
+                <MiniInput
+                    type="number"
+                    min={0}
+                    defaultValue={table.getState().pagination.pageIndex + 1}
+                    onChange={e => {
+                    const page = e.target.value ? Number(e.target.value) - 1 : 0
+                    table.setPageIndex(page)
+                
+                    }}
+                />
+                </PrettySpan>
+                <PrettySelect
+                value={table.getState().pagination.pageSize}
+                onChange={e => {
+                    table.setPageSize(Number(e.target.value))
+                }}
+                >
+                {[10, 20, 30].map(pageSize => (
+                    <option key={pageSize} value={pageSize}>
+                    Show {pageSize}
+                    </option>
+                ))}
+                </PrettySelect>
+            </ButtonPlate>
+            <ButtonPlate>
+                <div>{table.getRowModel().rows.length} Rows</div>
+                <div>
+                    <PrettyButton onClick={() => rerender()}>Force Rerender</PrettyButton>
+                </div>
+                <div>
+                    <PrettyButton onClick={() => refreshData()}>Refresh Data</PrettyButton>
+                </div>            
+            </ButtonPlate>
+            </BubbleBox>     
+ 
+        </>
 
-                    </tbody>
-                </PrettyTable>
-            </BubbleBox>
-            <BubbleBox>
-                <PrettyTable {...getTableProps()}>
-                    <thead>
-                        {headerGroups.map(headerGroup=>(
-                            <tr {...headerGroup.getHeaderGroupProps()}>
-                                {headerGroup.headers.map(column=>(
-                                    <th {...column.getHeaderProps()}>
-                                        {column.render('Header')}
-                                    </th>
-                                ))}
-                            </tr>                            
-                        ))}
-
-                    </thead>
-                    <tbody {...getTableBodyProps()}>
-                        {rows.map(row=>{
-                            prepareRow(row);
-                            return (
-                                <tr {...row.getRowProps()}>
-                                    {row.cells.map(cell=> {
-                                        return (
-                                           <td {...cell.getCellProps()}>
-                                                {cell.render('Cell')}
-                                           </td> 
-                                        )
-                                    })}
-                                    
-                                </tr>                                
-                            )
-                        })}
-
-                    </tbody>
-                </PrettyTable>
-            </BubbleBox>
-        </IndexContainer>
-    </>
+      )
 }
 const Options = () => {
     const [on, setOn] = useState<boolean>(false);
@@ -345,7 +416,53 @@ const Options = () => {
         <Switch state={on} setfunc={setOn}/>
     </>
 }
-
+function Filter({
+    column,
+    table,
+  }: {
+    column: Column<any, any>
+    table: Table<any>
+  }) {
+    const firstValue = table
+      .getPreFilteredRowModel()
+      .flatRows[0]?.getValue(column.id)
+  
+    const columnFilterValue = column.getFilterValue()
+  
+    return typeof firstValue === 'number' ? (
+      <div style={{display:"flex", gap:"5px"}}>
+        <input
+          type="number"
+          value={(columnFilterValue as [number, number])?.[0] ?? ''}
+          onChange={e =>
+            column.setFilterValue((old: [number, number]) => [
+              e.target.value,
+              old?.[1],
+            ])
+          }
+          placeholder={`Min`}
+        />
+        <input
+          type="number"
+          value={(columnFilterValue as [number, number])?.[1] ?? ''}
+          onChange={e =>
+            column.setFilterValue((old: [number, number]) => [
+              old?.[0],
+              e.target.value,
+            ])
+          }
+          placeholder={`Max`}
+        />
+      </div>
+    ) : (
+      <input
+        type="text"
+        value={(columnFilterValue ?? '') as string}
+        onChange={e => column.setFilterValue(e.target.value)}
+        placeholder={`Search...`}
+      />
+    )
+  }
 
 Admin.navbar = false;
 export default function Admin() {
@@ -379,7 +496,9 @@ export default function Admin() {
                 <PageTitle>
                     {curpageName.current}
                 </PageTitle>
+
                 {curpage.current}
+
             </Main>
         </Container>
     </>
@@ -388,5 +507,4 @@ export default function Admin() {
 const PageTitle = styled.div`
     padding:10px;
     font-size:4em;
-
 `

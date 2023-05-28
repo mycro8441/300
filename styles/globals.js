@@ -27,6 +27,7 @@ body {
   user-select: none;
   font-family:"Pretendard-Regular";
   color:${p=>p.theme.colors.textMild};
+  text-decoration: none;
 }
 `;
 export default GlobalStyle;

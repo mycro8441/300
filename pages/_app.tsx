@@ -24,27 +24,19 @@ export default function MyApp({
   Component,
   pageProps: { session, ...pageProps }
 }) {
-  const {themeMode} = useStore();
+  const {themeMode, isLogined, setIsLogined} = useStore();
   const themeTray = [light, dark]; // 라이트, 다크 테마 이외의 테마 추가 대비
   const theme = themeTray[+themeMode];
 
-  const [isLogined, setIslogined] = useState<boolean>(false); // dev
   return (
-    <SessionProvider session={session}>
+
       <ThemeProvider theme={theme || light}>
-        <SWRConfig
-          value={{
-            revalidateOnFocus: false,
-            fetcher: (resource, init) =>
-              fetch(resource, init).then((res) => res.json())
-          }}
-        >
             <GlobalStyle/>
             <Head>
               <title>BitCoin website</title>
               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </Head>
-            <button style={{position:"fixed", color:"black"}} onClick={()=>setIslogined(true)}>메인으로</button>
+            <button style={{position:"fixed", color:"black"}} onClick={()=>setIsLogined(true)}>메인으로</button>
               {isLogined ? <>
                 <Container>
                   {
@@ -68,24 +60,8 @@ export default function MyApp({
                   draggable={false}
                   theme={themeMode == true ? "dark" : "light"}
                 />               
-
-
-
-        </SWRConfig>
       </ThemeProvider>
-    </SessionProvider>
+
   )
 }
 
-function Auth({ children }) {
-  const { status } = useSession()
-  //DEV
-  //return children;
-  if (status === "loading") {
-    return <div>Loading...</div>
-  } else if(status==="unauthenticated") {
-    return <Login/>  
-  } else {
-    return children
-  }
-}

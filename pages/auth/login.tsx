@@ -6,6 +6,12 @@ import EmailIcon from '@mui/icons-material/Email';
 import { ErrorSharp, Visibility, VisibilityOff } from "@mui/icons-material";
 import * as yup from 'yup';
 import {yupResolver} from '@hookform/resolvers/yup';
+import axios from "axios";
+import Cookies from 'universal-cookie';
+import {useRouter} from 'next/navigation';
+import useStore from "@/store/index";
+const cookies = new Cookies();
+
 const Adjuster = styled.div`
     display:flex;
     justify-content: center;
@@ -114,6 +120,9 @@ export default function Login({}) {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
     const [mode, setMode] = useState<"login"|"signin">("login");
+    const {setIsLogined} = useStore();
+    const {push} = useRouter();
+
     const validate = {
         email: (value:string)=>{
             if(!value) {
@@ -153,8 +162,18 @@ export default function Login({}) {
         e.preventDefault();
         if(mode === 'login') {
             if(validate['email'](input.email) && validate['password'](input.password)) {
-                toast.success("로그인을 요청하였습니다.")
                 setIsSubmitting(true);
+                axios.post("http://49.50.166.9:8080/authenticate", {
+                    username:"asd",
+                    password:"sex",
+                }).then(res=>{
+                    toast.success("로그인 성공!");
+                    setIsLogined(true);
+                    //push('/');
+                    cookies.set('jwt', res.data, {httpOnly:true, path:"/"});
+                }).finally(()=>setIsSubmitting(false));
+
+                
             }            
         } else {
             if(validate['email'](input.email) && validate['password'](input.password) && validate['passwordConfirm'](input.passwordConfirm)) {

@@ -90,7 +90,6 @@ const Widget = styled.div`
 `
 
 function Home() {
-  const {data:session, status}= useSession();
   const {themeMode} = useStore();
 
   return (
