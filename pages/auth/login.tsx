@@ -3,7 +3,7 @@ import {Resolver, useForm} from "react-hook-form";
 import {toast} from "react-toastify";
 import { useEffect, useRef, useState } from "react";
 import EmailIcon from '@mui/icons-material/Email';
-import { Call, ErrorSharp, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Call, ErrorSharp, InputSharp, Visibility, VisibilityOff } from "@mui/icons-material";
 import * as yup from 'yup';
 import {yupResolver} from '@hookform/resolvers/yup';
 import axios from "axios";
@@ -105,12 +105,16 @@ const ChangeButton = styled.button<{isDisabled:boolean}>`
     color:white;
     cursor:pointer;
 `
-const CodeContainer = styled.div`
+const CodeContainer = styled.div<{done:boolean}>`
     display:flex;
     gap:10px;
     width:100%;
     justify-content: space-between;
     margin-top:20px;
+
+    opacity: ${p=>p.done ? 0:1};
+    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
     input {
         border:none;
         width:100%;
@@ -124,7 +128,14 @@ const CodeContainer = styled.div`
 
     }
 `
-
+const LoadingText = styled.div<{done:boolean}>`
+    position:absolute;
+    opacity: ${p=>p.done ? 1:0};
+    left:50%;
+    transform: translateX(-50%);
+    width:80%;
+    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+`
 type FormValues = {
     email:string;
     phoneNumber:string;
@@ -141,7 +152,9 @@ export default function Login({}) {
     const [visible, setVisible] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
-    const [mode, setMode] = useState<"login"|"signin"|"validate">("login");
+    const [mode, setMode] = useState<"login"|"signin"|"validate">("login"); // ref로 바꿈 예정
+
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const {setIsLogined} = useStore();
 
     const validate = {
@@ -213,10 +226,15 @@ export default function Login({}) {
 
                 setIsSubmitting(true);
                 setIsChanging(true);
+
+                setTimeout(()=>{
+                    setIsLoading(false);
+                }, 1000);
+
                 setTimeout(()=>{
                     setMode("validate");
                     setIsSubmitting(false);
-                    setInput({email:'', password:'', passwordConfirm:'', phoneNumber:''})
+                    //setInput({email:'', password:'', passwordConfirm:'', phoneNumber:''})
                     setIsChanging(false);
                 }, 400);
             }
@@ -255,15 +273,17 @@ export default function Login({}) {
                 <Container isChanging={isChanging}>
 
                     <h1>이메일 인증</h1>
-                    <CodeContainer>
-                        {[...Array(6)].map((_, i)=><>
-                            <div>
-                                <input key={i} type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
-                            </div>                        
-                        </>)}
-                    
-  
-                    </CodeContainer>
+                        <LoadingText done={isLoading}>인증 번호를 {input.email}로 전송 중...</LoadingText>
+                        <CodeContainer done={isLoading}>
+                            {[...Array(6)].map((_, i)=><>
+                                <div>
+                                    <input key={i} type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
+                                </div>                        
+                            </>)}
+                        
+    
+                        </CodeContainer>                    
+
                 </Container>
             
             </> : <>
