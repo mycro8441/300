@@ -110,13 +110,14 @@ const CodeContainer = styled.div`
     gap:10px;
     width:100%;
     justify-content: space-between;
+    margin-top:20px;
     input {
         border:none;
         width:100%;
         height:1.2em;
         background-color: ${p=>p.theme.colors.bgColor};
         border-radius: 5px;
-        font-size:2.8em;
+        font-size:2em;
         outline:none;
         text-align:center;
 
@@ -132,7 +133,7 @@ type FormValues = {
 };
 const emailRex = /^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
 const pwRex = /(?=.*\d{1,50})(?=.*[~`!@#$%\^&*()-+=]{1,50})(?=.*[a-zA-Z]{2,50}).{8,50}$/;
-const regPhone= /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+const regPhone= /^01([0|1|6|7|8|9])?([0-9]{3,4})?([0-9]{4})$/;
 export default function Login({}) {
 
 
@@ -212,11 +213,6 @@ export default function Login({}) {
 
                 setIsSubmitting(true);
                 setIsChanging(true);
-
-                axios.post("/api/sendEmail", input.email).then(res=>{
-                    console.log(res);
-                });
-
                 setTimeout(()=>{
                     setMode("validate");
                     setIsSubmitting(false);
