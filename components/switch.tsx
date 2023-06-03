@@ -14,7 +14,7 @@ const Ball = styled.div<{active:boolean}>`
     position: absolute;
     width:18px;
     height:18px;
-    transform:translate(-1px, -1px);
+    transform:translate(-2px, -2px);
     left:${p=>p.active ? "20px" : "0px"};
     transition:0.2s ease;
     border-radius:10px;

@@ -3,7 +3,7 @@ import {Resolver, useForm} from "react-hook-form";
 import {toast} from "react-toastify";
 import { useEffect, useState } from "react";
 import EmailIcon from '@mui/icons-material/Email';
-import { ErrorSharp, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Call, ErrorSharp, Visibility, VisibilityOff } from "@mui/icons-material";
 import * as yup from 'yup';
 import {yupResolver} from '@hookform/resolvers/yup';
 import axios from "axios";
@@ -19,7 +19,7 @@ const Adjuster = styled.div`
     flex-direction: column;
     width:100vw;
     height:100vh;
-
+    min-height:500px;
 `
 const GoLeft = keyframes`
     0% {
@@ -90,7 +90,7 @@ const SubmitButton = styled.button<{isDisabled:boolean}>`
     transition:0.3s ease;
     border:none;
     border-radius:30px;
-    color:${p=>p.theme.textColor};
+    color:white;
     cursor:pointer;
 `
 const ChangeButton = styled.button<{isDisabled:boolean}>`
@@ -102,16 +102,18 @@ const ChangeButton = styled.button<{isDisabled:boolean}>`
     transition:0.3s ease;
     border:none;
     border-radius:30px;
-    color:${p=>p.theme.textColor};
+    color:white;
     cursor:pointer;
 `
 type FormValues = {
     email:string;
+    phoneNumber:string;
     password:string;
     passwordConfirm:string;
 };
 const emailRex = /^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
 const pwRex = /(?=.*\d{1,50})(?=.*[~`!@#$%\^&*()-+=]{1,50})(?=.*[a-zA-Z]{2,50}).{8,50}$/;
+const regPhone= /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
 export default function Login({}) {
 
 
@@ -156,7 +158,18 @@ export default function Login({}) {
                 return false;
             }
             return true;
-        }
+        },
+        phoneNumber: (value:string)=>{
+            if(!value) {
+                toast.error("전화번호를 입력해주세요.");
+                return false;
+            }
+            if(!regPhone.test(value)) {
+                toast.error("올바른 전화번호를 입력해주세요.");
+                return false;
+            }
+            return true;
+        },
     }
     const onSubmit = (e) => {
         e.preventDefault();
@@ -176,7 +189,7 @@ export default function Login({}) {
                 
             }            
         } else {
-            if(validate['email'](input.email) && validate['password'](input.password) && validate['passwordConfirm'](input.passwordConfirm)) {
+            if(validate['email'](input.email) && validate['password'](input.password) && validate['passwordConfirm'](input.passwordConfirm) && validate['phoneNumber'](input.phoneNumber)) {
                 toast.success("회원가입을 요청하였습니다.")
                 setIsSubmitting(true);
             }
@@ -189,13 +202,14 @@ export default function Login({}) {
         email:'',
         password:'',
         passwordConfirm:'',
+        phoneNumber:'',
     })
     const changeMode = ()=>{
         setIsChanging(true);
         setTimeout(()=>{
             setMode(val=>val === "login" ? "signin" : "login");
             setIsSubmitting(false);
-            setInput({email:'', password:'', passwordConfirm:''})
+            setInput({email:'', password:'', passwordConfirm:'', phoneNumber:''})
             setIsChanging(false);
         }, 400);
     }
@@ -239,6 +253,11 @@ export default function Login({}) {
                     </Input>
                     <Input>
                         <PrettyInput type={visible ? "text" : "password"} name="passwordConfirm" onChange={onChange} value={input.passwordConfirm} placeholder="비밀번호 확인"/>
+                    </Input>
+                    <Input>
+                        <PrettyInput name="phoneNumber" value={input.phoneNumber} onChange={onChange}
+                        placeholder="전화번호"/>
+                        <Call fontSize="small"/>
                     </Input>
                     <SubmitButton type="submit" isDisabled={isSubmitting} disabled={isSubmitting}>회원가입</SubmitButton>
                 </form>   
