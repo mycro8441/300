@@ -13,6 +13,7 @@ import { useState } from 'react'
 import useStore from '../store';
 import NavBar from '@/components/navbar'
 import { useRouter } from 'next/router'
+import axios from 'axios'
 const Container = styled.div`
 
   width:100vw;
@@ -29,10 +30,16 @@ export default function MyApp({
   const themeTray = [light, dark]; // 라이트, 다크 테마 이외의 테마 추가 대비
   const theme = themeTray[+themeMode];
   const {push} = useRouter();
+
+  
   return (
 
       <ThemeProvider theme={theme || light}>
-            <GlobalStyle/>
+        <GlobalStyle/>
+        <SWRConfig value={{
+        fetcher: (url: string) => axios.get(url).then((res) => res.data),
+      }}>
+            
             <Head>
               <title>BitCoin website</title>
               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -56,11 +63,14 @@ export default function MyApp({
               </main>
               </Container>      
               </Auth>        */}
-              <ToastContainer
-                  autoClose={3000}
-                  draggable={false}
-                  theme={themeMode == true ? "dark" : "light"}
-                />               
+
+
+        </SWRConfig>
+        <ToastContainer
+          autoClose={3000}
+          draggable={false}
+          theme={themeMode == true ? "dark" : "light"}
+        />    
       </ThemeProvider>
 
   )

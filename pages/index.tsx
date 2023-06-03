@@ -9,6 +9,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import Chat from '@/components/Chat';
 import Signal from '@/components/Signal';
+import useSWR from 'swr';
 const Container = styled.div`
   width:100%;
   height:100%;
@@ -31,7 +32,7 @@ const MainL = styled.div`
 
   flex:1;
   height:100%;
-
+  min-height:200px;
 
   display: flex;
   flex-direction: column;
@@ -51,7 +52,7 @@ const MainR = styled.div`
 `
 const Sidebar = styled.div`
   flex:1;
-  height:100%;
+  min-height:200px;
   background-color: ${p=>p.theme.colors.blockColor};
   border-radius:20px;
   display:flex;
@@ -67,6 +68,8 @@ const MediaHidden = styled.div`
 `
 const ChatContainer = styled.div`
   flex:0.4;
+  flex-basis:0%;
+  min-height:100px;
   background-color: ${p=>p.theme.colors.blockColor};
   border-radius:20px;
 `

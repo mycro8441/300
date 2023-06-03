@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import {useTable} from "react-table";
 import { RemoveRedEye } from "@mui/icons-material";
+import useSWR from "swr";
 
 const dummydata = [ 
     {
@@ -110,16 +111,22 @@ const PayBtn  =styled.div`
     align-items: center;
     background-color: ${p=>p.theme.colors.signatureBlue};
 `
+
+type Signal = {
+    coin:string;
+    id:number;
+    localDateTime:string;
+    long_short:string;
+    min:number;
+    num:string;
+}
+
 export default function Signal() {
 
 
     
 
-    const data = useMemo(
-        () => dummydata ,    
-        []
-      )
-    
+    const { data, error } = useSWR<Signal[]>("http://49.247.43.169:8080/webhook/get/signal");
       const columns = useMemo(
         () => [
           {
@@ -168,7 +175,7 @@ export default function Signal() {
         rows,
         prepareRow,
         //@ts-ignore
-      } = useTable({ columns, data })
+      } = useTable({ columns, data:data??[] })
 
     return <>
             <BubbleBox>
@@ -187,7 +194,7 @@ export default function Signal() {
 
                     </thead>
                     <tbody {...getTableBodyProps()}>
-                        {rows.map(row=>{
+                        {rows?.map(row=>{
                             prepareRow(row);
                             return (
                                 <tr {...row.getRowProps()}>

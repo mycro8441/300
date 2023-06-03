@@ -15,6 +15,7 @@ import {
 import { makeData, Person } from "utils/makeData";
 import Switch from "@/components/switch";
 import { toast } from "react-toastify";
+import useSWR from "swr";
 
 const Container = styled.div`
 
@@ -258,8 +259,9 @@ const Index = () => {
       ],
       []
     )
-    const [data, setData] = useState(() => makeData(1000))
-    const refreshData = () => setData(() => makeData(1000))
+
+
+    const {data, error, mutate} = useSWR(`http://49.247.43.169:8080/get/user/all`)
   
     const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper()
     const table = useReactTable({
@@ -275,17 +277,18 @@ const Index = () => {
           updateData: (rowIndex, columnId, value) => {
             // Skip page index reset until after next rerender
             skipAutoResetPageIndex()
-            setData(old =>
-              old.map((row, index) => {
-                if (index === rowIndex) {
-                  return {
-                    ...old[rowIndex]!,
-                    [columnId]: value,
-                  }
-                }
-                return row
-              })
-            )
+            // setData(old =>
+            //   old.map((row, index) => {
+            //     console.log(old)
+            //     if (index === rowIndex) {
+            //       return {
+            //         ...old[rowIndex]!,
+            //         [columnId]: value,
+            //       }
+            //     }
+            //     return row
+            //   })
+            // )
           },
         },
         debugTable: false,
@@ -295,118 +298,122 @@ const Index = () => {
       return (
         <>
             <BubbleBox>
-            <PrettyTable>
-                <thead>
-                {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                    {headerGroup.headers.map(header => {
-                        return (
-                        <th key={header.id} colSpan={header.colSpan}>
-                            {header.isPlaceholder ? null : (
-                            <div>
-                                {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                                )}
-                                {header.column.getCanFilter() ? (
-                                <div>
-                                    <Filter column={header.column} table={table} />
-                                </div>
-                                ) : null}
-                            </div>
-                            )}
-                        </th>
-                        )
-                    })}
-                    </tr>
-                ))}
-                </thead>
-                <tbody>
-                {table.getRowModel().rows.map(row => {
-                    return (
-                    <tr key={row.id}>
-                        {row.getVisibleCells().map(cell => {
-                        return (
-                            <td key={cell.id}>
-                            {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                            )}
-                            </td>
-                        )
-                        })}
-                    </tr>
-                    )
-                })}
-                </tbody>
-            </PrettyTable>
-            <ButtonPlate>
-                <PrettyButton
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-                >
-                {'<<'}
-                </PrettyButton>
-                <PrettyButton
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                >
-                {'<'}
-                </PrettyButton>
-                <PrettyButton
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                >
-                {'>'}
-                </PrettyButton>
-                <PrettyButton
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-                >
-                {'>>'}
-                </PrettyButton>
-                <PrettySpan>
-                <div>Page</div>
-                <strong>
-                    {table.getState().pagination.pageIndex + 1} of{' '}
-                    {table.getPageCount()}
-                </strong>
-                </PrettySpan>
-                <PrettySpan>
-                | Go to page:
-                <MiniInput
-                    type="number"
-                    min={0}
-                    defaultValue={table.getState().pagination.pageIndex + 1}
-                    onChange={e => {
-                    const page = e.target.value ? Number(e.target.value) - 1 : 0
-                    table.setPageIndex(page)
+              {data&&<>
+              <PrettyTable>
                 
-                    }}
-                />
-                </PrettySpan>
-                <PrettySelect
-                value={table.getState().pagination.pageSize}
-                onChange={e => {
-                    table.setPageSize(Number(e.target.value))
-                }}
-                >
-                {[10, 20, 30].map(pageSize => (
-                    <option key={pageSize} value={pageSize}>
-                    Show {pageSize}
-                    </option>
-                ))}
-                </PrettySelect>
-            </ButtonPlate>
-            <ButtonPlate>
-                <div>{table.getRowModel().rows.length} Rows</div>
-                <div>
-                    <PrettyButton onClick={() => rerender()}>Force Rerender</PrettyButton>
-                </div>
-                <div>
-                    <PrettyButton onClick={() => refreshData()}>Refresh Data</PrettyButton>
-                </div>            
-            </ButtonPlate>
+                  <thead>
+                  {table?.getHeaderGroups().map(headerGroup => (
+                      <tr key={headerGroup.id}>
+                      {headerGroup.headers.map(header => {
+                          return (
+                          <th key={header.id} colSpan={header.colSpan}>
+                              {header.isPlaceholder ? null : (
+                              <div>
+                                  {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                  )}
+                                  {header.column.getCanFilter() ? (
+                                  <div>
+                                      <Filter column={header.column} table={table} />
+                                  </div>
+                                  ) : null}
+                              </div>
+                              )}
+                          </th>
+                          )
+                      })}
+                      </tr>
+                  ))}
+                  </thead>
+                  <tbody>
+                  {table?.getRowModel().rows.map(row => {
+                      return (
+                      <tr key={row.id}>
+                          {row.getVisibleCells().map(cell => {
+                          return (
+                              <td key={cell.id}>
+                              {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                              )}
+                              </td>
+                          )
+                          })}
+                      </tr>
+                      )
+                  })}
+                  </tbody>
+              </PrettyTable>
+              <ButtonPlate>
+                  <PrettyButton
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                  >
+                  {'<<'}
+                  </PrettyButton>
+                  <PrettyButton
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                  >
+                  {'<'}
+                  </PrettyButton>
+                  <PrettyButton
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                  >
+                  {'>'}
+                  </PrettyButton>
+                  <PrettyButton
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                  >
+                  {'>>'}
+                  </PrettyButton>
+                  <PrettySpan>
+                  <div>Page</div>
+                  <strong>
+                      {table.getState().pagination.pageIndex + 1} of{' '}
+                      {table.getPageCount()}
+                  </strong>
+                  </PrettySpan>
+                  <PrettySpan>
+                  | Go to page:
+                  <MiniInput
+                      type="number"
+                      min={0}
+                      defaultValue={table.getState().pagination.pageIndex + 1}
+                      onChange={e => {
+                      const page = e.target.value ? Number(e.target.value) - 1 : 0
+                      table.setPageIndex(page)
+                  
+                      }}
+                  />
+                  </PrettySpan>
+                  <PrettySelect
+                  value={table.getState().pagination.pageSize}
+                  onChange={e => {
+                      table.setPageSize(Number(e.target.value))
+                  }}
+                  >
+                  {[10, 20, 30].map(pageSize => (
+                      <option key={pageSize} value={pageSize}>
+                      Show {pageSize}
+                      </option>
+                  ))}
+                  </PrettySelect>
+              </ButtonPlate>
+              <ButtonPlate>
+                  <div>{table.getRowModel().rows.length} Rows</div>
+                  <div>
+                      <PrettyButton onClick={() => rerender()}>Force Rerender</PrettyButton>
+                  </div>
+                  <div>
+                      <PrettyButton onClick={() => mutate()}>Refresh Data</PrettyButton>
+                  </div>            
+              </ButtonPlate>              
+              </>}
+
             </BubbleBox>     
  
         </>

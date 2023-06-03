@@ -3,6 +3,7 @@ import { Avatar } from "@mui/material";
 import Image from "next/image";
 import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
+import useSWR from "swr";
 
 type sliderType = 0|1;
 const abs = (n:number) => n < 0 ? -n : n;
@@ -293,7 +294,7 @@ export default function Notice() {
         
     }
     , []);
-
+    const {data, error, mutate} = useSWR(`http://49.247.43.169:8080/get/user/all`)
     const topRef = useRef<HTMLDivElement>(null); // 맨 위로 가기를 위한 ref
     const onTopBtnClick = () => {
         topRef.current?.focus();
