@@ -1,7 +1,7 @@
 import styled, {keyframes, css} from "styled-components"
 import {Resolver, useForm} from "react-hook-form";
 import {toast} from "react-toastify";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EmailIcon from '@mui/icons-material/Email';
 import { Call, ErrorSharp, Visibility, VisibilityOff } from "@mui/icons-material";
 import * as yup from 'yup';
@@ -105,6 +105,25 @@ const ChangeButton = styled.button<{isDisabled:boolean}>`
     color:white;
     cursor:pointer;
 `
+const CodeContainer = styled.div`
+    display:flex;
+    gap:10px;
+    width:100%;
+    justify-content: space-between;
+    input {
+        border:none;
+        width:100%;
+        height:1.2em;
+        background-color: ${p=>p.theme.colors.bgColor};
+        border-radius: 5px;
+        font-size:2.8em;
+        outline:none;
+        text-align:center;
+
+
+    }
+`
+
 type FormValues = {
     email:string;
     phoneNumber:string;
@@ -121,9 +140,8 @@ export default function Login({}) {
     const [visible, setVisible] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
-    const [mode, setMode] = useState<"login"|"signin">("login");
+    const [mode, setMode] = useState<"login"|"signin"|"validate">("login");
     const {setIsLogined} = useStore();
-    const {push} = useRouter();
 
     const validate = {
         email: (value:string)=>{
@@ -190,8 +208,21 @@ export default function Login({}) {
             }            
         } else {
             if(validate['email'](input.email) && validate['password'](input.password) && validate['passwordConfirm'](input.passwordConfirm) && validate['phoneNumber'](input.phoneNumber)) {
-                toast.success("회원가입을 요청하였습니다.")
+                // signup
+
                 setIsSubmitting(true);
+                setIsChanging(true);
+
+                axios.post("/api/sendEmail", input.email).then(res=>{
+                    console.log(res);
+                });
+
+                setTimeout(()=>{
+                    setMode("validate");
+                    setIsSubmitting(false);
+                    setInput({email:'', password:'', passwordConfirm:'', phoneNumber:''})
+                    setIsChanging(false);
+                }, 400);
             }
         }
 
@@ -220,51 +251,72 @@ export default function Login({}) {
             [name]:value
         })
     }
+
+    const inputRefs = useRef([]);
     return <Adjuster>
-            {mode === "login" ? <Container isChanging={isChanging}>
-                <h1>로그인</h1>
-                <form onSubmit={onSubmit}>
-                    <Input>
-                        <PrettyInput name="email" value={input.email} onChange={onChange}
-                        placeholder="이메일"/>
-                        <EmailIcon fontSize="small"/>
-                    </Input>
-                    <Input>
-                        <PrettyInput type={visible ? "text" : "password"} name="password" onChange={onChange} value={input.password} placeholder="비밀번호"/>
-                        <div onClick={()=>setVisible(state=>!state)} style={{cursor:"pointer"}}>
-                            {visible ? <Visibility fontSize="small"/> : <VisibilityOff fontSize="small"/>}
-                        </div>
-                    </Input>
-                    <SubmitButton type="submit" isDisabled={isSubmitting} disabled={isSubmitting}>로그인</SubmitButton>
-                </form>            
-            </Container> : <Container isChanging={isChanging}>
-            <h1>회원가입</h1>
-                <form onSubmit={onSubmit}>
-                    <Input>
-                        <PrettyInput name="email" value={input.email} onChange={onChange}
-                        placeholder="이메일"/>
-                        <EmailIcon fontSize="small"/>
-                    </Input>
-                    <Input>
-                        <PrettyInput type={visible ? "text" : "password"} name="password" onChange={onChange} value={input.password} placeholder="비밀번호"/>
-                        <div onClick={()=>setVisible(state=>!state)} style={{cursor:"pointer"}}>
-                            {visible ? <Visibility fontSize="small"/> : <VisibilityOff fontSize="small"/>}
-                        </div>
-                    </Input>
-                    <Input>
-                        <PrettyInput type={visible ? "text" : "password"} name="passwordConfirm" onChange={onChange} value={input.passwordConfirm} placeholder="비밀번호 확인"/>
-                    </Input>
-                    <Input>
-                        <PrettyInput name="phoneNumber" value={input.phoneNumber} onChange={onChange}
-                        placeholder="전화번호"/>
-                        <Call fontSize="small"/>
-                    </Input>
-                    <SubmitButton type="submit" isDisabled={isSubmitting} disabled={isSubmitting}>회원가입</SubmitButton>
-                </form>   
-            </Container>}
-            <ChangeButton onClick={changeMode} isDisabled={isChanging} disabled={isChanging}>
-                {mode==="login" ? "회원가입으로" : "로그인으로"}
-            </ChangeButton>
+            {mode === "validate" ? <>
+
+                <Container isChanging={isChanging}>
+
+                    <h1>이메일 인증</h1>
+                    <CodeContainer>
+                        {[...Array(6)].map((_, i)=><>
+                            <div>
+                                <input key={i} type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
+                            </div>                        
+                        </>)}
+                    
+  
+                    </CodeContainer>
+                </Container>
+            
+            </> : <>
+                {mode === "login" ? <Container isChanging={isChanging}>
+                    <h1>로그인</h1>
+                    <form onSubmit={onSubmit}>
+                        <Input>
+                            <PrettyInput name="email" value={input.email} onChange={onChange}
+                            placeholder="이메일"/>
+                            <EmailIcon fontSize="small"/>
+                        </Input>
+                        <Input>
+                            <PrettyInput type={visible ? "text" : "password"} name="password" onChange={onChange} value={input.password} placeholder="비밀번호"/>
+                            <div onClick={()=>setVisible(state=>!state)} style={{cursor:"pointer"}}>
+                                {visible ? <Visibility fontSize="small"/> : <VisibilityOff fontSize="small"/>}
+                            </div>
+                        </Input>
+                        <SubmitButton type="submit" isDisabled={isSubmitting} disabled={isSubmitting}>로그인</SubmitButton>
+                    </form>            
+                </Container> : <Container isChanging={isChanging}>
+                <h1>회원가입</h1>
+                    <form onSubmit={onSubmit}>
+                        <Input>
+                            <PrettyInput name="email" value={input.email} onChange={onChange}
+                            placeholder="이메일"/>
+                            <EmailIcon fontSize="small"/>
+                        </Input>
+                        <Input>
+                            <PrettyInput type={visible ? "text" : "password"} name="password" onChange={onChange} value={input.password} placeholder="비밀번호"/>
+                            <div onClick={()=>setVisible(state=>!state)} style={{cursor:"pointer"}}>
+                                {visible ? <Visibility fontSize="small"/> : <VisibilityOff fontSize="small"/>}
+                            </div>
+                        </Input>
+                        <Input>
+                            <PrettyInput type={visible ? "text" : "password"} name="passwordConfirm" onChange={onChange} value={input.passwordConfirm} placeholder="비밀번호 확인"/>
+                        </Input>
+                        <Input>
+                            <PrettyInput name="phoneNumber" value={input.phoneNumber} onChange={onChange}
+                            placeholder="전화번호"/>
+                            <Call fontSize="small"/>
+                        </Input>
+                        <SubmitButton type="submit" isDisabled={isSubmitting} disabled={isSubmitting}>회원가입</SubmitButton>
+                    </form>   
+                </Container>}
+                <ChangeButton onClick={changeMode} isDisabled={isChanging} disabled={isChanging}>
+                    {mode==="login" ? "회원가입으로" : "로그인으로"}
+                </ChangeButton>            
+            </>}
+
             
 
 
