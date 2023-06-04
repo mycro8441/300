@@ -95,6 +95,11 @@ const Widget = styled.div`
 function Home() {
   const {themeMode} = useStore();
 
+  useEffect(()=>{
+    axios.get("/api/crawl").then(res=>{
+      console.log(res.data);
+    })
+  }, [])
   return (
     <>
       <Container>
@@ -131,5 +136,16 @@ function Home() {
 
   )
 }
+// export async function getStaticProps() {
+//   const { data } = await axios.get('https://sigbtc.pro/')
+//   const $ = cheerio.load(data)
+//   const title = $('.RSIRate').text()
+//   const lastScraped = new Date().toISOString()
+//   return {
+//     props: { title, lastScraped},
+//     revalidate: 10, // rerun after 10 seconds
+//   }
+// }
 Home.navbar = true;
 export default Home
+

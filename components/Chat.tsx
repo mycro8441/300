@@ -111,7 +111,7 @@ const ChatDisplay = () => {
     </>
 }
 const DisplayContainer = styled.div`
-
+    flex:1;
     width:100%;
     max-height:200px;
     overflow-y:auto;
