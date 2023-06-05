@@ -176,6 +176,7 @@ const NavBar = () => {
         <RightSide>
             <Link href="/admin">admin{"<dev>"}</Link>
             <Link href="/notice">notice</Link>
+            <Link href="/pay">pay</Link>
             <AvatarContainer onMouseEnter={()=>{
                 setIsHover(true)
             }}

@@ -179,7 +179,7 @@ export default function Signal() {
 
     return <>
             <BubbleBox>
-                <PayBtn>최근 시그널 1개 보기</PayBtn>
+                <PayBtn>현재 시그널 보기</PayBtn>
                 <PrettyTable {...getTableProps()}>
                     <thead>
                         {headerGroups.map(headerGroup=>(
