@@ -15,7 +15,7 @@ const Container = styled.div`
   height:100%;
   display: flex;
   justify-content: center;
-  
+  flex-grow:0;
 `
 const Adjuster = styled.div`
   
@@ -55,8 +55,7 @@ const Sidebar = styled.div`
   min-height:200px;
   background-color: ${p=>p.theme.colors.blockColor};
   border-radius:20px;
-  display:flex;
-  flex-direction: column;
+
   overflow: hidden;
 `
 const MediaHidden = styled.div`
@@ -73,6 +72,37 @@ const ChatContainer = styled.div`
   background-color: ${p=>p.theme.colors.blockColor};
   border-radius:20px;
 `
+const RateContainer = styled.div`
+  height:80px;
+  display:flex;
+  gap:10px;
+`
+const Progressbar = styled.div<{tcolor:number}>`
+    background-color: ${p=>p.theme.colors.bgColor};
+  border-radius: 1em;
+  /* (height of inner div) / 2 + padding */
+
+  div {
+    background-color: ${p=>p.tcolor === 0 ? "white" : p.tcolor === 1 ? p.theme.colors.signatureRed : p.tcolor === 2 ? p.theme.colors.signatureBlue : "orange"};
+    width: 40%;
+    /* Adjust with JavaScript */
+    height: 10px;
+    border-radius: 1em;
+  }
+`
+
+const RateBox = styled.div`
+  height:100%;
+  flex:1;
+  border-radius: 20px;
+  background-color: ${p=>p.theme.colors.blockColor};
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding:1.2em 1em;
+
+`
+
 const Widget = styled.div`
   width:100%;
   flex:1;
@@ -95,11 +125,7 @@ const Widget = styled.div`
 function Home() {
   const {themeMode} = useStore();
 
-  useEffect(()=>{
-    axios.get("/api/crawl").then(res=>{
-      console.log(res.data);
-    })
-  }, [])
+
   return (
     <>
       <Container>
@@ -112,9 +138,40 @@ function Home() {
               </MediaHidden>
               
             </Widget>  
-            <ChatContainer>
-              
-            </ChatContainer>             
+            <RateContainer>
+              <RateBox>
+                <div>
+                  공포 / 탐욕 지수 : 
+                </div>
+                <Progressbar tcolor={1}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div>
+                  강도 지수 (RSI) : 
+                </div>
+                <Progressbar tcolor={0}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div>
+                    스토캐스틱 : 
+                </div>
+                <Progressbar tcolor={0}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div>
+                  트랜드 : 
+                </div>
+                <Progressbar tcolor={2}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+            </RateContainer>
           </MainL>
  
 
