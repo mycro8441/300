@@ -26,7 +26,7 @@ const Container = styled.div`
 `
 const ThankTitle = styled.div`
     color:${p=>p.theme.colors.signatureBlue};
-    font-size:1.6em;
+    font-size:1.6em; 
     font-weight:bold;
 `
 const PrettyNumber = styled.div`
