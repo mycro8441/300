@@ -1,5 +1,7 @@
+import Pay_point from "@/components/payments/Paybtn"
 import { ArrowBack, Backspace } from "@mui/icons-material"
 import { Avatar } from "@mui/material"
+import axios from "axios"
 import { useEffect, useRef, useState } from "react"
 import styled, { css, keyframes } from "styled-components"
 
@@ -60,8 +62,8 @@ const UserContainer = styled.div<{inited:boolean}>`
 const UserProperty = styled.div`
     display:flex;
     flex-direction: column;
-    text-align: right;
-
+    align-items: flex-end;
+    justify-content: space-between;
 `
 const PayContainer = styled.div<{inited:boolean}>`
     width:100%;
@@ -104,6 +106,21 @@ const BackBtn = styled.div`
     align-items: center;
     cursor:pointer;
 `
+const PrettyNumber = styled.div`
+    font-size:1em;
+    height:1.2em;
+    padding:0 10px;
+    transition: 0.3s ease;
+    border-radius: 10px;
+    background-color: ${p=>p.theme.colors.bgColor};
+    color:${p=>p.theme.colors.signatureBlue};
+    font-weight: bold;
+`
+const NumberContainer = styled.div`
+    display:flex;
+    gap:5px;
+    text-align: right;
+`
 const Pay = () => {
 
     const [inited, setInited] = useState<boolean>(false);
@@ -128,10 +145,20 @@ const Pay = () => {
                     <UserProperty>
                         {mode.current === "confirm" ? <>
                             <span>nickname</span>
-                            <span>point : 1000</span>
+                            <NumberContainer>
+                                <span>현재 포인트 : </span>
+                                <PrettyNumber>1000</PrettyNumber>
+                            </NumberContainer>
                         </>:<>
-                            <span>현재 포인트 : 1000</span>
-                            <span>충전할 포인트 : 30000</span>
+                            <NumberContainer>
+                                <span>현재 포인트 : </span>
+                                <PrettyNumber>1000</PrettyNumber>
+                            </NumberContainer>
+                            <div style={{display:"flex", gap:"5px"}}>
+                                <span>충전할 포인트 : </span>
+                                <PrettyNumber>30000</PrettyNumber>
+                            </div>
+                            
                         </>}
                     </UserProperty>  
 
@@ -150,7 +177,7 @@ const Pay = () => {
                     </NextBtn>                
                 </>:<>
                     <BackBtn onClick={changeMode}><ArrowBack/>뒤로</BackBtn>
-                    <h1>결제</h1>
+                    {Pay_point({amount:30000})}
                 </>}
 
             </PayContainer>

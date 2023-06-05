@@ -125,7 +125,6 @@ const Widget = styled.div`
 function Home() {
   const {themeMode} = useStore();
 
-
   return (
     <>
       <Container>

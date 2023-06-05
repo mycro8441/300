@@ -8,7 +8,7 @@ interface serviceI {
 }
 const useStore = create<serviceI>(set=>({
     themeMode:true,
-    isLogined:false,
+    isLogined:true,
     setIsLogined:(value:boolean)=>set(()=>({isLogined:value})),
     setThemeMode:(value:boolean)=>set(()=>({themeMode:value})),
     toggleTheme: () => set(state=>({themeMode:!state.themeMode}))
