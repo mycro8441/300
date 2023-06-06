@@ -31,6 +31,6 @@ export default function Pay_point({amount}:{amount:number}) {
     
 
     return <NextBtn onClick={handleClick}>
-        결제
+        토스로 결제
     </NextBtn>
 }
