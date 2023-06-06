@@ -177,6 +177,8 @@ const Pay = () => {
                     </NextBtn>                
                 </>:<>
                     <BackBtn onClick={changeMode}><ArrowBack/>뒤로</BackBtn>
+                    <p>센트코인 지갑 주소 : 0x2430Fb3DB4fba6391a65ffc94704042bd5Bc86a9</p>
+          
                     {Pay_point({amount:30000})}
                 </>}
 
