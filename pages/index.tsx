@@ -5,11 +5,9 @@ import TradingViewTechWidget from "../components/technicalAnalysis";
 import {AdvancedRealTimeChart, TechnicalAnalysis, MarketData} from "react-ts-tradingview-widgets";
 import useStore from '../store';
 import { useEffect } from 'react';
-import axios from 'axios';
-import * as cheerio from 'cheerio';
+
 import Chat from '@/components/Chat';
 import Signal from '@/components/Signal';
-import useSWR from 'swr';
 const Container = styled.div`
   width:100%;
   height:100%;
@@ -123,7 +121,7 @@ const Widget = styled.div`
 `
 
 function Home() {
-  const {themeMode} = useStore();
+  const {themeMode, curPair} = useStore();
 
   return (
     <>
@@ -131,9 +129,9 @@ function Home() {
         <Adjuster>
           <MainL>
             <Widget>
-              <AdvancedRealTimeChart autosize symbol='BTCUSDT' theme={themeMode ? "dark" : "light"}/>
+              <AdvancedRealTimeChart autosize symbol={curPair} theme={themeMode ? "dark" : "light"}/>
               <MediaHidden>
-                <TechnicalAnalysis autosize symbol='BTCUSDT' colorTheme={themeMode ? "dark" : "light"}/>
+                <TechnicalAnalysis autosize symbol={curPair} colorTheme={themeMode ? "dark" : "light"}/>
               </MediaHidden>
               
             </Widget>  

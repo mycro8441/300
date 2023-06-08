@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import {useTable} from "react-table";
 import { RemoveRedEye } from "@mui/icons-material";
 import useSWR from "swr";
-
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+import useStore from "../store";
 const dummydata = [ 
     {
     "min": 1,
@@ -92,6 +94,11 @@ const PrettyTable = styled.table`
 
 
 `
+const Adjust = styled.div`
+    display:flex;
+    flex-direction: column;
+    gap:10px;
+`
 const BubbleBox = styled.div`
     width:100%;
     height:100%;
@@ -111,6 +118,46 @@ const PayBtn  =styled.div`
     align-items: center;
     background-color: ${p=>p.theme.colors.signatureBlue};
 `
+const OptionBlock = styled.div`
+    height:100px;
+    width:100%;
+    background-color: ${p=>p.theme.colors.blockColor};
+    border-radius: 20px;
+
+    div {
+        margin:5px;
+        padding:0;
+        margin-top:10px;
+        border:none;
+        border-radius: 10px;
+    }
+    div > div {
+        background-color: ${p=>p.theme.colors.signatureBlue};
+    }
+    div > div:last-child {
+        div:hover {
+            background-color: #232f80;
+            color:white;
+        }
+        
+    }
+    div > div > div {
+        padding-left:5px;
+    }
+`
+const SelectBar = styled.div`
+    display:flex;
+    background-color: ${p=>p.theme.colors.bgColor};
+    border-radius: 10px;
+    height:2em;
+    width:100%;
+
+`
+const SelectBox = styled.div<{selected:boolean}>`
+    flex:1;
+    height:100%;
+
+`
 
 type Signal = {
     coin:string;
@@ -120,11 +167,51 @@ type Signal = {
     min:number;
     num:string;
 }
-
+const options = [
+    "BTCUSDT",
+    "ETHUSDT",
+    "XRPUSDT",
+    "ADAUSDT",
+    "DOGEUSDT",
+    "MATICUSDT",
+    "SOLUSDT",
+    "DOTUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "AVAXUSDT",
+    "LINKUSDT",
+    "UNIUSDT",
+    "ATOMUSDT",
+    "ETCUSDT",
+    "XMRUSDT",
+    "XLMUSDT",
+    "BCHUSDT",
+    "FILUSDT",
+    "LDOUSDT",
+    "APTUSDT",
+    "VETUSDT",
+    "NEARUSDT",
+    "ALGOUSDT",
+    "APEUSDT",
+    "ARBUSDT",
+    "ICPUSDT",
+    "QNTUSDT",
+    "EOSUSDT",
+    "GRTUSDT",
+    "FTMUSDT",
+    "STXUSDT",
+    "MANAUSDT",
+    "AAVEUSDT",
+    "THETAUSDT",
+    "XTZUSDT",
+    "AXSUSDT",
+    "SANDUSDT",
+]
 export default function Signal() {
-
-
+    const {curPair, setCurPair} = useStore();
+    const curOp = useRef<string>(curPair ?? options[0]);
     
+    const [mode, setMode] = useState<0|1|2>(0);
 
     const { data, error } = useSWR<Signal[]>("http://49.247.43.169:8080/webhook/get/signal");
       const columns = useMemo(
@@ -176,8 +263,24 @@ export default function Signal() {
         prepareRow,
         //@ts-ignore
       } = useTable({ columns, data:data??[] })
+    const onSelect = e => {
+        setCurPair(e.value)
+    }
+    return <Adjust>
+            <OptionBlock>
+                <Dropdown options={options} onChange={onSelect} value={curOp.current}/>
+                <SelectBar>
+                    <SelectBox selected={mode === 0}>
 
-    return <>
+                    </SelectBox>
+                    <SelectBox selected={mode === 1}>
+                        
+                    </SelectBox>
+                    <SelectBox selected={mode === 2}>
+                    
+                    </SelectBox>
+                </SelectBar>
+            </OptionBlock>
             <BubbleBox>
                 <PayBtn>현재 시그널 보기</PayBtn>
                 <PrettyTable {...getTableProps()}>
@@ -214,5 +317,5 @@ export default function Signal() {
                     </tbody>
                 </PrettyTable>
             </BubbleBox>
-    </>
+    </Adjust>
 }
