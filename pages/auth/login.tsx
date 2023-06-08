@@ -298,8 +298,8 @@ export default function Login({}) {
                         <LoadingText done={isLoading}>인증 번호를 {input.email}로 전송 중...</LoadingText>
                         <CodeContainer onSubmit={onCodeSubmit} done={isLoading}>
                             {[...Array(6)].map((_, i)=><>
-                                <div>
-                                    <input key={i} type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
+                                <div key={i}>
+                                    <input type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
                                 </div>                        
                             </>)}
                             
