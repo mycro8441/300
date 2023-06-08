@@ -47,7 +47,7 @@ const Container = styled.div<{isChanging:boolean}>`
     height:auto;
     animation: ${p=>p.isChanging ? css`${GoLeft} 0.4s ease forwards` : css`${GoRight} 0.4s ease forwards`};
     background-color: ${p=>p.theme.colors.blockColor};
-    border-radius: 50px;
+    border-radius: 30px;
     padding:30px;
     text-align:center;
 
@@ -77,7 +77,7 @@ const PrettyInput = styled.input`
     
     width:100%;
     height:100%;
-    border-radius: 15px;
+    border-radius: 10px;
     border:none;
     background:${p=>p.theme.colors.bgColor};
     box-sizing:border-box;

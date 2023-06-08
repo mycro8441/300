@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react'
-import TradingViewWidget from "../components/TradingViewWidget"
-import TradingViewTechWidget from "../components/technicalAnalysis";
 import {AdvancedRealTimeChart, TechnicalAnalysis, MarketData} from "react-ts-tradingview-widgets";
 import useStore from '../store';
 import { useEffect } from 'react';

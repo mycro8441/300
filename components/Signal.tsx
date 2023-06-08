@@ -135,10 +135,21 @@ const OptionBlock = styled.div`
         background-color: ${p=>p.theme.colors.signatureBlue};
     }
     div > div:last-child {
-        div:hover {
-            background-color: #232f80;
+        div {
             color:white;
         }
+        div:hover {
+            background-color: #232f80;
+        }
+        &::-webkit-scrollbar {
+        width:10px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: black;
+        border-radius: 10px;
+        background-clip:padding-box;
+        border:2px solid transparent;
+    }
         
     }
     div > div > div {
@@ -215,7 +226,6 @@ const options = [
 ]
 export default function Signal() {
     const {curPair, setCurPair} = useStore();
-    const curOp = useRef<string>(curPair ?? options[0]);
     
     const [mode, setMode] = useState<0|1|2>(0);
 
@@ -274,7 +284,7 @@ export default function Signal() {
     }
     return <Adjust>
             <OptionBlock>
-                <Dropdown options={options} onChange={onSelect} value={curOp.current}/>
+                <Dropdown options={options} onChange={onSelect} value={curPair + ".P"}/>
                 <SelectBar>
                     <SelectBox onClick={()=>setMode(0)} selected={mode === 0}>
                         3M
