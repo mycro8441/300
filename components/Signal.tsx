@@ -150,13 +150,19 @@ const SelectBar = styled.div`
     background-color: ${p=>p.theme.colors.bgColor};
     border-radius: 10px;
     height:2em;
-    width:100%;
-
+    overflow:hidden;
+    margin:10px !important;
 `
 const SelectBox = styled.div<{selected:boolean}>`
     flex:1;
     height:100%;
-
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    margin:0 !important;
+    border-radius:0 !important;
+    background-color:${p=>p.selected ? `${p.theme.colors.signatureBlue} !important`:`${p.theme.colors.bgColor} !important`};
+    cursor:pointer;
 `
 
 type Signal = {
@@ -270,14 +276,14 @@ export default function Signal() {
             <OptionBlock>
                 <Dropdown options={options} onChange={onSelect} value={curOp.current}/>
                 <SelectBar>
-                    <SelectBox selected={mode === 0}>
-
+                    <SelectBox onClick={()=>setMode(0)} selected={mode === 0}>
+                        3M
                     </SelectBox>
-                    <SelectBox selected={mode === 1}>
-                        
+                    <SelectBox onClick={()=>setMode(1)} selected={mode === 1}>
+                        10M
                     </SelectBox>
-                    <SelectBox selected={mode === 2}>
-                    
+                    <SelectBox onClick={()=>setMode(2)} selected={mode === 2}>
+                        30M
                     </SelectBox>
                 </SelectBar>
             </OptionBlock>
