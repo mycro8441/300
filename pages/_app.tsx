@@ -1,6 +1,5 @@
 import GlobalStyle from 'styles/globals'
 import 'react-toastify/dist/ReactToastify.css'
-import { SessionProvider, useSession } from 'next-auth/react'
 import { SWRConfig } from 'swr'
 import { ToastContainer } from 'react-toastify'
 import { ThemeProvider } from 'styled-components'
