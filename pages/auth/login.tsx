@@ -137,7 +137,7 @@ const LoadingText = styled.div<{done:boolean}>`
     z-index:1;
     transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 `
-const CodeSubmit = styled.div`
+const CodeSubmit = styled.div<{done:boolean}>`
     height:25px;
     width:100%;
     background-color: ${p=>p.theme.colors.signatureBlue};
@@ -151,6 +151,8 @@ const CodeSubmit = styled.div`
     display:flex;
     justify-content: center;
     align-items: center;
+    opacity: ${p=>p.done ? 0:1};
+    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 `
 type FormValues = {
     email:string;
@@ -304,7 +306,7 @@ export default function Login({}) {
                             
     
                         </CodeContainer>                    
-                        <CodeSubmit onClick={onCodeSubmit}>인증하기</CodeSubmit>
+                        <CodeSubmit done={isLoading} onClick={onCodeSubmit}>인증하기</CodeSubmit>
                 </Container>
             
             </> : <>
