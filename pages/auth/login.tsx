@@ -105,13 +105,13 @@ const ChangeButton = styled.button<{isDisabled:boolean}>`
     color:white;
     cursor:pointer;
 `
-const CodeContainer = styled.div<{done:boolean}>`
+const CodeContainer = styled.form<{done:boolean}>`
     display:flex;
     gap:10px;
     width:100%;
     justify-content: space-between;
     margin-top:20px;
-
+    z-index:2;
     opacity: ${p=>p.done ? 0:1};
     transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
@@ -134,7 +134,23 @@ const LoadingText = styled.div<{done:boolean}>`
     left:50%;
     transform: translateX(-50%);
     width:80%;
+    z-index:1;
     transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+`
+const CodeSubmit = styled.div`
+    height:25px;
+    width:100%;
+    background-color: ${p=>p.theme.colors.signatureBlue};
+    transition:0.3s ease;
+    border:none;
+    border-radius:30px;
+    color:white;
+    cursor:pointer;
+    margin:auto;
+    margin-top: 1em;
+    display:flex;
+    justify-content: center;
+    align-items: center;
 `
 type FormValues = {
     email:string;
@@ -267,6 +283,10 @@ export default function Login({}) {
     }
 
     const inputRefs = useRef([]);
+
+    const onCodeSubmit =()=> {
+
+    }
     return <Adjuster>
             {mode === "validate" ? <>
 
@@ -274,16 +294,17 @@ export default function Login({}) {
 
                     <h1>이메일 인증</h1>
                         <LoadingText done={isLoading}>인증 번호를 {input.email}로 전송 중...</LoadingText>
-                        <CodeContainer done={isLoading}>
+                        <CodeContainer onSubmit={onCodeSubmit} done={isLoading}>
                             {[...Array(6)].map((_, i)=><>
                                 <div>
                                     <input key={i} type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
                                 </div>                        
                             </>)}
-                        
+                            
+                            
     
                         </CodeContainer>                    
-
+                        <CodeSubmit onClick={onCodeSubmit}>인증하기</CodeSubmit>
                 </Container>
             
             </> : <>
