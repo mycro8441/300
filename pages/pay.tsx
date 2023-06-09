@@ -116,6 +116,7 @@ const PrettyNumber = styled.div`
     background-color: ${p=>p.theme.colors.bgColor};
     color:${p=>p.theme.colors.signatureBlue};
     font-weight: bold;
+    user-select: all;
 `
 const NumberContainer = styled.div`
     display:flex;
