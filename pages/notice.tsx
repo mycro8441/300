@@ -223,27 +223,6 @@ const AdminInput = () => {
 
 Notice.navbar=true;
 export default function Notice() {
-    const [blockList, setBlockList] = useState<BlockType[]>([
-        {
-            email:"owner",
-            timeStamp: new Date().getTime(),
-            content:"ㅎㅇㅎㅇㅇ",
-
-        },
-        {
-            email:"owner",
-            timeStamp: new Date().getTime(),
-            content:"ㅎㅇ",
-
-
-        },
-        {
-            email:"owner",
-            timeStamp: new Date().getTime(),
-            content:"ㅎㅇ",
-        }
-
-    ]);
 
 
     const SliderComponent =() => { // 모드가 변함에 따라 업데이트해주기 때문에 state를 밖으로 뺌
@@ -294,7 +273,7 @@ export default function Notice() {
         
     }
     , []);
-    const {data, error, mutate} = useSWR(`http://49.247.43.169:8080/get/user/all`)
+    const {data, error, mutate} = useSWR<BlockType[]>(`http://49.247.43.169:8080/get/notice`)
     const topRef = useRef<HTMLDivElement>(null); // 맨 위로 가기를 위한 ref
     const onTopBtnClick = () => {
         topRef.current?.focus();
@@ -306,7 +285,7 @@ export default function Notice() {
                 <BlockAdjuster>
                     <BlockSlider ref={topRef}>
                         <AdminInput/>
-                        {blockList.map((obj, i)=>(
+                        {data?.map((obj, i)=>(
 
                                 <Block key={i}>
                                     <BlockHeader>

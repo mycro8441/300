@@ -182,16 +182,25 @@ const PrettySelect = styled.select`
     }
     
 `
-
+const BanBtn = styled.button`
+  background-color: ${p=>p.theme.colors.signatureRed};
+  border:none;
+  border-radius: 6px;
+`
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends RowData> {
       updateData: (rowIndex: number, columnId: string, value: unknown) => void
     }
 }
+const BanUser = () => {
   
+}
   // Give our default column cell renderer editing superpowers!
 const defaultColumn: Partial<ColumnDef<Person>> = {
     cell: ({ getValue, row: { index,original }, column: { id }, table }) => {
+      if(id === "Ban") {
+        return <BanBtn value={original.name}>BAN</BanBtn>
+      }
       const initialValue = getValue()
       // We need to keep and update the state of the cell normally
       const [value, setValue] = useState(initialValue)
@@ -257,11 +266,8 @@ const Index = () => {
             footer: props => props.column.id,
         },
         {
-          id:"ban",
-          accessorKey:"ban",
-          Cell:({value})=>(
-            <button>Ban</button>
-          )
+          width:300,
+          header:"Ban",
         }
       ],
       []

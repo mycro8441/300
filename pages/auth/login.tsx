@@ -106,6 +106,7 @@ const ChangeButton = styled.button<{isDisabled:boolean}>`
     cursor:pointer;
 `
 const CodeContainer = styled.form<{done:boolean}>`
+    position:relative;
     display:flex;
     gap:10px;
     width:100%;
@@ -134,7 +135,7 @@ const LoadingText = styled.div<{done:boolean}>`
     left:50%;
     transform: translateX(-50%);
     width:80%;
-    z-index:1;
+    z-index:0;
     transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 `
 const CodeSubmit = styled.div<{done:boolean}>`
@@ -288,14 +289,18 @@ export default function Login({}) {
     const inputRefs = useRef([]);
 
     const onCodeSubmit =()=> {
-
+        let code = "";
+        for(let i=0;i<6;i++) {
+            code += inputRefs.current[i].value;
+        }
+        
     }
     return <Adjuster>
             {mode === "validate" ? <>
 
                 <Container isChanging={isChanging}>
-                    {isValidated ? <>
-                        
+                    {isValidated.current ? <>
+                        k
                     </>:<>
                         <h1>이메일 인증</h1>
                         <LoadingText done={isLoading}>인증 번호를 {input.email}로 전송 중...</LoadingText>
