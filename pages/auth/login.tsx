@@ -10,6 +10,7 @@ import axios from "axios";
 import Cookies from 'universal-cookie';
 import {useRouter} from 'next/navigation';
 import useStore from "@/store/index";
+import Link from "next/link";
 const cookies = new Cookies();
 
 const Adjuster = styled.div`
@@ -293,14 +294,26 @@ export default function Login({}) {
         for(let i=0;i<6;i++) {
             code += inputRefs.current[i].value;
         }
-        
+        //some api validation logic
+
+        // if validated, set "isValidated" ref to true
+
+        setIsChanging(true);
+        setTimeout(()=>{
+            isValidated.current = true;
+            setIsChanging(false);
+        }, 300);
     }
     return <Adjuster>
             {mode === "validate" ? <>
 
                 <Container isChanging={isChanging}>
                     {isValidated.current ? <>
-                        k
+                        <h2>인증이 완료되었습니다</h2>
+
+                        <SubmitButton onClick={()=>setIsLogined(true)} isDisabled={false}>메인으로</SubmitButton>
+
+                        
                     </>:<>
                         <h1>이메일 인증</h1>
                         <LoadingText done={isLoading}>인증 번호를 {input.email}로 전송 중...</LoadingText>
