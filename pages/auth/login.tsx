@@ -165,7 +165,9 @@ type FormValues = {
 const emailRex = /^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
 const pwRex = /(?=.*\d{1,50})(?=.*[~`!@#$%\^&*()-+=]{1,50})(?=.*[a-zA-Z]{2,50}).{8,50}$/;
 const regPhone= /^01([0|1|6|7|8|9])?([0-9]{3,4})?([0-9]{4})$/;
-export default function Login({}) {
+
+
+export default function Login() {
 
 
 
@@ -230,12 +232,10 @@ export default function Login({}) {
             if(validate['email'](input.email) && validate['password'](input.password)) {
                 setIsSubmitting(true);
                 axios.post("http://49.50.166.9:8080/authenticate", {
-                    username:"asd",
-                    password:"sex",
+                    username:input.email,
+                    password:input.password,
                 }).then(res=>{
-                    toast.success("로그인 성공!");
                     setIsLogined(true);
-                    //push('/');
                     cookies.set('jwt', res.data, {httpOnly:true, path:"/"});
                 }).finally(()=>setIsSubmitting(false));
 
@@ -296,6 +296,14 @@ export default function Login({}) {
         }
         //some api validation logic
 
+        // api login logic
+        axios.post("http://49.50.166.9:8080/authenticate", {
+            username:input.email,
+            password:input.password,
+        }).then(res=>{
+            setIsLogined(true);
+            cookies.set('jwt', res.data, {httpOnly:true, path:"/"});
+        })
         // if validated, set "isValidated" ref to true
 
         setIsChanging(true);
