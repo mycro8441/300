@@ -256,13 +256,20 @@ const Index = () => {
             accessorKey:'points',
             footer: props => props.column.id,
         },
+        {
+          id:"ban",
+          accessorKey:"ban",
+          Cell:({value})=>(
+            <button>Ban</button>
+          )
+        }
       ],
       []
     )
 
 
-    const {data, error, mutate} = useSWR(`http://49.247.43.169:8080/get/user/all`)
-  
+    //const {data, error, mutate} = useSWR(`http://49.247.43.169:8080/get/user/all`)
+    const data = useMemo(()=>makeData(1000), []); 
     const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper()
     const table = useReactTable({
         data,
@@ -409,7 +416,7 @@ const Index = () => {
                       <PrettyButton onClick={() => rerender()}>Force Rerender</PrettyButton>
                   </div>
                   <div>
-                      <PrettyButton onClick={() => mutate()}>Refresh Data</PrettyButton>
+                      {/* <PrettyButton onClick={() => mutate()}>Refresh Data</PrettyButton> */}
                   </div>            
               </ButtonPlate>              
               </>}

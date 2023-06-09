@@ -25,7 +25,7 @@ const Container = styled.div`
     border-radius:1em;
 `
 const ThankTitle = styled.div`
-    color:${p=>p.theme.colors.signatureBlue};
+    color:${p=>p.theme.colors.textColor};
     font-size:1.6em; 
     font-weight:bold;
 `
@@ -49,6 +49,7 @@ const HomeBtn = styled.div`
     display:flex;
     justify-content: center;
     align-items: center;
+    color:white;
 `
 export default function Complete({orderId, secretKey}) {
     

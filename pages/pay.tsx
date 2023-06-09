@@ -98,6 +98,7 @@ const NextBtn = styled.div`
     display:flex;
     justify-content: center;
     align-items: center;
+    color:white;
 `
 const BackBtn = styled.div`
     position:absolute;

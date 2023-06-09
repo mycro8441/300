@@ -12,6 +12,7 @@ const NextBtn = styled.div`
     display:flex;
     justify-content: center;
     align-items: center;
+    color:white;
 `
 export default function Pay_point({amount}:{amount:number}) {
     const handleClick = async()=>{
@@ -25,6 +26,7 @@ export default function Pay_point({amount}:{amount:number}) {
             orderName:"포인트 결제",
             successUrl:`${window.location.origin}/payments/complete`,
             failUrl:`${window.location.origin}/payments/fail`,
+        
         });        
     }
 

@@ -155,6 +155,7 @@ export default function Login({}) {
     const [mode, setMode] = useState<"login"|"signin"|"validate">("login"); // ref로 바꿈 예정
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const isValidated = useRef(false);
     const {setIsLogined} = useStore();
 
     const validate = {
@@ -271,8 +272,10 @@ export default function Login({}) {
             {mode === "validate" ? <>
 
                 <Container isChanging={isChanging}>
-
-                    <h1>이메일 인증</h1>
+                    {isValidated ? <>
+                        
+                    </>:<>
+                        <h1>이메일 인증</h1>
                         <LoadingText done={isLoading}>인증 번호를 {input.email}로 전송 중...</LoadingText>
                         <CodeContainer done={isLoading}>
                             {[...Array(6)].map((_, i)=><>
@@ -282,7 +285,9 @@ export default function Login({}) {
                             </>)}
                         
     
-                        </CodeContainer>                    
+                        </CodeContainer>                           
+                    </>}
+             
 
                 </Container>
             
