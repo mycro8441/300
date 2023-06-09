@@ -1,6 +1,5 @@
 import GlobalStyle from 'styles/globals'
 import 'react-toastify/dist/ReactToastify.css'
-import { SessionProvider, useSession } from 'next-auth/react'
 import { SWRConfig } from 'swr'
 import { ToastContainer } from 'react-toastify'
 import { ThemeProvider } from 'styled-components'
@@ -41,7 +40,7 @@ export default function MyApp({
       }}>
             
             <Head>
-              <title>BitCoin website</title>
+              <title>CoinPick365</title>
               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </Head>
             <button style={{position:"fixed", color:"black"}} onClick={()=>{setIsLogined(true);push("/")}}>메인으로</button>

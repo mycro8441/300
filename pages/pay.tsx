@@ -39,7 +39,7 @@ const Container = styled.div<{isChanging:boolean}>`
     gap:10px;
     animation: ${p=>p.isChanging ? css`${GoLeft} 0.4s ease forwards` : css`${GoRight} 0.4s ease forwards`};
 
-    width:400px;
+    width:450px;
 `
 const UserContainer = styled.div<{inited:boolean}>`
     padding:1em 1.5em;
@@ -178,6 +178,16 @@ const Pay = () => {
                     </NextBtn>                
                 </>:<>
                     <BackBtn onClick={changeMode}><ArrowBack/>뒤로</BackBtn>
+                   
+
+             
+                        <p>센트코인 지갑 주소</p>
+                         <PrettyNumber>0x2430Fb3DB4fba6391a65ffc94704042bd5Bc86a9</PrettyNumber>
+                    
+
+                    <p>또는</p>
+                     
+          
                     {Pay_point({amount:30000})}
                 </>}
 
