@@ -110,7 +110,7 @@ const PositionColor = styled.div<{isShort:boolean}>`
 
 const PayBtn  =styled.div`
     width:100%;
-
+    color:white;
     height:2em;
     border-radius:5px;
     display:flex;
@@ -172,6 +172,7 @@ const SelectBox = styled.div<{selected:boolean}>`
     align-items: center;
     margin:0 !important;
     border-radius:0 !important;
+    color:${p=>p.selected ? "white" : p.theme.colors.textColor};
     background-color:${p=>p.selected ? `${p.theme.colors.signatureBlue} !important`:`${p.theme.colors.bgColor} !important`};
     cursor:pointer;
 `
