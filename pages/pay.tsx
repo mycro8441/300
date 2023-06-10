@@ -123,13 +123,19 @@ const NumberContainer = styled.div`
     gap:5px;
     text-align: right;
 `
+
+const point_amount = 30000; // 시그널 공개 시 필요한 포인트
 const Pay = () => {
 
     const [inited, setInited] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
-    setTimeout(() => {
+
+    const curPoint = useRef("");
+    axios.get("http://49.247.43.169:8080/get/point/user").then(res=>{
+        curPoint.current = res.data;
         setInited(true);
-    }, 300);
+    })
+
     const mode = useRef<"confirm"|"pay">("confirm");
     const changeMode = ()=>{
         setIsChanging(true);
@@ -149,16 +155,16 @@ const Pay = () => {
                             <span>nickname</span>
                             <NumberContainer>
                                 <span>현재 포인트 : </span>
-                                <PrettyNumber>1000</PrettyNumber>
+                                <PrettyNumber>{curPoint.current}</PrettyNumber>
                             </NumberContainer>
                         </>:<>
                             <NumberContainer>
                                 <span>현재 포인트 : </span>
-                                <PrettyNumber>1000</PrettyNumber>
+                                <PrettyNumber>{curPoint.current}</PrettyNumber>
                             </NumberContainer>
                             <div style={{display:"flex", gap:"5px"}}>
                                 <span>충전할 포인트 : </span>
-                                <PrettyNumber>30000</PrettyNumber>
+                                <PrettyNumber>{point_amount}</PrettyNumber>
                             </div>
                             
                         </>}
@@ -173,7 +179,7 @@ const Pay = () => {
             <PayContainer inited={inited}>
                 {mode.current === "confirm" ? <>
                     <p>다음 포인트를 충전합니다</p>
-                    <span>{inited ? "30000" : ""}</span>
+                    <span>{point_amount}</span>
                     <NextBtn onClick={changeMode}>
                         다음
                     </NextBtn>                
@@ -189,7 +195,7 @@ const Pay = () => {
                     <p>또는</p>
                      
           
-                    {Pay_point({amount:30000})}
+                    {Pay_point({amount:point_amount})}
                 </>}
 
             </PayContainer>

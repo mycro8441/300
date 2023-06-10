@@ -174,7 +174,7 @@ export default function Login() {
     const [visible, setVisible] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
-    const [mode, setMode] = useState<"login"|"signin"|"validate">("login"); // ref로 바꿈 예정
+    const mode = useRef<"login"|"signin"|"validate">("login"); // ref로 바꿈 예정
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const isValidated = useRef(false);
@@ -228,10 +228,10 @@ export default function Login() {
     }
     const onSubmit = (e) => {
         e.preventDefault();
-        if(mode === 'login') {
+        if(mode.current === 'login') {
             if(validate['email'](input.email) && validate['password'](input.password)) {
                 setIsSubmitting(true);
-                axios.post("http://49.50.166.9:8080/authenticate", {
+                axios.post("http://49.247.43.169:8080/authenticate", {
                     username:input.email,
                     password:input.password,
                 }).then(res=>{
@@ -253,7 +253,7 @@ export default function Login() {
                 }, 1000);
 
                 setTimeout(()=>{
-                    setMode("validate");
+                    mode.current = "validate";
                     setIsSubmitting(false);
                     //setInput({email:'', password:'', passwordConfirm:'', phoneNumber:''})
                     setIsChanging(false);
@@ -273,7 +273,7 @@ export default function Login() {
     const changeMode = ()=>{
         setIsChanging(true);
         setTimeout(()=>{
-            setMode(val=>val === "login" ? "signin" : "login");
+            mode.current = mode.current === "login" ? "signin" : "login";
             setIsSubmitting(false);
             setInput({email:'', password:'', passwordConfirm:'', phoneNumber:''})
             setIsChanging(false);
@@ -295,7 +295,7 @@ export default function Login() {
             code += inputRefs.current[i].value;
         }
         //some api validation logic
-
+        
         // api login logic
         axios.post("http://49.50.166.9:8080/authenticate", {
             username:input.email,
@@ -313,7 +313,7 @@ export default function Login() {
         }, 300);
     }
     return <Adjuster>
-            {mode === "validate" ? <>
+            {mode.current === "validate" ? <>
 
                 <Container isChanging={isChanging}>
                     {isValidated.current ? <>
@@ -328,7 +328,7 @@ export default function Login() {
                         <CodeContainer onSubmit={onCodeSubmit} done={isLoading}>
                             {[...Array(6)].map((_, i)=><>
                                 <div key={i}>
-                                    <input type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
+                                    <input key={i+6} type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
                                 </div>                        
                             </>)}
                             
@@ -340,7 +340,7 @@ export default function Login() {
                 </Container>
             
             </> : <>
-                {mode === "login" ? <Container isChanging={isChanging}>
+                {mode.current === "login" ? <Container isChanging={isChanging}>
                     <h1>로그인</h1>
                     <form onSubmit={onSubmit}>
                         <Input>
@@ -382,7 +382,7 @@ export default function Login() {
                     </form>   
                 </Container>}
                 <ChangeButton onClick={changeMode} isDisabled={isChanging} disabled={isChanging}>
-                    {mode==="login" ? "회원가입으로" : "로그인으로"}
+                    {mode.current==="login" ? "회원가입으로" : "로그인으로"}
                 </ChangeButton>            
             </>}
 

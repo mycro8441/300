@@ -1,62 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import {useTable} from "react-table";
-import { RemoveRedEye } from "@mui/icons-material";
 import useSWR from "swr";
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import useStore from "../store";
-const dummydata = [ 
-    {
-    "min": 1,
-    "coin": "BTC",
-    "long_short": "long",
-    "num": "1000000",
-    "localDateTime": "2021-08-01T00:00:00"
-    },
-    {
-    "min": 1,
-    "coin": "BTC",
-    "long_short": "short",
-    "num": "1000000",
-    "localDateTime": "2021-08-02T00:00:00"
-    },
-    {
-    "min": 1,
-    "coin": "BTC",
-    "long_short": "long",
-    "num": "1000000",
-    "localDateTime": "2021-08-03T00:00:00"
-    },
-    {
-    "min": 1,
-    "coin": "BTC",
-    "long_short": "long",
-    "num": "1000000",
-    "localDateTime": "2021-08-03T00:00:00"
-    },
-    {
-    "min": 1,
-    "coin": "BTC",
-    "long_short": "long",
-    "num": "1000000",
-    "localDateTime": "2021-08-03T00:00:00"
-    },
-    {
-    "min": 1,
-    "coin": "BTC",
-    "long_short": "long",
-    "num": "1000000",
-    "localDateTime": "2021-08-03T00:00:00"
-    },
-    {
-    "min": 1,
-    "coin": "BTC",
-    "long_short": "long",
-    "num": "1000000",
-    "localDateTime": "2021-08-03T00:00:00"
-    }
-]
+import { useRouter } from "next/router";
 
 
 const Container = styled.div`
@@ -225,11 +174,14 @@ const options = [
     "AXSUSDT",
     "SANDUSDT",
 ]
+
+
+
 export default function Signal() {
     const {curPair, setCurPair} = useStore();
     
     const [mode, setMode] = useState<0|1|2>(0);
-
+    const router = useRouter();
     const { data, error } = useSWR<Signal[]>("http://49.247.43.169:8080/webhook/get/signal");
       const columns = useMemo(
         () => [
@@ -299,7 +251,7 @@ export default function Signal() {
                 </SelectBar>
             </OptionBlock>
             <BubbleBox>
-                <PayBtn>현재 시그널 보기</PayBtn>
+                <PayBtn onClick={()=>router.push("/pay")}>현재 시그널 보기</PayBtn>
                 <PrettyTable {...getTableProps()}>
                     <thead>
                         {headerGroups.map(headerGroup=>(

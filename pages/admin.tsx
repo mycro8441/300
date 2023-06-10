@@ -274,8 +274,7 @@ const Index = () => {
     )
 
 
-    //const {data, error, mutate} = useSWR(`http://49.247.43.169:8080/get/user/all`)
-    const data = useMemo(()=>makeData(1000), []); 
+    const {data, error, mutate} = useSWR(`http://49.247.43.169:8080/get/user/all`)
     const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper()
     const table = useReactTable({
         data,

@@ -43,7 +43,6 @@ export default function MyApp({
               <title>CoinPick365</title>
               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </Head>
-            <button style={{position:"fixed", color:"black"}} onClick={()=>{setIsLogined(true);push("/")}}>메인으로</button>
               {isLogined ? <>
                 <Container>
                   {

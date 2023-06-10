@@ -1,7 +1,9 @@
 import { ArrowUpward } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
+import axios from "axios";
 import Image from "next/image";
 import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { toast } from "react-toastify";
 import styled from "styled-components"
 import useSWR from "swr";
 
@@ -202,20 +204,29 @@ const AdminContainer = styled.div`
 
 `
 
+const checkIsAdmin = () => {
 
+
+
+    return true;
+}
 const AdminInput = () => {
     const [input, setInput] = useState<string>('');
 
     const onSubmit = (e) => {
         e.preventDefault();
-
+        axios.post("http://49.247.43.169:8080/post/notice", input).then(res=>{
+            toast.success("공지되었습니다.")
+            setInput("");
+        })
+        
     }
 
     return <>
         <Block>
             <AdminContainer>
                 <textarea placeholder="내용을 입력해주세요." value={input} onChange={e=>setInput(e.target.value)}/>
-                <button onClick={onSubmit}>Shoot the bullet</button>
+                <button onClick={onSubmit}>Send</button>
             </AdminContainer>
         </Block>
     </>
@@ -224,14 +235,15 @@ const AdminInput = () => {
 Notice.navbar=true;
 export default function Notice() {
 
-
-    const SliderComponent =() => { // 모드가 변함에 따라 업데이트해주기 때문에 state를 밖으로 뺌
+    
+    const SliderComponent = () => { // 모드가 변함에 따라 업데이트해주기 때문에 state를 밖으로 뺌
         const content = ["new", "old"];
-        const [mode, setMode] = useState<sliderType>(0); // localStorage에 마지막 모드 저장 후 불러오기    
+        const [mode, setMode] = useState<sliderType>(0); // localStorage에 마지막 모드 저장 후 불러오기   
         // mode state를 바깥으로 뺄 경우 transition 적용 안됨 버그..
         // 이 블럭에서 외부 state 변경 함수를 실행하는 것으로 해결 예정
         const [isSliderVisible, setIsSliderVisible] = useState<boolean>(true);
-        let lastScrollY = 0;
+        //let lastScrollY = 0;
+
         let lastDir : boolean = false;
         useEffect(()=>{
             addEventListener("mousewheel", (e:WheelEvent) => {
@@ -268,16 +280,18 @@ export default function Notice() {
     const isAdmin = useRef<boolean>(false);
     const [inited, setInited] = useState(false); // hydration 오류 해결
     useEffect(()=>{
-        isAdmin.current =true;
+        isAdmin.current = checkIsAdmin();
         setInited(true);
         
     }
     , []);
     const {data, error, mutate} = useSWR<BlockType[]>(`http://49.247.43.169:8080/get/notice`)
+    const dataPlate = useMemo(()=>[data, data?.reverse()], [data]);
     const topRef = useRef<HTMLDivElement>(null); // 맨 위로 가기를 위한 ref
     const onTopBtnClick = () => {
         topRef.current?.focus();
     }
+
     return <>
         {inited && <>
             <Container>
