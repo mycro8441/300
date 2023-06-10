@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import Chat from '@/components/Chat';
 import Signal from '@/components/Signal';
+import { Suspense } from '@/components/Suspense';
 const Container = styled.div`
   width:100%;
   height:100%;
@@ -102,7 +103,7 @@ const RateBox = styled.div`
 const Widget = styled.div`
   width:100%;
   flex:1;
-  background-color:white;
+  background-color:${p=>p.theme.colors.blockColor};
   border-radius:20px;
   overflow: hidden;
   display:flex;
@@ -121,23 +122,19 @@ const Widget = styled.div`
 function Home() {
   const {themeMode, curPair} = useStore();
   const [isInited, setIsInited] = useState<boolean>(false);
-  useEffect(()=>{
-    setIsInited(true); // 트레이딩뷰가 처음에 보이지 않아 추가함
-  }, [])
+
   return (
     <>
       <Container>
         <Adjuster>
           <MainL>
             <Widget>
-              {isInited && <>
-                <AdvancedRealTimeChart autosize symbol={curPair} theme={themeMode ? "dark" : "light"}/>
-                <MediaHidden>
-                  <TechnicalAnalysis autosize symbol={curPair} colorTheme={themeMode ? "dark" : "light"}/>
-                </MediaHidden>              
-              </>}
-
-              
+                <Suspense>
+                  <AdvancedRealTimeChart autosize symbol={curPair} theme={themeMode ? "dark" : "light"}/>
+                  <MediaHidden>
+                    <TechnicalAnalysis autosize symbol={curPair} colorTheme={themeMode ? "dark" : "light"}/>
+                  </MediaHidden>                      
+                </Suspense>
             </Widget>  
             <RateContainer>
               <RateBox>
