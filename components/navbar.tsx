@@ -7,6 +7,7 @@ import useStore from "../store";
 import shallow from "zustand";
 import Link from "next/link";
 import Cookies from 'universal-cookie';
+import axios from "axios";
 const cookie = new Cookies();
 const Padding = styled.div`
 
@@ -150,11 +151,15 @@ const HoverMenuOption = styled.div`
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
     const {themeMode, setThemeMode, setIsLogined} = useStore();
+    const [curPoint, setCurPoint] = useState("");
+    axios.get("http://49.247.43.169:8080/get/point/user").then(res=>{
+        setCurPoint(res.data);
+    })
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
             <HoverMenuContainer  active={active || menuHover}>
                 <div>Good to see you, {"nickname"}.</div>
-                <HoverMenuOption><div>Point:</div><div>1000</div></HoverMenuOption>
+                <HoverMenuOption><div>Point:</div><div>{curPoint}</div></HoverMenuOption>
                 <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={setThemeMode}/></HoverMenuOption>
                 <PrettyButton onClick={()=>{
                     cookie.remove("jwt");
@@ -170,7 +175,7 @@ const NavBar = () => {
     return <>
 
     <Container>
-        <Link href="/"><h2>LOGO</h2></Link>
+        <Link href="/"><h2>CoinPick365</h2></Link>
        
         <SearchComponent/>
         <RightSide>

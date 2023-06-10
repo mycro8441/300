@@ -78,7 +78,7 @@ const PayContainer = styled.div<{inited:boolean}>`
     span {
   
         font-size:3em;
-        padding:${p=>p.inited ? "0 10px" : 0};
+        padding:0 10px;
         transition: 0.3s ease;
         border-radius: 10px;
         background-color: ${p=>p.theme.colors.bgColor};
