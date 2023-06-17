@@ -69,7 +69,7 @@ const PositionColor = styled.div<{isShort:boolean}>`
 
 const PayBtn  =styled.div`
     width:100%;
-
+    color:white;
     height:2em;
     border-radius:5px;
     display:flex;
@@ -129,6 +129,7 @@ const SelectBox = styled.div<{selected:boolean}>`
     display:flex;
     justify-content: center;
     align-items: center;
+    color:${p=>p.selected ? "white" : "gray"};
     margin:0 !important;
     border-radius:0 !important;
     background-color:${p=>p.selected ? `${p.theme.colors.signatureBlue} !important`:`${p.theme.colors.bgColor} !important`};
@@ -255,7 +256,7 @@ export default function Signal({
     }
     return <Adjust>
             <OptionBlock>
-                <Dropdown options={options} onChange={onSelect} value={curPair}/>
+                <Dropdown options={options} onChange={onSelect} value={curPair + ".P"}/>
                 <SelectBar>
                     <SelectBox onClick={()=>setMode(0)} selected={mode === 0}>
                         5M

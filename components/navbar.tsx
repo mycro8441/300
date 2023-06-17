@@ -67,7 +67,7 @@ const RightSide = styled.div`
 const HoverMenuAdjust = styled.div`
     position:fixed;
     right:40px;
-    z-index:2;
+    z-index:3;
     top:50px;
 
 `
@@ -149,14 +149,14 @@ const HoverMenuOption = styled.div`
 
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
-    const {themeMode, setThemeMode, setIsLogined,isLogined} = useStore();
+    const {themeMode, toggleTheme, setIsLogined,isLogined} = useStore();
     const {push} = useRouter();
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
             <HoverMenuContainer  active={active || menuHover}>
                 <div>Good to see you, {"nickname"}.</div>
                 <HoverMenuOption><div>Point:</div><div>1000</div></HoverMenuOption>
-                <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={setThemeMode}/></HoverMenuOption>
+                <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={()=>{toggleTheme();localStorage.setItem("theme", themeMode === true ? "light" : "dark")}}/></HoverMenuOption>
                 <PrettyButton onClick={()=> {
                     logout();
                     setIsLogined(false);

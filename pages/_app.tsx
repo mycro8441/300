@@ -25,11 +25,13 @@ export default function MyApp({
   Component,
   pageProps: { session, ...pageProps }
 }) {
-  const {themeMode, isLogined, setIsLogined} = useStore();
-  const themeTray = [light, dark]; // 라이트, 다크 테마 이외의 테마 추가 대비
-  const theme = themeTray[+themeMode];
+  const {themeMode, setThemeMode, isLogined, setIsLogined} = useStore();
+  const [theme, setTheme] = useState(light);
   const router = useRouter();
-
+  useEffect(()=>{
+    setTheme(localStorage.getItem("theme") == "light" ? light : dark);
+    setThemeMode(localStorage.getItem("theme") == "dark");
+  }, [themeMode])
   useEffect( ()=>{
       if(window.localStorage.getItem("token") !== null) setIsLogined(true);
       if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login" && router.asPath !== "/admin") router.push("/auth/login")
@@ -37,7 +39,7 @@ export default function MyApp({
 
   return (
 
-      <ThemeProvider theme={theme || light}>
+      <ThemeProvider theme={theme}>
         <GlobalStyle/>
         <SWRConfig>
             <Head>

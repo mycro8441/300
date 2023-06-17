@@ -8,6 +8,8 @@ interface serviceI {
     curPair:string;
     setCurPair: (value:string) => void;
 }
+
+
 const useStore = create<serviceI>(set=>({
     themeMode:true,
     isLogined:false,
