@@ -14,6 +14,7 @@ import NavBar from '@/components/navbar'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 import {authClient, client} from "@/lib/api/client";
+import { getUserInfo } from '@/lib/api/user'
 
 const Container = styled.div`
   width:100vw;
@@ -21,22 +22,54 @@ const Container = styled.div`
   display:flex;
   flex-direction: column;
 `
+
 export default function MyApp({
   Component,
   pageProps: { session, ...pageProps }
 }) {
-  const {themeMode, setThemeMode, isLogined, setIsLogined} = useStore();
-  const [theme, setTheme] = useState(light);
+  const {themeMode, setThemeMode, userInfo, isLogined, setIsLogined, setUserInfo} = useStore();
+  const [theme, setTheme] = useState(dark);
   const router = useRouter();
+  useEffect(()=>{
+    if(localStorage.getItem("theme") === null) {
+      localStorage.setItem("theme", "dark");
+    }
+  }, [])
   useEffect(()=>{
     setTheme(localStorage.getItem("theme") == "light" ? light : dark);
     setThemeMode(localStorage.getItem("theme") == "dark");
   }, [themeMode])
   useEffect( ()=>{
       if(window.localStorage.getItem("token") !== null) setIsLogined(true);
-      if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login" && router.asPath !== "/admin") router.push("/auth/login")
+      if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login") router.push("/auth/login"); // 메인, 로그인 페이지 외에는 로드인 없이 접근 불가
+      //if(isLogined && userInfo.role !== "ROLE_ADMIN" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
   },[router])
-
+  useEffect(()=>{
+    if(isLogined) {
+      getUserInfo().then(res=>{
+        const {
+          id,
+          username,
+          password,
+          phoneNumber,
+          role,
+          point,
+          ban,
+          usrPw
+        } = res;
+        setUserInfo({
+          id: id,
+          email:username,
+          encryptedPw:password,
+          phoneNumber:phoneNumber,
+          role:role,
+          points:point,
+          ban:ban,
+          usrPw:usrPw,
+        })
+      })
+    }
+  }, [isLogined])
   return (
 
       <ThemeProvider theme={theme}>

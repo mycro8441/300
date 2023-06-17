@@ -4,6 +4,7 @@ import styled, { StyledComponent } from "styled-components";
 import useSWR, {useSWRConfig} from "swr";
 import useSWRMutation from "swr/mutation"
 import {getChat, sendMessage} from "@/lib/api/chat";
+import useStore from "../store";
 
 const InputContainer = styled.form`
     width:100%;
@@ -84,7 +85,8 @@ const Chat = () => {
     const { mutate } = useSWRConfig();
     const { data, error} = useSWR<Chat[]>("/get/chat",getChat);
     const [input, setInput] = useState<string>('');
-
+    const {userInfo} = useStore()
+    const bottomRef = useRef<HTMLDivElement>(null);
     const onSubmit = async (e) => {
         e.preventDefault();
 
@@ -104,7 +106,7 @@ const Chat = () => {
                         ...data,
                         newChat,
                     ],
-                    rollbackOnError: true,
+                    rollbackOnError: !userInfo.ban,
 
                 }
             )
@@ -117,12 +119,11 @@ const Chat = () => {
         setInput(e.target.value)
     }
 
-    useEffect(() => {
-        console.log(data)
-    },[data])
-
+    useEffect(()=>{
+        bottomRef.current?.scrollIntoView();
+    }, [data]);
     return (<Adjuster>
-            <DisplayContainer >
+            <DisplayContainer>
                 {data?.sort(
                     (a,b)=>new Date(a.chatDate).getTime() - new Date(b.chatDate).getTime()
                 ).map(chat=>(
@@ -135,6 +136,7 @@ const Chat = () => {
                         </TextContainer>
                     </MessageContainer>
                 ))}
+                <div ref={bottomRef}/>
             </DisplayContainer>
             <InputContainer onSubmit={onSubmit}>
                 <input placeholder="채팅을 입력해주세요." value={input} onChange={onChange}/>

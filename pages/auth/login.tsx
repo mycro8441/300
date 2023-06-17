@@ -42,7 +42,7 @@ const GoRight = keyframes`
     }
 `
 const Container = styled.div<{isChanging:boolean}>`
-    width:300px;
+    width:350px;
     max-width:70%;
     height:auto;
     animation: ${p=>p.isChanging ? css`${GoLeft} 0.4s ease forwards` : css`${GoRight} 0.4s ease forwards`};

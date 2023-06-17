@@ -32,7 +32,6 @@ export const login = async (userId: string, password: string) => {
             responseType:"text"
         }
     );
-    console.log(userId, password, a)
     if (a.status != 403) {
         localStorage.setItem("token", a.data);
         return true;

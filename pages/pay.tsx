@@ -3,6 +3,7 @@ import { ArrowBack, Backspace } from "@mui/icons-material"
 import { Avatar } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
 import styled, { css, keyframes } from "styled-components"
+import useStore from "../store"
 
 const GoLeft = keyframes`
     0% {
@@ -118,8 +119,13 @@ const NumberContainer = styled.div`
     gap:5px;
     text-align: right;
 `
-const Pay = () => {
 
+
+const fixed_point_amount = 30000;
+
+
+const Pay = () => {
+    const {userInfo} = useStore();
     const [inited, setInited] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
     setTimeout(() => {
@@ -143,16 +149,16 @@ const Pay = () => {
                             <span>nickname</span>
                             <NumberContainer>
                                 <span>현재 포인트 : </span>
-                                <PrettyNumber>1000</PrettyNumber>
+                                <PrettyNumber>{userInfo.points}</PrettyNumber>
                             </NumberContainer>
                         </>:<>
                             <NumberContainer>
                                 <span>현재 포인트 : </span>
-                                <PrettyNumber>1000</PrettyNumber>
+                                <PrettyNumber>{userInfo.points}</PrettyNumber>
                             </NumberContainer>
                             <div style={{display:"flex", gap:"5px"}}>
                                 <span>충전할 포인트 : </span>
-                                <PrettyNumber>30000</PrettyNumber>
+                                <PrettyNumber>{fixed_point_amount}</PrettyNumber>
                             </div>
                         </>}
                     </UserProperty>
@@ -164,7 +170,7 @@ const Pay = () => {
             <PayContainer inited={inited}>
                 {mode.current === "confirm" ? <>
                     <p>다음 포인트를 충전합니다</p>
-                    <span>{inited ? "30000" : ""}</span>
+                    <span>{inited ? fixed_point_amount : ""}</span>
                     <NextBtn onClick={changeMode}>
                         다음
                     </NextBtn>
@@ -173,7 +179,7 @@ const Pay = () => {
                         <p>센트코인 지갑 주소</p>
                          <PrettyNumber>0x2430Fb3DB4fba6391a65ffc94704042bd5Bc86a9</PrettyNumber>
                     <p>또는</p>
-                    {Pay_point({amount:30000})}
+                    {Pay_point({amount:fixed_point_amount})}
                 </>}
             </PayContainer>
         </Container>

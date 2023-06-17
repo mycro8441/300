@@ -149,19 +149,26 @@ const HoverMenuOption = styled.div`
 
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
-    const {themeMode, toggleTheme, setIsLogined,isLogined} = useStore();
+    const {themeMode, toggleTheme, setIsLogined, isLogined, userInfo} = useStore();
     const {push} = useRouter();
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
             <HoverMenuContainer  active={active || menuHover}>
-                <div>Good to see you, {"nickname"}.</div>
-                <HoverMenuOption><div>Point:</div><div>1000</div></HoverMenuOption>
+                {isLogined ? <>
+                    <div>반갑습니다, {userInfo.email}님</div>
+                    <HoverMenuOption><div>Point:</div><div>{userInfo.points}</div></HoverMenuOption>                  
+                </>:<>
+                    <div>로그인 해주세요.</div>
+                </>}
+
                 <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={()=>{toggleTheme();localStorage.setItem("theme", themeMode === true ? "light" : "dark")}}/></HoverMenuOption>
                 <PrettyButton onClick={()=> {
-                    logout();
                     setIsLogined(false);
                     push("/auth/login");
-                }}>Login</PrettyButton>
+                    logout()
+                    
+                    
+                }}>{isLogined ? "로그아웃" : "로그인"}</PrettyButton>
             </HoverMenuContainer>
 
     </HoverMenuAdjust>

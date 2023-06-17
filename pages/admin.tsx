@@ -12,7 +12,6 @@ import {
     flexRender,
     RowData,
   } from '@tanstack/react-table';
-import { makeData, Person } from "utils/makeData";
 import Switch from "@/components/switch";
 import { toast } from "react-toastify";
 import { banUser, getUserList, setPoint } from "@/lib/api/admin";
@@ -111,9 +110,9 @@ const PrettyTable = styled.table`
 
     border-collapse: collapse;
     border-radius:10px;
-    box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px gray;
     thead > tr {
-        border-bottom: 2px solid ${p=>p.theme.colors.invertColor};
+        border-bottom: 2px solid gray;
 
     }
     td {
@@ -182,16 +181,28 @@ const PrettySelect = styled.select`
     }
     
 `
-const Banbtn = styled.div`
+const Banbtn = styled.div<{banned:boolean}>`
   height:100%;
   width:40px;
   border-radius:5px !important;
-  cursor:pointer;
+  cursor:${p=>p.banned ? "none" : "pointer"};
   display:flex;
   justify-content: center;
   align-items:center;
-  background-color: ${p=>p.theme.colors.signatureRed};
+  background-color: ${p=>p.banned ? p.theme.colors.signatureBlue : p.theme.colors.signatureRed};
 `
+
+type User = {
+  id:number;
+  email:string;
+  phoneNumber:string;
+  role:string;
+  encryptedPw:string;
+  points:number;
+  ban:boolean;
+  usrPw:string;
+}
+
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends RowData> {
       updateData: (rowIndex: number, columnId: string, value: unknown) => void
@@ -199,27 +210,29 @@ declare module '@tanstack/react-table' {
 }
   
   // Give our default column cell renderer editing superpowers!
-const defaultColumn: Partial<ColumnDef<Person>> = {
+const defaultColumn: Partial<ColumnDef<User>> = {
     cell: ({ getValue, row: { index,original }, column: { id }, table }) => {
       const initialValue = getValue()
       // We need to keep and update the state of the cell normally
       const [value, setValue] = useState(initialValue)
       
       if(id === "Ban") {
-        return <Banbtn onClick={()=>{
+        return <Banbtn banned={original.ban} onClick={()=>{
           banUser(original.email).then(res=>{
             toast.success(`${original.email}을 밴 처리하였습니다.`);
           }).catch(err=>{
             toast.error("밴 처리 과정에서 오류가 발생하였습니다.");
           })
         }}>
-          Ban
+          {original.ban ? "밴됨" : "밴"}
         </Banbtn>
       }
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
-        if(id === "points") {
-          setPoint(original.email, original.points);
+        if(id === "point") {
+          setPoint(original.email, original.points).then(res=>{
+            console.log(res)
+          })
         }
         table.options.meta?.updateData(index, id, value)
       }
@@ -260,28 +273,28 @@ const Index = () => {
 
     const rerender = useReducer(() => ({}), {})[1]
 
-    const columns = useMemo<ColumnDef<Person>[]>(
+    const columns = useMemo<ColumnDef<User>[]>(
       () => [
         {
+          header:'id',
+          accessorKey:"id",
+          footer: props=>props.column.id,
+        },
+        {
           header: 'Email',
-          accessorKey:'email',
+          accessorKey:'username',
           footer: props => props.column.id,
           
         },
         {
-          header: 'Password',
-          accessorKey:'password',
+          header: 'Number',
+          accessorKey:"phoneNumber",
           footer: props => props.column.id,
         },
         {
             header: 'Points',
-            accessorKey:'points',
+            accessorKey:'point',
             footer: props => props.column.id,
-        },
-        {
-            header:'Number',
-            accessorKey:"phoneNumber",
-            footer:props=>props.column.id,
         },
         {
             width:300,
@@ -291,17 +304,16 @@ const Index = () => {
       []
     )
 
-    const [data, setData] = useState<Person[]>();
+    const [data, setData] = useState<User[]>();
     
       
     const mutate = () => {
-      setData(makeData(100));
-      // getUserList().then(res=>{
-      //   setData(res);
-      // }).catch(err=>{
-      //   toast.error("사용자 목록을 가져오는 데 실패했습니다.")
-      //   console.log(err)
-      // })
+      getUserList().then(res=>{
+        setData(res);
+      }).catch(err=>{
+        toast.error("사용자 목록을 가져오는 데 실패했습니다.")
+        console.log(err)
+      })
     }
 
     useEffect(()=>{
