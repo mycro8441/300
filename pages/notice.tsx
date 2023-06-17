@@ -1,11 +1,9 @@
 import { ArrowUpward } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
-import axios from "axios";
 import Image from "next/image";
 import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { toast } from "react-toastify";
 import styled from "styled-components"
-import useSWR from "swr";
+import {getNotice, sendNotice} from "@/lib/api/notice";
 
 type sliderType = 0|1;
 const abs = (n:number) => n < 0 ? -n : n;
@@ -177,6 +175,13 @@ const AdminContainer = styled.div`
     * {
         border-radius: 1em;
     }
+  input {
+    padding:5px;
+    resize:none;
+    background-color: ${p=>p.theme.colors.bgColor};
+    outline:none;
+    border:none;
+  }
     textarea {
         flex:1;
         padding:5px;
@@ -204,27 +209,23 @@ const AdminContainer = styled.div`
 
 `
 
-const checkIsAdmin = () => {
 
-
-
-    return true;
-}
-const AdminInput = () => {
+const AdminInput = ({getFreshData}) => {
     const [input, setInput] = useState<string>('');
+    const [noticeTitle, setNoticeTitle] = useState<string>('');
 
-    const onSubmit = (e) => {
+
+    const onSubmit = async (e) => {
         e.preventDefault();
-        axios.post("http://49.247.43.169:8080/post/notice", input).then(res=>{
-            toast.success("공지되었습니다.")
-            setInput("");
-        })
-        
+        await sendNotice(noticeTitle,input);
+        setInput('');
+        await getFreshData();
     }
 
     return <>
         <Block>
             <AdminContainer>
+                <input type="text" value={noticeTitle} onChange={e => setNoticeTitle(e.target.value)} placeholder={"제목을 입력해주세요"} />
                 <textarea placeholder="내용을 입력해주세요." value={input} onChange={e=>setInput(e.target.value)}/>
                 <button onClick={onSubmit}>Send</button>
             </AdminContainer>
@@ -235,32 +236,30 @@ const AdminInput = () => {
 Notice.navbar=true;
 export default function Notice() {
 
-    
-    const SliderComponent = () => { // 모드가 변함에 따라 업데이트해주기 때문에 state를 밖으로 뺌
+    const SliderComponent =() => { // 모드가 변함에 따라 업데이트해주기 때문에 state를 밖으로 뺌
         const content = ["new", "old"];
-        const [mode, setMode] = useState<sliderType>(0); // localStorage에 마지막 모드 저장 후 불러오기   
+        const [mode, setMode] = useState<sliderType>(0); // localStorage에 마지막 모드 저장 후 불러오기
         // mode state를 바깥으로 뺄 경우 transition 적용 안됨 버그..
         // 이 블럭에서 외부 state 변경 함수를 실행하는 것으로 해결 예정
         const [isSliderVisible, setIsSliderVisible] = useState<boolean>(true);
-        //let lastScrollY = 0;
-
+        let lastScrollY = 0;
         let lastDir : boolean = false;
         useEffect(()=>{
             addEventListener("mousewheel", (e:WheelEvent) => {
                 //@ts-ignore
                 if(e.target.tagname === "TEXTAREA") return;
                 const dir = e.deltaY > 0;
-                
+
                 if(dir == lastDir) return;
                 lastDir = dir;
 
                 if(dir) {
-                    
+
                     setIsSliderVisible(false);
                 } else {
                     setIsSliderVisible(true);
                 }
-                
+
               });
         }, [])
         return <>
@@ -273,46 +272,50 @@ export default function Notice() {
                 <SliderPicker mode={mode}>
                     {content[mode]}
                 </SliderPicker>
-            </Slider>    
+            </Slider>
         </>
     }
 
+    const [data, setData] = useState([]);
+
     const isAdmin = useRef<boolean>(false);
     const [inited, setInited] = useState(false); // hydration 오류 해결
+
+    const getFreshData = async () => {
+        const data = await getNotice();
+        setData(data);
+    }
     useEffect(()=>{
-        isAdmin.current = checkIsAdmin();
-        setInited(true);
-        
+        isAdmin.current =true;
+        getFreshData().then(res=>{
+            setInited(true);
+        })
     }
     , []);
-    const {data, error, mutate} = useSWR<BlockType[]>(`http://49.247.43.169:8080/get/notice`)
-    const dataPlate = useMemo(()=>[data, data?.reverse()], [data]);
+    // const {data, error, mutate} = useSWR(`/get/user/all`)
     const topRef = useRef<HTMLDivElement>(null); // 맨 위로 가기를 위한 ref
     const onTopBtnClick = () => {
         topRef.current?.focus();
     }
-
     return <>
         {inited && <>
             <Container>
                 <SliderComponent/>
                 <BlockAdjuster>
                     <BlockSlider ref={topRef}>
-                        <AdminInput/>
+                        <AdminInput getFreshData={()=>getFreshData()}/>
                         {data?.map((obj, i)=>(
 
                                 <Block key={i}>
                                     <BlockHeader>
-
-                                            {obj.email[0].toUpperCase() + obj.email.slice(1, obj.email.length)}
-                                            {obj.timeStamp}                                      
-
+                                            {obj.user.username}
+                                            {obj.noticeDate}
                                     </BlockHeader >
                                     <BlockContent >
-                                        {obj.content}
+                                        {obj.noticeContent}
                                     </BlockContent>
-                                    
-                                </Block>                        
+
+                                </Block>
 
                         ))}
                         <SliderEnd>
@@ -320,7 +323,7 @@ export default function Notice() {
                         </SliderEnd>
                     </BlockSlider>
                 </BlockAdjuster>
-            </Container>        
+            </Container>
             <TopButtonAdjust>
                 <TopButton onClick={()=>onTopBtnClick()}>
                     <ArrowUpward/>

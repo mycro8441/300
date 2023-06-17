@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 
 import Chat from '@/components/Chat';
 import Signal from '@/components/Signal';
-import { Suspense } from '@/components/Suspense';
+import useSWR from "swr";
+import {getBottomSignal} from "@/lib/api/signal";
 const Container = styled.div`
   width:100%;
   height:100%;
@@ -15,34 +16,27 @@ const Container = styled.div`
   flex-grow:0;
 `
 const Adjuster = styled.div`
-  
   width:100%;
-  
   height:100%;
   display:flex;
   justify-content: center;
   padding:30px;
-
   gap:10px;
 `
 const MainL = styled.div`
-
   flex:1;
   height:100%;
   min-height:200px;
-
   display: flex;
   flex-direction: column;
   gap:10px;
 `
 const MainR = styled.div`
-
   flex:0.1;
   height:100%;
   @media screen and (max-width:800px) {
     display:none;
   }
-
   display: flex;
   flex-direction: column;
   gap:10px;
@@ -52,7 +46,6 @@ const Sidebar = styled.div`
   min-height:200px;
   background-color: ${p=>p.theme.colors.blockColor};
   border-radius:20px;
-
   overflow: hidden;
 `
 const MediaHidden = styled.div`
@@ -60,11 +53,10 @@ const MediaHidden = styled.div`
     @media screen and (max-width:800px) {
     display:none;
   }
-  
 `
 const ChatContainer = styled.div`
   flex:0.4;
-  flex-basis:0%;
+  flex-basis:0;
   min-height:100px;
   background-color: ${p=>p.theme.colors.blockColor};
   border-radius:20px;
@@ -74,15 +66,12 @@ const RateContainer = styled.div`
   display:flex;
   gap:10px;
 `
-const Progressbar = styled.div<{tcolor:number}>`
-    background-color: ${p=>p.theme.colors.bgColor};
+const Progressbar = styled.div<{tcolor:number, size:number}>`
+  background-color: ${p=>p.theme.colors.bgColor};
   border-radius: 1em;
-  /* (height of inner div) / 2 + padding */
-
   div {
     background-color: ${p=>p.tcolor === 0 ? "white" : p.tcolor === 1 ? p.theme.colors.signatureRed : p.tcolor === 2 ? p.theme.colors.signatureBlue : "orange"};
-    width: 40%;
-    /* Adjust with JavaScript */
+    width: ${props=>props.size}%;
     height: 10px;
     border-radius: 1em;
   }
@@ -97,7 +86,6 @@ const RateBox = styled.div`
   flex-direction: column;
   justify-content: space-between;
   padding:1.2em 1em;
-
 `
 
 const Widget = styled.div`
@@ -107,72 +95,95 @@ const Widget = styled.div`
   border-radius:20px;
   overflow: hidden;
   display:flex;
-
   div {
     height:100%;flex-grow: 1;
-
   }
   div:nth-child(2) {
     flex:1;
     overflow-y: hidden;
-    
   }
 `
 
 function Home() {
   const {themeMode, curPair} = useStore();
   const [isInited, setIsInited] = useState<boolean>(false);
-
+  const {data} = useSWR("/get/buttom-signal",getBottomSignal, {refreshInterval:1000})
+  useEffect(()=>{
+    setIsInited(true); // 트레이딩뷰가 처음에 보이지 않아 추가함
+  }, [])
   return (
     <>
       <Container>
         <Adjuster>
           <MainL>
             <Widget>
-                <Suspense>
-                  <AdvancedRealTimeChart autosize symbol={curPair} theme={themeMode ? "dark" : "light"}/>
-                  <MediaHidden>
-                    <TechnicalAnalysis autosize symbol={curPair} colorTheme={themeMode ? "dark" : "light"}/>
-                  </MediaHidden>                      
-                </Suspense>
-            </Widget>  
+              {isInited && <>
+                <AdvancedRealTimeChart autosize symbol={curPair} theme={themeMode ? "dark" : "light"}/>
+                <MediaHidden>
+                  <TechnicalAnalysis autosize symbol={curPair} colorTheme={themeMode ? "dark" : "light"}/>
+                </MediaHidden>
+              </>}
+            </Widget>
+            <RateContainer>
+
+              <RateBox>
+                <div>
+                    BTC 김프 : {data && JSON.parse(data[0].sjon).stoch}
+                </div>
+                <Progressbar tcolor={0} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).stoch)} >
+                  <div/>
+                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div>
+                  ETH 김프 : {data && JSON.parse(data[0].sjon).rsi}
+                </div>
+                <Progressbar size={
+                  30
+                } tcolor={2}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div>
+                  XRP 김프 : {data && JSON.parse(data[0].sjon).rsi}
+                </div>
+                <Progressbar size={
+                  30
+                } tcolor={2}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div>
+                  AVAX : {data && JSON.parse(data[0].sjon).rsi}
+                </div>
+                <Progressbar size={
+                  30
+                } tcolor={2}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+            </RateContainer>
             <RateContainer>
               <RateBox>
                 <div>
-                  공포 / 탐욕 지수 : 
+                  LONG 비율 : {data && JSON.parse(data[0].sjon).longRatio}
                 </div>
-                <Progressbar tcolor={1}>
+                <Progressbar tcolor={1} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).fear)}>
                   <div/>
                 </Progressbar>
               </RateBox>
               <RateBox>
                 <div>
-                  강도 지수 (RSI) : 
+                  SHORT 비율 (RSI) : {data && JSON.parse(data[0].sjon).rsi}
                 </div>
-                <Progressbar tcolor={0}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
-              <RateBox>
-                <div>
-                    스토캐스틱 : 
-                </div>
-                <Progressbar tcolor={0}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
-              <RateBox>
-                <div>
-                  트랜드 : 
-                </div>
-                <Progressbar tcolor={2}>
+                <Progressbar tcolor={0} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).rsi)}>
                   <div/>
                 </Progressbar>
               </RateBox>
             </RateContainer>
           </MainL>
- 
-
           <MainR>
             <Sidebar>
               <Signal/>
@@ -181,26 +192,12 @@ function Home() {
               <Chat/>
             </ChatContainer>
           </MainR>
-
-                      
-
         </Adjuster>
-
-      </Container>    
+      </Container>
     </>
 
   )
 }
-// export async function getStaticProps() {
-//   const { data } = await axios.get('https://sigbtc.pro/')
-//   const $ = cheerio.load(data)
-//   const title = $('.RSIRate').text()
-//   const lastScraped = new Date().toISOString()
-//   return {
-//     props: { title, lastScraped},
-//     revalidate: 10, // rerun after 10 seconds
-//   }
-// }
 Home.navbar = true;
 export default Home
 

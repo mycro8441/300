@@ -1,56 +1,66 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import styled from "styled-components";
 import {useTable} from "react-table";
+import { RemoveRedEye } from "@mui/icons-material";
 import useSWR from "swr";
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import useStore from "../store";
-import { useRouter } from "next/router";
-
+import {getSignal} from "@/lib/api/signal";
 
 const Container = styled.div`
     width:100%;
-    height:auto;
+    height:100%;
     display:flex;
     padding:20px;
     justify-content: space-between;
 `
 const PrettyTable = styled.table`
     width:100%;
-    height:auto;
+    flex:1;
     padding:5px;
     border-radius:10px;
+    thead {
+        position:sticky;
+        top:0px;
+        margin:0 0 0 0;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+    }
     thead > tr {
         border-bottom: 2px solid ${p=>p.theme.colors.invertColor};
-        th::after {
-            content:'';
-            width:1px;
-            position:absolute;
-            top:0;
-            left:0;
-            bottom:0;
-            background-color: white;
+        th {
+            line-height: 30px;
         }
-    }
-    td, th {
 
     }
     td {
             text-align:center;
-            
     }
-
-
-
+    tbody {
+        overflow:scroll;
+    }
 `
 const Adjust = styled.div`
     display:flex;
     flex-direction: column;
     gap:10px;
+    height:100%;
 `
 const BubbleBox = styled.div`
+    flex:1;
     width:100%;
-    height:100%;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+        width:10px;
+        }
+    &::-webkit-scrollbar-thumb {
+        background-color: ${p=>p.theme.colors.bgColor};
+        border-radius: 10px;
+        background-clip:padding-box;
+        border:2px solid ${p=>p.theme.colors.blockColor};
+        
+    }
 `
 
 const PositionColor = styled.div<{isShort:boolean}>`
@@ -59,7 +69,7 @@ const PositionColor = styled.div<{isShort:boolean}>`
 
 const PayBtn  =styled.div`
     width:100%;
-    color:white;
+
     height:2em;
     border-radius:5px;
     display:flex;
@@ -121,7 +131,6 @@ const SelectBox = styled.div<{selected:boolean}>`
     align-items: center;
     margin:0 !important;
     border-radius:0 !important;
-    color:${p=>p.selected ? "white" : p.theme.colors.textColor};
     background-color:${p=>p.selected ? `${p.theme.colors.signatureBlue} !important`:`${p.theme.colors.bgColor} !important`};
     cursor:pointer;
 `
@@ -174,84 +183,96 @@ const options = [
     "AXSUSDT",
     "SANDUSDT",
 ]
+export default function Signal({
 
-
-
-export default function Signal() {
+                               }) {
     const {curPair, setCurPair} = useStore();
-    
-    const [mode, setMode] = useState<0|1|2>(0);
-    const router = useRouter();
-    const { data, error } = useSWR<Signal[]>("http://49.247.43.169:8080/webhook/get/signal");
-      const columns = useMemo(
+
+    const [mode, setMode] = useState<0|1|2|3>(0);
+
+    const { data, error } = useSWR<Signal[]>("/webhook/get/signal",getSignal,);
+    const [finalData, setFinalData] = useState<Signal[]>([]);
+    useEffect(()=>{
+        if(data) {
+            setFinalData(data
+                .filter(
+                    // @ts-ignore
+                    v => v.cryptoName.replace(".P","") == curPair
+                ).
+                sort(
+                (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
+            )
+            );
+        }
+    },[data, curPair])
+    const columns = useMemo(
         () => [
           {
-            Header: 'Pair',
-            accessor: 'coin', 
+            Header: 'Position',
+            accessor: 'side',
+            Cell: ({value, row}) => (
+                    <PositionColor isShort={value == "sell"}>
+                        {value.toUpperCase()}
+                    </PositionColor>
+            )
           },
           {
-            Header: 'Position',
-            accessor: 'long_short',
-            Cell: ({value, row}) => (
-                <>
-            
-                    <PositionColor isShort={value == "short"}>
-                        {value[0].toUpperCase() + value.slice(1, value.length)}
-                    </PositionColor>  
-
-               
-                </>
-
-
-            )
-          },    
-          {
             Header: 'Price',
-            accessor: 'num',
-            
+            accessor: 'closePrice',
           },
           {
             Header: 'Time',
             accessor: 'localDateTime',
-            
+              sortType: 'datetime',
+            Cell: ({value, row}) => {
+                const date = new Date(value);
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const hour = date.getHours();
+                const min = date.getMinutes();
+                return `${year}-${month}-${day} ${hour}:${min}`
+            }
           },
           {
             Header: 'Profit',
             accessor: 'profit',
-            
           },
         ],
         []
       )
-    
-      const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-        //@ts-ignore
-      } = useTable({ columns, data:data??[] })
+
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    //@ts-ignore
+  } = useTable({ columns, data:finalData??[] })
     const onSelect = e => {
         setCurPair(e.value)
     }
     return <Adjust>
             <OptionBlock>
-                <Dropdown options={options} onChange={onSelect} value={curPair + ".P"}/>
+                <Dropdown options={options} onChange={onSelect} value={curPair}/>
                 <SelectBar>
                     <SelectBox onClick={()=>setMode(0)} selected={mode === 0}>
-                        3M
+                        5M
                     </SelectBox>
                     <SelectBox onClick={()=>setMode(1)} selected={mode === 1}>
-                        10M
+                        15M
                     </SelectBox>
                     <SelectBox onClick={()=>setMode(2)} selected={mode === 2}>
                         30M
                     </SelectBox>
+                    <SelectBox onClick={()=>setMode(3)} selected={mode === 3}>
+                        1H
+                    </SelectBox>
                 </SelectBar>
             </OptionBlock>
             <BubbleBox>
-                <PayBtn onClick={()=>router.push("/pay")}>현재 시그널 보기</PayBtn>
+                <PayBtn>현재 시그널 보기</PayBtn>
                 <PrettyTable {...getTableProps()}>
                     <thead>
                         {headerGroups.map(headerGroup=>(
@@ -261,25 +282,37 @@ export default function Signal() {
                                         {column.render('Header')}
                                     </th>
                                 ))}
-                            </tr>                            
+                            </tr>
                         ))}
 
                     </thead>
                     <tbody {...getTableBodyProps()}>
-                        {rows?.map(row=>{
+                        {rows
+                            ?.map((row,index)=>{
+                            if(index == 0 || index == 1) {
+                                return(
+                                    <tr key={index} role={"row"}>
+                                        <td role={"cell"}>-</td>
+                                        <td role={"cell"}>-</td>
+                                        <td role={"cell"}>-</td>
+                                    </tr>
+                                )
+                            }
                             prepareRow(row);
                             return (
                                 <tr {...row.getRowProps()}>
+                                    {row.cells
+                                        .map((cell, i)=> {
 
-                                    {row.cells.map((cell, i)=> {
                                         return (
                                             <td {...cell.getCellProps()}>
                                             {cell.render('Cell')}
-                                          </td> 
+
+                                          </td>
                                         )
                                     })}
-                                    
-                                </tr>                                
+
+                                </tr>
                             )
                         })}
 

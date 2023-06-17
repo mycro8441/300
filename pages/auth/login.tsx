@@ -1,17 +1,16 @@
 import styled, {keyframes, css} from "styled-components"
 import {Resolver, useForm} from "react-hook-form";
 import {toast} from "react-toastify";
-import { useEffect, useRef, useState } from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import EmailIcon from '@mui/icons-material/Email';
 import { Call, ErrorSharp, InputSharp, Visibility, VisibilityOff } from "@mui/icons-material";
-import * as yup from 'yup';
-import {yupResolver} from '@hookform/resolvers/yup';
-import axios from "axios";
-import Cookies from 'universal-cookie';
+
+
 import {useRouter} from 'next/navigation';
 import useStore from "@/store/index";
-import Link from "next/link";
-const cookies = new Cookies();
+import {getEmailAuthCode, login, register, verifyEmailAuthCode} from "@/lib/api/auth";
+
+
 
 const Adjuster = styled.div`
     display:flex;
@@ -126,8 +125,10 @@ const CodeContainer = styled.form<{done:boolean}>`
         font-size:2em;
         outline:none;
         text-align:center;
-
-
+      cursor: pointer;
+      &:hover {
+        
+      }
     }
 `
 const LoadingText = styled.div<{done:boolean}>`
@@ -136,7 +137,7 @@ const LoadingText = styled.div<{done:boolean}>`
     left:50%;
     transform: translateX(-50%);
     width:80%;
-    z-index:0;
+    z-index:1;
     transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 `
 const CodeSubmit = styled.div<{done:boolean}>`
@@ -165,20 +166,20 @@ type FormValues = {
 const emailRex = /^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
 const pwRex = /(?=.*\d{1,50})(?=.*[~`!@#$%\^&*()-+=]{1,50})(?=.*[a-zA-Z]{2,50}).{8,50}$/;
 const regPhone= /^01([0|1|6|7|8|9])?([0-9]{3,4})?([0-9]{4})$/;
-
-
-export default function Login() {
+export default function Login({}) {
 
 
 
     const [visible, setVisible] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
-    const mode = useRef<"login"|"signin"|"validate">("login"); // ref로 바꿈 예정
+    const [mode, setMode] = useState<"login"|"signin"|"validate"|"done">("login"); // ref로 바꿈 예정
+
+    const loadingMsg = useRef<number>(0);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const isValidated = useRef(false);
     const {setIsLogined} = useStore();
+    const {push}       = useRouter();
 
     const validate = {
         email: (value:string)=>{
@@ -228,42 +229,35 @@ export default function Login() {
     }
     const onSubmit = (e) => {
         e.preventDefault();
-        if(mode.current === 'login') {
+        if(mode === 'login') {
             if(validate['email'](input.email) && validate['password'](input.password)) {
-                setIsSubmitting(true);
-                axios.post("http://49.247.43.169:8080/authenticate", {
-                    username:input.email,
-                    password:input.password,
-                }).then(res=>{
-                    setIsLogined(true);
-                    cookies.set('jwt', res.data, {httpOnly:true, path:"/"});
-                }).finally(()=>setIsSubmitting(false));
-
-                
-            }            
+                submitLogin();
+            }
         } else {
             if(validate['email'](input.email) && validate['password'](input.password) && validate['passwordConfirm'](input.passwordConfirm) && validate['phoneNumber'](input.phoneNumber)) {
                 // signup
-
                 setIsSubmitting(true);
                 setIsChanging(true);
-
-                setTimeout(()=>{
+                    
+                getEmailAuthCode(input.email).then(res=>{
+                    if(res) {
+                        toast.success("인증번호가 당신의 이메일로 전송되었습니다.");
+                    } else {
+                        toast.error("인증번호를 전송하는 데 에러가 발생하였습니다.");
+                    }
                     setIsLoading(false);
-                }, 1000);
+                })
 
                 setTimeout(()=>{
-                    mode.current = "validate";
+                    setMode("validate");
                     setIsSubmitting(false);
                     //setInput({email:'', password:'', passwordConfirm:'', phoneNumber:''})
                     setIsChanging(false);
                 }, 400);
             }
         }
-
-
     }
-    
+
     const [input, setInput] = useState<FormValues>({
         email:'',
         password:'',
@@ -273,7 +267,7 @@ export default function Login() {
     const changeMode = ()=>{
         setIsChanging(true);
         setTimeout(()=>{
-            mode.current = mode.current === "login" ? "signin" : "login";
+            setMode(val=>val === "login" ? "signin" : "login");
             setIsSubmitting(false);
             setInput({email:'', password:'', passwordConfirm:'', phoneNumber:''})
             setIsChanging(false);
@@ -287,108 +281,169 @@ export default function Login() {
         })
     }
 
-    const inputRefs = useRef([]);
+    const inputRefs = useRef<HTMLInputElement[]>([]);
 
-    const onCodeSubmit =()=> {
-        let code = "";
-        for(let i=0;i<6;i++) {
-            code += inputRefs.current[i].value;
+    useEffect(() => {
+            window.addEventListener('keydown', e => {
+               if(inputRefs.current.length === 6 && inputRefs.current[0]?.value === "" && e.key !== "Backspace" && e.key !== "Enter") {
+                   inputRefs.current[0].focus();
+               }
+            })
+    }, [])
+
+
+    const onCodeChange = ()=> {
+        if(inputRefs.current.map(el=>el.value).join('').length == 6) {
+            onCodeSubmit();
         }
-        //some api validation logic
-        
-        // api login logic
-        axios.post("http://49.50.166.9:8080/authenticate", {
-            username:input.email,
-            password:input.password,
-        }).then(res=>{
-            setIsLogined(true);
-            cookies.set('jwt', res.data, {httpOnly:true, path:"/"});
-        })
-        // if validated, set "isValidated" ref to true
-
-        setIsChanging(true);
-        setTimeout(()=>{
-            isValidated.current = true;
-            setIsChanging(false);
-        }, 300);
     }
+    const onCodeSubmit =()=> {
+        loadingMsg.current = 1;
+        setIsLoading(true);
+
+        submitAuthCode(inputRefs.current.map(el=>el.value).join(''))
+    }
+    const submitAuthCode = (code:string)=> {
+        verifyEmailAuthCode(input.email, code, input.email, input.password, input.phoneNumber).catch(err=>{
+            if(err.response.status === 400) {
+                setIsChanging(true);
+                setMode("done");
+                setTimeout(()=>{
+                    setIsChanging(false);
+                    
+                }, 400);
+            }
+            else {
+                toast.error("회원가입을 하는 데 오류가 발생하였습니다.");
+            }
+        }).finally(()=>{
+            loadingMsg.current = 0;
+            setIsLoading(false);
+        })
+    }
+    // const submitSignup = () => {
+    //     register({name:input.email, password:input.password, phoneNumber:input.phoneNumber}).then(r=>{
+    //         console.log(r)
+    //         if(r == 200) {
+    //             setIsChanging(true);
+    //             setMode("done");
+    //             setTimeout(()=>{
+    //                 setIsChanging(false);
+                    
+    //             }, 400);
+    //         }
+    //     }).catch(err=>{
+    //         if(err.response.status === 500) {
+    //             toast.error("이미 가입된 이메일입니다.");
+    //             changeMode();
+    //         }
+    //     })
+    // }
+    const submitLogin = () => {
+        setIsSubmitting(true);
+        login(input.email, input.password).then(res=>{
+            if(res) {
+                toast.success("로그인 성공!");
+                setIsLogined(true);
+                push('/');                
+            }
+            else {
+                toast.error("이메일 또는 비밀번호가 일치하지 않습니다.");
+            }
+        }).
+        catch(err=>{
+            toast.error("로그인을 하는데 오류가 발생했습니다.");
+        }).finally(()=>setIsSubmitting(false));
+    }
+
     return <Adjuster>
-            {mode.current === "validate" ? <>
-
+            {mode === "validate" ? <> 
                 <Container isChanging={isChanging}>
-                    {isValidated.current ? <>
-                        <h2>인증이 완료되었습니다</h2>
-
-                        <SubmitButton onClick={()=>setIsLogined(true)} isDisabled={false}>메인으로</SubmitButton>
-
-                        
-                    </>:<>
-                        <h1>이메일 인증</h1>
-                        <LoadingText done={isLoading}>인증 번호를 {input.email}로 전송 중...</LoadingText>
-                        <CodeContainer onSubmit={onCodeSubmit} done={isLoading}>
-                            {[...Array(6)].map((_, i)=><>
+                    <h1>이메일 인증</h1>
+                        {loadingMsg.current === 0 ? <>
+                            <LoadingText done={isLoading}>인증 번호를 {input.email}로 전송 중...</LoadingText>                        
+                        </>:<>
+                            {loadingMsg.current === 1 ? <>
+                                <LoadingText done={isLoading}>인증하는 중...</LoadingText>
+                            </>:<>
+                                <LoadingText done={isLoading}>계정을 생성하는 중...</LoadingText>
+                            </>}
+                        </>}
+                        <CodeContainer done={isLoading}>
+                            {[...Array(6)].map((_, i)=>
                                 <div key={i}>
-                                    <input key={i+6} type="text" maxLength={1} onDrop={()=>false} ref={el => (inputRefs.current[i] = el)} onChange={e=>e.target.value.length === 1 ? i<5&&inputRefs.current[i+1].focus() : i>0 && inputRefs.current[i-1].focus()}/>
-                                </div>                        
-                            </>)}
-                            
-                            
-    
-                        </CodeContainer>                    
-                        <CodeSubmit done={isLoading} onClick={onCodeSubmit}>인증하기</CodeSubmit>
-                    </>}
+                                    <input key={i}
+                                           type="text"
+                                           maxLength={1}
+                                           onDrop={()=>false}
+                                           ref={el => (inputRefs.current[i] = el)}
+                                           onChange={e=>{
+                                                onCodeChange();
+                                                e.target.value.length === 1 ?
+                                                i < 5 &&inputRefs.current[i+1].focus() :
+                                                i > 0 && inputRefs.current[i-1].focus()
+                                           }
+
+                                          }
+                                    />
+                                </div>
+                            )}
+                        </CodeContainer>
                 </Container>
-            
+
             </> : <>
-                {mode.current === "login" ? <Container isChanging={isChanging}>
-                    <h1>로그인</h1>
-                    <form onSubmit={onSubmit}>
-                        <Input>
-                            <PrettyInput name="email" value={input.email} onChange={onChange}
-                            placeholder="이메일"/>
-                            <EmailIcon fontSize="small"/>
-                        </Input>
-                        <Input>
-                            <PrettyInput type={visible ? "text" : "password"} name="password" onChange={onChange} value={input.password} placeholder="비밀번호"/>
-                            <div onClick={()=>setVisible(state=>!state)} style={{cursor:"pointer"}}>
-                                {visible ? <Visibility fontSize="small"/> : <VisibilityOff fontSize="small"/>}
-                            </div>
-                        </Input>
-                        <SubmitButton type="submit" isDisabled={isSubmitting} disabled={isSubmitting}>로그인</SubmitButton>
-                    </form>            
-                </Container> : <Container isChanging={isChanging}>
-                <h1>회원가입</h1>
-                    <form onSubmit={onSubmit}>
-                        <Input>
-                            <PrettyInput name="email" value={input.email} onChange={onChange}
-                            placeholder="이메일"/>
-                            <EmailIcon fontSize="small"/>
-                        </Input>
-                        <Input>
-                            <PrettyInput type={visible ? "text" : "password"} name="password" onChange={onChange} value={input.password} placeholder="비밀번호"/>
-                            <div onClick={()=>setVisible(state=>!state)} style={{cursor:"pointer"}}>
-                                {visible ? <Visibility fontSize="small"/> : <VisibilityOff fontSize="small"/>}
-                            </div>
-                        </Input>
-                        <Input>
-                            <PrettyInput type={visible ? "text" : "password"} name="passwordConfirm" onChange={onChange} value={input.passwordConfirm} placeholder="비밀번호 확인"/>
-                        </Input>
-                        <Input>
-                            <PrettyInput name="phoneNumber" value={input.phoneNumber} onChange={onChange}
-                            placeholder="전화번호"/>
-                            <Call fontSize="small"/>
-                        </Input>
-                        <SubmitButton type="submit" isDisabled={isSubmitting} disabled={isSubmitting}>회원가입</SubmitButton>
-                    </form>   
-                </Container>}
-                <ChangeButton onClick={changeMode} isDisabled={isChanging} disabled={isChanging}>
-                    {mode.current==="login" ? "회원가입으로" : "로그인으로"}
-                </ChangeButton>            
+                {mode === "done" ? <>
+                    <Container isChanging={isChanging}>
+                        <h1>이메일 인증이 완료되었습니다!</h1>
+                    </Container>
+                </>:<>
+                    {mode === "login" ? <Container isChanging={isChanging}>
+                        <h1>로그인</h1>
+                        <form onSubmit={onSubmit}>
+                            <Input>
+                                <PrettyInput name="email" value={input.email} onChange={onChange}
+                                placeholder="이메일"/>
+                                <EmailIcon fontSize="small"/>
+                            </Input>
+                            <Input>
+                                <PrettyInput type={visible ? "text" : "password"} name="password" onChange={onChange} value={input.password} placeholder="비밀번호"/>
+                                <div onClick={()=>setVisible(state=>!state)} style={{cursor:"pointer"}}>
+                                    {visible ? <Visibility fontSize="small"/> : <VisibilityOff fontSize="small"/>}
+                                </div>
+                            </Input>
+                            <SubmitButton type="submit" isDisabled={isSubmitting} disabled={isSubmitting}>로그인</SubmitButton>
+                        </form>
+                    </Container> : <Container isChanging={isChanging}>
+                    <h1>회원가입</h1>
+                        <form onSubmit={onSubmit}>
+                            <Input>
+                                <PrettyInput name="email" value={input.email} onChange={onChange}
+                                placeholder="이메일"/>
+                                <EmailIcon fontSize="small"/>
+                            </Input>
+                            <Input>
+                                <PrettyInput type={visible ? "text" : "password"} name="password" onChange={onChange} value={input.password} placeholder="비밀번호"/>
+                                <div onClick={()=>setVisible(state=>!state)} style={{cursor:"pointer"}}>
+                                    {visible ? <Visibility fontSize="small"/> : <VisibilityOff fontSize="small"/>}
+                                </div>
+                            </Input>
+                            <Input>
+                                <PrettyInput type={visible ? "text" : "password"} name="passwordConfirm" onChange={onChange} value={input.passwordConfirm} placeholder="비밀번호 확인"/>
+                            </Input>
+                            <Input>
+                                <PrettyInput name="phoneNumber" value={input.phoneNumber} onChange={onChange}
+                                placeholder="전화번호"/>
+                                <Call fontSize="small"/>
+                            </Input>
+                            <SubmitButton type="submit" onClick={onSubmit} isDisabled={isSubmitting} disabled={isSubmitting}>회원가입</SubmitButton>
+                        </form>
+                    </Container>}
+                    <ChangeButton onClick={changeMode} isDisabled={isChanging} disabled={isChanging}>
+                        {mode==="login" ? "회원가입으로" : "로그인으로"}
+                    </ChangeButton>                
+                </>}
+
             </>}
-
-            
-
-
-    
     </Adjuster>
 }
+

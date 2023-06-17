@@ -2,8 +2,9 @@ import { faker, fakerRO } from '@faker-js/faker'
 
 export type Person = {
     id:number;
-    name:string;
+    email:string;
     password:string;
+    phoneNumber:string;
     points:number;
     subRows?:Person[];
 }
@@ -19,9 +20,10 @@ const range = (len: number) => {
 const newPerson = (): Person => {
   return {
     id:faker.number.int(),
-    name:faker.name.firstName(),
+    email:faker.name.firstName(),
     password:faker.string.sample(),
     points:faker.number.int(),
+    phoneNumber:faker.name.jobTitle()
   }
 }
 

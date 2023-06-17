@@ -5,24 +5,24 @@ import { Avatar } from "@mui/material";
 import PrettySwitch from "./switch";
 import useStore from "../store";
 import shallow from "zustand";
+import {useRouter} from "next/navigation";
 import Link from "next/link";
 import Cookies from 'universal-cookie';
-import axios from "axios";
+import {logout} from "@/lib/api/auth";
 const cookie = new Cookies();
 const Padding = styled.div`
 
     width:100%;
     height:50px;
 `
+
 const Container = styled.div`
     left:0;
     width:100%;
     height:50px;
     padding: 0 40px;
-    box-shadow: 0 0px 10px 2px #bbb;
     display:flex;
     align-items: center;
-
     justify-content: space-between;
     background-color: ${p=>p.theme.colors.blockColor};
     z-index:1000;
@@ -52,7 +52,6 @@ const SearchBar = styled.input`
     padding-right:35px;
     border-radius: 30px;
     border:none;
-    box-shadow: 0px 0px 10px 1px #bbbbbb35;
     background-color: ${p=>p.theme.colors.bgColor};
     &:focus {
         outline:none;
@@ -72,7 +71,7 @@ const HoverMenuAdjust = styled.div`
     top:50px;
 
 `
-const HoverMenuContainer = styled.div<{active:boolean}>`
+const   HoverMenuContainer = styled.div<{active:boolean}>`
     overflow:hidden;
 
     margin-top:10px;
@@ -117,12 +116,12 @@ const SearchComponent = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        
+
     }
 
     return <InputContainer onSubmit={onSubmit}>
-            <SearchBar value={value} onChange={e=>setValue(e.target.value)}/>
-            <div><Search fontSize="small"/></div>      
+            <SearchBar placeholder={"검색어를 입력해주세요"} value={value} onChange={e=>setValue(e.target.value)}/>
+            <div><Search fontSize="small"/></div>
     </InputContainer>
 
 }
@@ -150,21 +149,19 @@ const HoverMenuOption = styled.div`
 
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
-    const {themeMode, setThemeMode, setIsLogined} = useStore();
-    const [curPoint, setCurPoint] = useState("");
-    axios.get("http://49.247.43.169:8080/get/point/user").then(res=>{
-        setCurPoint(res.data);
-    })
+    const {themeMode, setThemeMode, setIsLogined,isLogined} = useStore();
+    const {push} = useRouter();
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
             <HoverMenuContainer  active={active || menuHover}>
                 <div>Good to see you, {"nickname"}.</div>
-                <HoverMenuOption><div>Point:</div><div>{curPoint}</div></HoverMenuOption>
+                <HoverMenuOption><div>Point:</div><div>1000</div></HoverMenuOption>
                 <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={setThemeMode}/></HoverMenuOption>
-                <PrettyButton onClick={()=>{
-                    cookie.remove("jwt");
+                <PrettyButton onClick={()=> {
+                    logout();
                     setIsLogined(false);
-                }}>Logout</PrettyButton>
+                    push("/auth/login");
+                }}>Login</PrettyButton>
             </HoverMenuContainer>
 
     </HoverMenuAdjust>
@@ -175,11 +172,10 @@ const NavBar = () => {
     return <>
 
     <Container>
-        <Link href="/"><h2>CoinPick365</h2></Link>
-       
+        <Link href="/"><h2>LOGO</h2></Link>
+
         <SearchComponent/>
         <RightSide>
-            <Link href="/admin">admin{"<dev>"}</Link>
             <Link href="/notice">notice</Link>
             <Link href="/pay">pay</Link>
             <AvatarContainer onMouseEnter={()=>{
@@ -193,7 +189,7 @@ const NavBar = () => {
                 <Avatar/>
             </AvatarContainer>
 
-            <HoverMenu active={isHover}/>            
+            <HoverMenu active={isHover}/>
         </RightSide>
 
     </Container>

@@ -3,14 +3,12 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components"
 
-
 const Adjust = styled.div`
     width:100%;
     height:100%;
     display: flex;
     justify-content: center;
     align-items: center;
-
 `
 const Container = styled.div`
     width:300px;
@@ -25,7 +23,7 @@ const Container = styled.div`
     border-radius:1em;
 `
 const ThankTitle = styled.div`
-    color:${p=>p.theme.colors.textColor};
+    color:${p=>p.theme.colors.signatureBlue};
     font-size:1.6em; 
     font-weight:bold;
 `
@@ -49,24 +47,40 @@ const HomeBtn = styled.div`
     display:flex;
     justify-content: center;
     align-items: center;
-    color:white;
 `
 export default function Complete({orderId, secretKey}) {
-    
+
     const basicToken = Buffer.from(`${secretKey}:`, "utf8").toString("base64");
     const router = useRouter();
     const url = `https://api.tosspayments.com/v1/payments/orders/${orderId}`;
     const [data, setData] = useState(null);
+
     useEffect(()=>{
         axios.get(url, {
             headers: {
               Authorization: `Basic ${basicToken}`,
               "Content-Type": "application/json",
             },
-        }).then((res) => {setData(res.data);console.log(res.data)});
+        }).then((res) => {
+                setData(res.data);
+                console.log(res.data);
+                sendToBack(orderId,res.data.totalAmount,res.data.paymentKey)
+            }
+        );
 
     }, [orderId])
-    
+
+    const sendToBack = async (orderId,amount,paymentKey) => {
+        await axios.get(
+            `https://coinpick365.com:8080/success?orderId=${orderId}&amount=${amount}&paymentKey=${paymentKey}`,{
+                headers: {
+                    Authorization: `Basic ${basicToken}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        )
+    }
+
     return (
         <>
             <Adjust>

@@ -1,7 +1,6 @@
 import Pay_point from "@/components/payments/Paybtn"
 import { ArrowBack, Backspace } from "@mui/icons-material"
 import { Avatar } from "@mui/material"
-import axios from "axios"
 import { useEffect, useRef, useState } from "react"
 import styled, { css, keyframes } from "styled-components"
 
@@ -38,7 +37,6 @@ const Container = styled.div<{isChanging:boolean}>`
     align-items: center;
     gap:10px;
     animation: ${p=>p.isChanging ? css`${GoLeft} 0.4s ease forwards` : css`${GoRight} 0.4s ease forwards`};
-
     width:450px;
 `
 const UserContainer = styled.div<{inited:boolean}>`
@@ -60,7 +58,7 @@ const UserContainer = styled.div<{inited:boolean}>`
     }
 `
 const UserProperty = styled.div`
-    display:flex;
+    display: flex;
     flex-direction: column;
     align-items: flex-end;
     justify-content: space-between;
@@ -76,9 +74,8 @@ const PayContainer = styled.div<{inited:boolean}>`
         margin-bottom:20px;
     }
     span {
-  
         font-size:3em;
-        padding:0 10px;
+        padding:${p=>p.inited ? "0 10px" : 0};
         transition: 0.3s ease;
         border-radius: 10px;
         background-color: ${p=>p.theme.colors.bgColor};
@@ -98,7 +95,6 @@ const NextBtn = styled.div`
     display:flex;
     justify-content: center;
     align-items: center;
-    color:white;
 `
 const BackBtn = styled.div`
     position:absolute;
@@ -116,26 +112,19 @@ const PrettyNumber = styled.div`
     background-color: ${p=>p.theme.colors.bgColor};
     color:${p=>p.theme.colors.signatureBlue};
     font-weight: bold;
-    user-select: all;
 `
 const NumberContainer = styled.div`
     display:flex;
     gap:5px;
     text-align: right;
 `
-
-const point_amount = 30000; // 시그널 공개 시 필요한 포인트
 const Pay = () => {
 
     const [inited, setInited] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
-
-    const curPoint = useRef("");
-    axios.get("http://49.247.43.169:8080/get/point/user").then(res=>{
-        curPoint.current = res.data;
+    setTimeout(() => {
         setInited(true);
-    })
-
+    }, 300);
     const mode = useRef<"confirm"|"pay">("confirm");
     const changeMode = ()=>{
         setIsChanging(true);
@@ -146,7 +135,6 @@ const Pay = () => {
     }
     return <Adjust>
         <Container isChanging={isChanging}>
-
             <UserContainer inited={inited}>
                 {inited ? <>
                     <Avatar/>
@@ -155,22 +143,19 @@ const Pay = () => {
                             <span>nickname</span>
                             <NumberContainer>
                                 <span>현재 포인트 : </span>
-                                <PrettyNumber>{curPoint.current}</PrettyNumber>
+                                <PrettyNumber>1000</PrettyNumber>
                             </NumberContainer>
                         </>:<>
                             <NumberContainer>
                                 <span>현재 포인트 : </span>
-                                <PrettyNumber>{curPoint.current}</PrettyNumber>
+                                <PrettyNumber>1000</PrettyNumber>
                             </NumberContainer>
                             <div style={{display:"flex", gap:"5px"}}>
                                 <span>충전할 포인트 : </span>
-                                <PrettyNumber>{point_amount}</PrettyNumber>
+                                <PrettyNumber>30000</PrettyNumber>
                             </div>
-                            
                         </>}
-                    </UserProperty>  
-
-             
+                    </UserProperty>
                 </> : <>
                     <p>Loading...</p>
                 </>}
@@ -179,27 +164,18 @@ const Pay = () => {
             <PayContainer inited={inited}>
                 {mode.current === "confirm" ? <>
                     <p>다음 포인트를 충전합니다</p>
-                    <span>{point_amount}</span>
+                    <span>{inited ? "30000" : ""}</span>
                     <NextBtn onClick={changeMode}>
                         다음
-                    </NextBtn>                
+                    </NextBtn>
                 </>:<>
                     <BackBtn onClick={changeMode}><ArrowBack/>뒤로</BackBtn>
-                   
-
-             
                         <p>센트코인 지갑 주소</p>
                          <PrettyNumber>0x2430Fb3DB4fba6391a65ffc94704042bd5Bc86a9</PrettyNumber>
-                    
-
                     <p>또는</p>
-                     
-          
-                    {Pay_point({amount:point_amount})}
+                    {Pay_point({amount:30000})}
                 </>}
-
             </PayContainer>
-            
         </Container>
     </Adjust>
 }

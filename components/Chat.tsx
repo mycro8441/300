@@ -1,48 +1,21 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
-import useSWR from "swr";
+import useSWR, {useSWRConfig} from "swr";
+import useSWRMutation from "swr/mutation"
+import {getChat, sendMessage} from "@/lib/api/chat";
 
-
-
-
-const sendMessage = (msg:string) => {
-    axios.post("http://49.247.43.169:8080/post/chat", {chatContent:msg}).then(res=>{
-        console.log(res)
-    });
-}
-const ChatInput = () => {
-    const [input, setInput] = useState<string>('');
-
-    const onSubmit = e => {
-        e.preventDefault();
-
-        sendMessage(input);
-        setInput('');
-    }
-    const onChange = e => {
-        setInput(e.target.value)
-    }
-    return <>
-        <InputContainer onSubmit={onSubmit}>
-            <input placeholder="채팅을 입력해주세요." value={input} onChange={onChange}/>
-            <InputSubmitBtn>
-                Send
-            </InputSubmitBtn>
-        </InputContainer>
-    </>
-
-}
 const InputContainer = styled.form`
     width:100%;
-    height:3em;
+    height:3.3em;
     display:flex;
     gap:5px;
-    padding:5px;
+    padding:10px;
     input {
         flex:1;
+        outline: none;
         border:none;
-        border-radius:15px;
+        border-radius:12px;
         padding-left:15px;
         font-size: 1em;
         background-color: ${p=>p.theme.colors.bgColor};
@@ -53,13 +26,15 @@ const InputSubmitBtn = styled.button`
     width:5em;
     border:none;
     height:100%;
-    border-radius: 15px;
+    border-radius: 12px;
     background-color:${p=>p.theme.colors.signatureBlue};
     display:flex;
     justify-content: center;
     align-items: center;
     cursor:pointer;
-    
+    &:hover {
+      opacity:0.8;
+    }
 `
 
 const MessageContainer = styled.div`
@@ -86,30 +61,6 @@ type Chat = {
     chatSender:string;
     id:number;
 }
-const ChatDisplay = () => {
-    const { data, error } = useSWR<Chat[]>("http://49.247.43.169:8080/get/chat");
-    
-    const chatRef = useRef(null);
-
-
-    useEffect(()=>{
-        chatRef.current.scrollIntoView(false, {behavior:"smooth"});
-    }, [data])
-    return <>
-        <DisplayContainer ref={chatRef}>
-            {data?.map(chat=>(
-                <MessageContainer key={chat.id}>
-                    <NickContainer>
-                        {chat.chatSender}
-                    </NickContainer>
-                    <TextContainer>
-                        {chat.chatSender}
-                    </TextContainer>
-                </MessageContainer>                
-            ))}
-        </DisplayContainer>
-    </>
-}
 const DisplayContainer = styled.div`
     flex:1;
     width:100%;
@@ -130,20 +81,73 @@ const DisplayContainer = styled.div`
     }
 `
 const Chat = () => {
-    //const {data, error, isValidating, mutate} = useSWR('/api/chat/messages', getMessages);
+    const { mutate } = useSWRConfig();
+    const { data, error} = useSWR<Chat[]>("/get/chat",getChat);
+    const [input, setInput] = useState<string>('');
 
+    const onSubmit = async (e) => {
+        e.preventDefault();
 
-    return <>
-        <Adjuster>
-            <ChatDisplay/>
-            <ChatInput/>
-        </Adjuster>
-    
-    </>
+        const newChat = {
+            id: Math.random(),
+            chatContent: input,
+            chatDate: new Date().toISOString(),
+            chatSender: null,
+        };
+
+        try {
+            await mutate(
+                "/get/chat",
+                 sendMessage(input),
+                {
+                    optimisticData:data => [
+                        ...data,
+                        newChat,
+                    ],
+                    rollbackOnError: true,
+
+                }
+            )
+            setInput('');
+        } catch (error) {
+            console.error('메시지 전송 중 오류 발생:', error);
+        }
+    };
+    const onChange = e => {
+        setInput(e.target.value)
+    }
+
+    useEffect(() => {
+        console.log(data)
+    },[data])
+
+    return (<Adjuster>
+            <DisplayContainer >
+                {data?.sort(
+                    (a,b)=>new Date(a.chatDate).getTime() - new Date(b.chatDate).getTime()
+                ).map(chat=>(
+                    <MessageContainer key={chat.id}>
+                        <NickContainer>
+                            {chat.chatSender}
+                        </NickContainer>
+                        <TextContainer>
+                            {chat.chatContent}
+                        </TextContainer>
+                    </MessageContainer>
+                ))}
+            </DisplayContainer>
+            <InputContainer onSubmit={onSubmit}>
+                <input placeholder="채팅을 입력해주세요." value={input} onChange={onChange}/>
+                <InputSubmitBtn>
+                    Send
+                </InputSubmitBtn>
+            </InputContainer>
+        </Adjuster>)
 }
 const Adjuster = styled.div`
     display:flex;
     flex-direction: column;
+    justify-content: space-between;
     width:100%;
     height:100%;
 `

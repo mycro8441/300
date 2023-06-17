@@ -11,7 +11,7 @@ class MyDocument extends Document {
           sheet.collectStyles(<App {...props}/>),
       });
       const initialProps = await Document.getInitialProps(ctx);
-      return { 
+      return {
         ...initialProps,
         styles: (
           <>
@@ -23,8 +23,6 @@ class MyDocument extends Document {
     } finally {
       sheet.seal()
     }
-    
-    
   }
 
   render() {
@@ -34,9 +32,9 @@ class MyDocument extends Document {
           <meta charSet="utf-8" />
           <meta name="robots" content="follow, index" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-          <meta 
-          httpEquiv="Content-Security-Policy" 
-          content="upgrade-insecure-requests" 
+          <meta
+          httpEquiv="Content-Security-Policy"
+          content="upgrade-insecure-requests"
         />
         </Head>
         <body>

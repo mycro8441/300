@@ -15,7 +15,7 @@ import {
 import { makeData, Person } from "utils/makeData";
 import Switch from "@/components/switch";
 import { toast } from "react-toastify";
-import useSWR from "swr";
+import { banUser, getUserList, setPoint } from "@/lib/api/admin";
 
 const Container = styled.div`
 
@@ -182,32 +182,45 @@ const PrettySelect = styled.select`
     }
     
 `
-const BanBtn = styled.button`
+const Banbtn = styled.div`
+  height:100%;
+  width:40px;
+  border-radius:5px !important;
+  cursor:pointer;
+  display:flex;
+  justify-content: center;
+  align-items:center;
   background-color: ${p=>p.theme.colors.signatureRed};
-  border:none;
-  border-radius: 6px;
 `
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends RowData> {
       updateData: (rowIndex: number, columnId: string, value: unknown) => void
     }
 }
-const BanUser = () => {
   
-}
   // Give our default column cell renderer editing superpowers!
 const defaultColumn: Partial<ColumnDef<Person>> = {
     cell: ({ getValue, row: { index,original }, column: { id }, table }) => {
-      if(id === "Ban") {
-        return <BanBtn value={original.name}>BAN</BanBtn>
-      }
       const initialValue = getValue()
       // We need to keep and update the state of the cell normally
       const [value, setValue] = useState(initialValue)
-  
+      
+      if(id === "Ban") {
+        return <Banbtn onClick={()=>{
+          banUser(original.email).then(res=>{
+            toast.success(`${original.email}을 밴 처리하였습니다.`);
+          }).catch(err=>{
+            toast.error("밴 처리 과정에서 오류가 발생하였습니다.");
+          })
+        }}>
+          Ban
+        </Banbtn>
+      }
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
-        toast.info(<div><div>{original.name}의 정보를 수정함</div><br/><div>id: {original.id}</div><br/><div><>{id}의 값을</><br/><>{value}으로 설정함</></div></div>, {position:toast.POSITION.TOP_RIGHT});
+        if(id === "points") {
+          setPoint(original.email, original.points);
+        }
         table.options.meta?.updateData(index, id, value)
       }
   
@@ -250,8 +263,8 @@ const Index = () => {
     const columns = useMemo<ColumnDef<Person>[]>(
       () => [
         {
-          header: 'Name',
-          accessorKey:'name',
+          header: 'Email',
+          accessorKey:'email',
           footer: props => props.column.id,
           
         },
@@ -266,15 +279,34 @@ const Index = () => {
             footer: props => props.column.id,
         },
         {
-          width:300,
-          header:"Ban",
+            header:'Number',
+            accessorKey:"phoneNumber",
+            footer:props=>props.column.id,
+        },
+        {
+            width:300,
+            header:"Ban"
         }
       ],
       []
     )
 
+    const [data, setData] = useState<Person[]>();
+    
+      
+    const mutate = () => {
+      setData(makeData(100));
+      // getUserList().then(res=>{
+      //   setData(res);
+      // }).catch(err=>{
+      //   toast.error("사용자 목록을 가져오는 데 실패했습니다.")
+      //   console.log(err)
+      // })
+    }
 
-    const {data, error, mutate} = useSWR(`http://49.247.43.169:8080/get/user/all`)
+    useEffect(()=>{
+      mutate();
+    }, [])
     const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper()
     const table = useReactTable({
         data,
@@ -421,7 +453,7 @@ const Index = () => {
                       <PrettyButton onClick={() => rerender()}>Force Rerender</PrettyButton>
                   </div>
                   <div>
-                      {/* <PrettyButton onClick={() => mutate()}>Refresh Data</PrettyButton> */}
+                      <PrettyButton onClick={() => mutate()}>Refresh Data</PrettyButton>
                   </div>            
               </ButtonPlate>              
               </>}
