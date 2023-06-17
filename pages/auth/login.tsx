@@ -9,8 +9,13 @@ import { Call, ErrorSharp, InputSharp, Visibility, VisibilityOff } from "@mui/ic
 import {useRouter} from 'next/navigation';
 import useStore from "@/store/index";
 import {getEmailAuthCode, login, register, verifyEmailAuthCode} from "@/lib/api/auth";
+<<<<<<< HEAD
 
 
+=======
+import email from "next-auth/core/lib/email/signin";
+const cookies = new Cookies();
+>>>>>>> 702169ef5a34fcaad479c2cc20d6653ab4027a91
 
 const Adjuster = styled.div`
     display:flex;
@@ -231,7 +236,19 @@ export default function Login({}) {
         e.preventDefault();
         if(mode === 'login') {
             if(validate['email'](input.email) && validate['password'](input.password)) {
+<<<<<<< HEAD
                 submitLogin();
+=======
+                setIsSubmitting(true);
+                login(input.email, input.password).then(res=>{
+                    toast.success("로그인 성공!");
+                    setIsLogined(true);
+                    push('/');
+                }).
+                catch(err=>{
+                    toast.error("로그인 실패!");
+                }).finally(()=>setIsSubmitting(false));
+>>>>>>> 702169ef5a34fcaad479c2cc20d6653ab4027a91
             }
         } else {
             if(validate['email'](input.email) && validate['password'](input.password) && validate['passwordConfirm'](input.passwordConfirm) && validate['phoneNumber'](input.phoneNumber)) {
@@ -447,3 +464,7 @@ export default function Login({}) {
     </Adjuster>
 }
 
+<<<<<<< HEAD
+=======
+}
+>>>>>>> 702169ef5a34fcaad479c2cc20d6653ab4027a91
