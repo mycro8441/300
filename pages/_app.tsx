@@ -41,13 +41,6 @@ export default function MyApp({
   }, [themeMode])
   useEffect( ()=>{
       if(window.localStorage.getItem("token") !== null) setIsLogined(true);
-      if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login") router.push("/auth/login"); // 메인, 로그인 페이지 외에는 로드인 없이 접근 불가
-      getUserInfo().then(res=>{
-        if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
-      })
-  },[router])
-  useEffect(()=>{
-    if(isLogined) {
       getUserInfo().then(res=>{
         const {
           id,
@@ -70,8 +63,13 @@ export default function MyApp({
           usrPw:usrPw,
         })
       })
-    }
-  }, [isLogined])
+      if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login") router.push("/auth/login"); // 메인, 로그인 페이지 외에는 로드인 없이 접근 불가
+
+      if(userInfo.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
+
+  },[router])
+
+
   return (
 
       <ThemeProvider theme={theme}>
