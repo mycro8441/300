@@ -61,11 +61,14 @@ export default function MyApp({
           points:point,
           ban:ban,
           usrPw:usrPw,
-        })
+        });
+        if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
       })
+
+      console.log(isLogined)
       if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login") router.push("/auth/login"); // 메인, 로그인 페이지 외에는 로드인 없이 접근 불가
 
-      if(userInfo.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
+      
 
   },[router])
 
