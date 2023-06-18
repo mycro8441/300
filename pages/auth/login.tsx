@@ -283,7 +283,6 @@ export default function Login({}) {
     const inputRefs = useRef<HTMLInputElement[]>([]);
 
     useEffect(() => {
-            if(isLogined) router.push("/404")
             window.addEventListener('keydown', e => {
                if(inputRefs.current.length === 6 && inputRefs.current[0]?.value === "" && e.key !== "Backspace" && e.key !== "Enter") {
                    inputRefs.current[0].focus();
