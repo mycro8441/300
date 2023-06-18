@@ -7,6 +7,7 @@ import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import useStore from "../store";
 import {getSignal} from "@/lib/api/signal";
+import { useRouter } from "next/router";
 
 const Container = styled.div`
     width:100%;
@@ -76,6 +77,7 @@ const PayBtn  =styled.div`
     justify-content: center;
     align-items: center;
     background-color: ${p=>p.theme.colors.signatureBlue};
+    cursor:pointer;
 `
 const OptionBlock = styled.div`
     height:100px;
@@ -190,7 +192,7 @@ export default function Signal({
     const {curPair, setCurPair} = useStore();
 
     const [mode, setMode] = useState<0|1|2|3>(0);
-
+    const router = useRouter()
     const { data, error } = useSWR<Signal[]>("/webhook/get/signal",getSignal,);
     const [finalData, setFinalData] = useState<Signal[]>([]);
     useEffect(()=>{
@@ -273,7 +275,9 @@ export default function Signal({
                 </SelectBar>
             </OptionBlock>
             <BubbleBox>
-                <PayBtn>현재 시그널 보기</PayBtn>
+                <PayBtn onClick={()=>{
+                    router.push("/pay")
+                }}>현재 시그널 보기</PayBtn>
                 <PrettyTable {...getTableProps()}>
                     <thead>
                         {headerGroups.map(headerGroup=>(
