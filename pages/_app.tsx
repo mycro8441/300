@@ -43,7 +43,7 @@ export default function MyApp({
       if(window.localStorage.getItem("token") !== null) setIsLogined(true);
       if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login") router.push("/auth/login"); // 메인, 로그인 페이지 외에는 로드인 없이 접근 불가
       getUserInfo().then(res=>{
-        if(isLogined && res.role !== "ROLE_ADMIN" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
+        if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
       })
   },[router])
   useEffect(()=>{

@@ -15,6 +15,7 @@ import {
 import Switch from "@/components/switch";
 import { toast } from "react-toastify";
 import { banUser, getUserList, setPoint } from "@/lib/api/admin";
+import { getPayUsers } from "@/lib/api/pay";
 
 const Container = styled.div`
 
@@ -476,13 +477,220 @@ const Index = () => {
 
       )
 }
-const Options = () => {
-    const [on, setOn] = useState<boolean>(false);
-    return <>
-        options
-        <Switch state={on} setfunc={setOn}/>
-    </>
+const PayUsers = () => {
+
+  const rerender = useReducer(() => ({}), {})[1]
+
+  const columns = useMemo<ColumnDef<User>[]>(
+    () => [
+      {
+        header:'id',
+        accessorKey:"id",
+        footer: props=>props.column.id,
+      },
+      {
+        header: 'Email',
+        accessorKey:'username',
+        footer: props => props.column.id,
+        
+      },
+      {
+        header: 'Number',
+        accessorKey:"phoneNumber",
+        footer: props => props.column.id,
+      },
+      {
+          header: 'Points',
+          accessorKey:'point',
+          footer: props => props.column.id,
+      },
+      {
+          width:300,
+          header:"Ban"
+      }
+    ],
+    []
+  )
+
+  const [data, setData] = useState<User[]>();
+  
+    
+  const mutate = () => {
+    getPayUsers().then(res=>{
+      setData(res);
+    }).catch(err=>{
+      toast.error("사용자 목록을 가져오는 데 실패했습니다.")
+      console.log(err)
+    })
+  }
+
+  useEffect(()=>{
+    mutate();
+  }, [])
+  const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper()
+  const table = useReactTable({
+      data,
+      columns,
+      defaultColumn,
+      getCoreRowModel: getCoreRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      autoResetPageIndex,
+      // Provide our updateData function to our table meta
+      meta: {
+        updateData: (rowIndex, columnId, value) => {
+          // Skip page index reset until after next rerender
+          skipAutoResetPageIndex()
+          // setData(old =>
+          //   old.map((row, index) => {
+          //     console.log(old)
+          //     if (index === rowIndex) {
+          //       return {
+          //         ...old[rowIndex]!,
+          //         [columnId]: value,
+          //       }
+          //     }
+          //     return row
+          //   })
+          // )
+        },
+      },
+      debugTable: false,
+    })
+
+
+    return (
+      <>
+          <BubbleBox>
+            {data&&<>
+            <PrettyTable>
+              
+                <thead>
+                {table?.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                    {headerGroup.headers.map(header => {
+                        return (
+                        <th key={header.id} colSpan={header.colSpan}>
+                            {header.isPlaceholder ? null : (
+                            <div>
+                                {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                                )}
+                                {header.column.getCanFilter() ? (
+                                <div>
+                                    <Filter column={header.column} table={table} />
+                                </div>
+                                ) : null}
+                            </div>
+                            )}
+                        </th>
+                        )
+                    })}
+                    </tr>
+                ))}
+                </thead>
+                <tbody>
+                {table?.getRowModel().rows.map(row => {
+                    return (
+                    <tr key={row.id}>
+                        {row.getVisibleCells().map(cell => {
+                        return (
+                            <td key={cell.id}>
+                            {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                            )}
+                            </td>
+                        )
+                        })}
+                    </tr>
+                    )
+                })}
+                </tbody>
+            </PrettyTable>
+            <ButtonPlate>
+                <PrettyButton
+                onClick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
+                >
+                {'<<'}
+                </PrettyButton>
+                <PrettyButton
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                >
+                {'<'}
+                </PrettyButton>
+                <PrettyButton
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                >
+                {'>'}
+                </PrettyButton>
+                <PrettyButton
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+                >
+                {'>>'}
+                </PrettyButton>
+                <PrettySpan>
+                <div>Page</div>
+                <strong>
+                    {table.getState().pagination.pageIndex + 1} of{' '}
+                    {table.getPageCount()}
+                </strong>
+                </PrettySpan>
+                <PrettySpan>
+                | Go to page:
+                <MiniInput
+                    type="number"
+                    min={0}
+                    defaultValue={table.getState().pagination.pageIndex + 1}
+                    onChange={e => {
+                    const page = e.target.value ? Number(e.target.value) - 1 : 0
+                    table.setPageIndex(page)
+                
+                    }}
+                />
+                </PrettySpan>
+                <PrettySelect
+                value={table.getState().pagination.pageSize}
+                onChange={e => {
+                    table.setPageSize(Number(e.target.value))
+                }}
+                >
+                {[10, 20, 30].map(pageSize => (
+                    <option key={pageSize} value={pageSize}>
+                    Show {pageSize}
+                    </option>
+                ))}
+                </PrettySelect>
+            </ButtonPlate>
+            <ButtonPlate>
+                <div>{table.getRowModel().rows.length} Rows</div>
+                <div>
+                    <PrettyButton onClick={() => rerender()}>Force Rerender</PrettyButton>
+                </div>
+                <div>
+                    <PrettyButton onClick={() => mutate()}>Refresh Data</PrettyButton>
+                </div>            
+            </ButtonPlate>              
+            </>}
+
+          </BubbleBox>     
+
+      </>
+
+    )
 }
+// const Options = () => {
+//     const [on, setOn] = useState<boolean>(false);
+//     return <>
+//         options
+//         <Switch state={on} setfunc={setOn}/>
+//     </>
+// }
 function Filter({
     column,
     table,
@@ -555,8 +763,8 @@ export default function Admin() {
                 <SidebarOption activated={mode[0]} onClick={()=>{curpage.current=<Index/>;curpageName.current = "DashBoard"; Select(0)}}>
                     Dashboard
                 </SidebarOption>
-                <SidebarOption activated={mode[1]} onClick={()=>{curpage.current=<Options/>;curpageName.current = "Config";Select(1)}}>
-                    Config
+                <SidebarOption activated={mode[1]} onClick={()=>{curpage.current=<PayUsers/>;curpageName.current = "Config";Select(1)}}>
+                    PayUsers
                 </SidebarOption>
             </Sidebar>
             <Main>
