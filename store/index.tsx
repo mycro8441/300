@@ -25,7 +25,7 @@ interface serviceI {
 
 const useStore = create<serviceI>(set=>({
     themeMode:true,
-    isLogined:true,
+    isLogined:false,
     curPair:"BTCUSDT",
     setIsLogined:(value:boolean)=>set(()=>({isLogined:value})),
     setThemeMode:(value:boolean)=>set(()=>({themeMode:value})),

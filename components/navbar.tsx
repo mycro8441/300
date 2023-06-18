@@ -175,7 +175,7 @@ const HoverMenu = ({active} : {active:boolean})=> {
 }
 const NavBar = () => {
     const [isHover, setIsHover] = useState<boolean>(false);
-
+    const {userInfo} = useStore()
     return <>
 
     <Container>
@@ -185,6 +185,7 @@ const NavBar = () => {
         <RightSide>
             <Link href="/notice">notice</Link>
             <Link href="/pay">pay</Link>
+            {userInfo.role === "ROLE_ADMIN" && <Link href="/pay"></Link>}
             <AvatarContainer onMouseEnter={()=>{
                 setIsHover(true)
             }}
