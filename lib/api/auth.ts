@@ -22,8 +22,8 @@ export const verifyEmailAuthCode = async (targetEmail: string, authCode: string,
     return data;
 }
 export const login = async (userId: string, password: string) => {
-    let a = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}authenticate`,
+    let a = await client.post(
+        "authenticate",
         {
             username: userId,
             password: password,
