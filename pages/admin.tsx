@@ -49,7 +49,7 @@ const Sidebar = styled.div`
     
 `
 const SidebarOption = styled.div<{activated:boolean}>`
-
+    color:white;
     height:2em;
     display:flex;
     justify-content: center;
@@ -186,7 +186,7 @@ const Banbtn = styled.div<{banned:boolean}>`
   height:100%;
   width:40px;
   border-radius:5px !important;
-  cursor:${p=>p.banned ? "none" : "pointer"};
+  cursor:${p=>p.banned ? "normal" : "pointer"};
   display:flex;
   justify-content: center;
   align-items:center;
@@ -219,8 +219,10 @@ const defaultColumn: Partial<ColumnDef<User>> = {
       
       if(id === "Ban") {
         return <Banbtn banned={original.ban} onClick={()=>{
-          banUser(original.email).then(res=>{
-            toast.success(`${original.email}을 밴 처리하였습니다.`);
+          // @ts-ignore
+          banUser(original.username).then(res=>{
+            // @ts-ignore
+            toast.success(`${original.username}을 밴 처리하였습니다.`);
           }).catch(err=>{
             toast.error("밴 처리 과정에서 오류가 발생하였습니다.");
           })
@@ -231,8 +233,10 @@ const defaultColumn: Partial<ColumnDef<User>> = {
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
         if(id == "point") {
-          setPoint(original.email, original.points).then(res=>{
-            toast.success(`${original.email}의 포인트를 변경하였습니다.`)
+          // @ts-ignore
+          setPoint(original.username, original.point).then(res=>{
+            // @ts-ignore
+            toast.success(`${original.username}의 포인트를 변경하였습니다.`)
           }).catch(err=>{
             toast.error("포인트 변경에 실패했습니다")
           })

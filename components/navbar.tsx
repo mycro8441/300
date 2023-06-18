@@ -155,7 +155,7 @@ const HoverMenu = ({active} : {active:boolean})=> {
 
             <HoverMenuContainer  active={active || menuHover}>
                 {isLogined ? <>
-                    <div>반갑습니다, {userInfo.email}님</div>
+                    <div>반갑습니다, {userInfo.email || "loading..."}님</div>
                     <HoverMenuOption><div>Point:</div><div>{userInfo.points}</div></HoverMenuOption>                  
                 </>:<>
                     <div>로그인 해주세요.</div>
