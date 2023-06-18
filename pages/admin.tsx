@@ -230,9 +230,11 @@ const defaultColumn: Partial<ColumnDef<User>> = {
       }
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
-        if(id === "point") {
+        if(id == "point") {
           setPoint(original.email, original.points).then(res=>{
-            console.log(res)
+            toast.success(`${original.email}의 포인트를 변경하였습니다.`)
+          }).catch(err=>{
+            toast.error("포인트 변경에 실패했습니다")
           })
         }
         table.options.meta?.updateData(index, id, value)
