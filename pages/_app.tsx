@@ -42,7 +42,7 @@ export default function MyApp({
   useEffect( ()=>{
       if(window.localStorage.getItem("token") !== null) setIsLogined(true);
       if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login") router.push("/auth/login"); // 메인, 로그인 페이지 외에는 로드인 없이 접근 불가
-      //if(isLogined && userInfo.role !== "ROLE_ADMIN" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
+      if(isLogined && userInfo.role !== "ROLE_ADMIN" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
   },[router])
   useEffect(()=>{
     if(isLogined) {

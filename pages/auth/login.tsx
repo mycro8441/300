@@ -178,9 +178,8 @@ export default function Login({}) {
     const loadingMsg = useRef<number>(0);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const {setIsLogined} = useStore();
-    const {push}       = useRouter();
-
+    const {setIsLogined, isLogined} = useStore();
+    const router = useRouter();
     const validate = {
         email: (value:string)=>{
             if(!value) {
@@ -284,6 +283,7 @@ export default function Login({}) {
     const inputRefs = useRef<HTMLInputElement[]>([]);
 
     useEffect(() => {
+            if(isLogined) router.push("/404")
             window.addEventListener('keydown', e => {
                if(inputRefs.current.length === 6 && inputRefs.current[0]?.value === "" && e.key !== "Backspace" && e.key !== "Enter") {
                    inputRefs.current[0].focus();
@@ -304,19 +304,19 @@ export default function Login({}) {
         submitAuthCode(inputRefs.current.map(el=>el.value).join(''))
     }
     const submitAuthCode = (code:string)=> {
-        verifyEmailAuthCode(input.email, code, input.email, input.password, input.phoneNumber).catch(err=>{
-            if(err.response.status === 400) {
-                setIsChanging(true);
+        verifyEmailAuthCode(input.email, code, input.email, input.password, input.phoneNumber).then(res=>{
+            // 200 OK
+            setIsChanging(true);
                 
-                setTimeout(()=>{
-                    setMode("done");
-                    setIsChanging(false);
-                    
-                }, 400);
-            }
-            else {
-                toast.error("회원가입을 하는 데 오류가 발생하였습니다.");
-            }
+            setTimeout(()=>{
+                setMode("done");
+                setIsChanging(false);
+                
+            }, 400);
+        }).catch(err=>{
+
+            toast.error("회원가입을 하는 데 오류가 발생하였습니다.");
+
         }).finally(()=>{
             loadingMsg.current = 0;
             setIsLoading(false);
@@ -346,7 +346,7 @@ export default function Login({}) {
             if(res) {
                 toast.success("로그인 성공!");
                 setIsLogined(true);
-                push('/');                
+                router.push('/');                
             }
             else {
                 toast.error("이메일 또는 비밀번호가 일치하지 않습니다.");
