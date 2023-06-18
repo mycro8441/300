@@ -1,11 +1,11 @@
 import Pay_point from "@/components/payments/Paybtn"
 import { requestPoint } from "@/lib/api/pay"
-import { ArrowBack, Backspace } from "@mui/icons-material"
+import { ArrowBack, Backspace, Router } from "@mui/icons-material"
 import { Avatar } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
 import styled, { css, keyframes } from "styled-components"
 import useStore from "../store"
-
+import { useRouter } from 'next/router'
 const GoLeft = keyframes`
     0% {
         opacity: 1;
@@ -130,7 +130,7 @@ const Pay = () => {
     const [inited, setInited] = useState<boolean>(false);
     const [isChanging, setIsChanging] = useState<boolean>(false);
     const [input, setInput] = useState('');
-
+    const router = useRouter();
     setTimeout(() => {
         setInited(true);
     }, 300);
@@ -182,7 +182,7 @@ const Pay = () => {
                         <p>센트코인 지갑 주소</p>
                          <PrettyNumber>0x2430Fb3DB4fba6391a65ffc94704042bd5Bc86a9</PrettyNumber>
                          <input onChange={e=>setInput(e.target.value)} value={input}/>
-                         <NextBtn onClick={()=>requestPoint(input)}>요청하기</NextBtn>
+                         <NextBtn onClick={()=>{requestPoint(input);router.push("/")}}>요청하기</NextBtn>
                 </>}
             </PayContainer>
         </Container>
