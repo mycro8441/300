@@ -106,7 +106,7 @@ const Chat = () => {
                         ...data,
                         newChat,
                     ],
-                    rollbackOnError: !userInfo.ban,
+                    rollbackOnError: !userInfo.ban || true,
 
                 }
             )
