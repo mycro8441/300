@@ -139,12 +139,12 @@ const SelectBox = styled.div<{selected:boolean}>`
 `
 
 type Signal = {
-    coin:string;
-    id:number;
+    id:string;
+    cryptoName:string;
+    timeframe:"5m"|"15m"|"30m"|"1h";
+    side:"sell"|"buy";
+    closePrice:string;
     localDateTime:string;
-    long_short:string;
-    min:number;
-    num:string;
 }
 const options = [
     "BTCUSDT",
@@ -186,11 +186,11 @@ const options = [
     "AXSUSDT",
     "SANDUSDT",
 ]
-function isNumMatch(mode, num) {
-    if(mode === 0 && num === "5M") return true;
-    if(mode === 1 && num === "15M") return true;
-    if(mode === 2 && num === "30M") return true;
-    if(mode === 3 && num === "1H") return true;
+function isNumMatch(mode:0|1|2|3, num:"5m"|"15m"|"30m"|"1h") {
+    if(mode === 0 && num === "5m") return true;
+    if(mode === 1 && num === "15m") return true;
+    if(mode === 2 && num === "30m") return true;
+    if(mode === 3 && num === "1h") return true;
     return false;    
 }
 export default function Signal({
@@ -207,7 +207,7 @@ export default function Signal({
             setFinalData(data
                 .filter(
                     // @ts-ignore
-                    v => v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.min)
+                    v => v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeframe)
                 ).
                 sort(
                 (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
