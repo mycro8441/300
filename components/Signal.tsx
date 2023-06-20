@@ -186,6 +186,13 @@ const options = [
     "AXSUSDT",
     "SANDUSDT",
 ]
+function isNumMatch(mode, num) {
+    if(mode === 0 && num === "5M") return true;
+    if(mode === 1 && num === "15M") return true;
+    if(mode === 2 && num === "30M") return true;
+    if(mode === 3 && num === "1H") return true;
+    return false;    
+}
 export default function Signal({
 
                                }) {
@@ -200,14 +207,14 @@ export default function Signal({
             setFinalData(data
                 .filter(
                     // @ts-ignore
-                    v => v.cryptoName.replace(".P","") == curPair
+                    v => v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.min)
                 ).
                 sort(
                 (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
             )
             );
         }
-    },[data, curPair])
+    },[data, curPair, mode])
     const columns = useMemo(
         () => [
           {
