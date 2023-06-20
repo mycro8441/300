@@ -245,8 +245,8 @@ export default function Signal({
             }
           },
           {
-            Header: 'Profit',
-            accessor: 'profit',
+            Header: 'Price',
+            accessor: 'closePrice',
           },
         ],
         []
