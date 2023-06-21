@@ -141,7 +141,7 @@ const SelectBox = styled.div<{selected:boolean}>`
 type Signal = {
     id:string;
     cryptoName:string;
-    timeframe:"5m"|"15m"|"30m"|"1h";
+    timeFrame:"5m"|"15m"|"30m"|"1h";
     side:"sell"|"buy";
     closePrice:string;
     localDateTime:string;
@@ -196,10 +196,11 @@ function isNumMatch(mode:0|1|2|3, num:"5m"|"15m"|"30m"|"1h") {
 export default function Signal({
 
                                }) {
-    const {curPair, setCurPair} = useStore();
+    const {curPair, setCurPair, userInfo} = useStore();
 
     const [mode, setMode] = useState<0|1|2|3>(0);
     const router = useRouter()
+    
     const { data, error } = useSWR<Signal[]>("/webhook/get/signal",getSignal,);
     const [finalData, setFinalData] = useState<Signal[]>([]);
     useEffect(()=>{
@@ -207,7 +208,7 @@ export default function Signal({
             setFinalData(data
                 .filter(
                     // @ts-ignore
-                    v => v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeframe)
+                    v => v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeFrame)
                 ).
                 sort(
                 (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
@@ -243,10 +244,6 @@ export default function Signal({
                 const min = date.getMinutes();
                 return `${year}-${month}-${day} ${hour}:${min}`
             }
-          },
-          {
-            Header: 'Price',
-            accessor: 'closePrice',
           },
         ],
         []
@@ -301,7 +298,7 @@ export default function Signal({
                     <tbody {...getTableBodyProps()}>
                         {rows
                             ?.map((row,index)=>{
-                            if(index == 0 || index == 1) {
+                            if((index == 0 || index == 1)) {
                                 return(
                                     <tr key={index} role={"row"}>
                                         <td role={"cell"}>-</td>

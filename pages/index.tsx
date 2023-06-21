@@ -12,6 +12,7 @@ const Container = styled.div`
   width:100%;
   height:100%;
   display: flex;
+  overflow-x:hidden;
   justify-content: center;
   flex-grow:0;
 `
@@ -125,6 +126,32 @@ function Home() {
               </>}
             </Widget>
             <RateContainer>
+              <RateBox>
+                <div>
+                  공포/탐욕 지수 : {data && JSON.parse(data[0].sjon).longRatio}
+                </div>
+                <Progressbar tcolor={1} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).fear)}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div>
+                  강도지수 (RSI) : {data && JSON.parse(data[0].sjon).rsi}
+                </div>
+                <Progressbar tcolor={0} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).rsi)}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div>
+                  스토캐스틱 지수 : {data && JSON.parse(data[0].sjon).rsi}
+                </div>
+                <Progressbar tcolor={0} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).rsi)}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+            </RateContainer>
+            <RateContainer>
 
               <RateBox>
                 <div>
@@ -183,6 +210,7 @@ function Home() {
                 </Progressbar>
               </RateBox>
             </RateContainer>
+            
           </MainL>
           <MainR>
             <Sidebar>
