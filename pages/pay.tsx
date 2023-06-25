@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react"
 import styled, { css, keyframes } from "styled-components"
 import useStore from "../store"
 import { useRouter } from 'next/router'
+import { toast } from "react-toastify"
 const GoLeft = keyframes`
     0% {
         opacity: 1;
@@ -51,7 +52,7 @@ const UserContainer = styled.div<{inited:boolean}>`
     background-color: ${p=>p.theme.colors.blockColor};
     border-radius: 20px;
     overflow:hidden;
-    opacity: ${p=>p.inited ? 1 : 0.5};;
+    opacity: ${p=>p.inited ? 1 : 0.5};
     transition: 0.5s ease;
 
     p {
@@ -124,26 +125,57 @@ const NumberContainer = styled.div`
 
 const PrettyInput = styled.input`
     
-    width:100%;
+    width:90%;
     height:100%;
     border-radius: 10px;
     border:none;
     background:${p=>p.theme.colors.bgColor};
     box-sizing:border-box;
     padding-left:15px;
+    
 `
-const fixed_point_amount = 30000;
 
+const SelectBlock=styled.div<{inited:boolean}>`
+    width:${p=>p.inited ? "100%" : "90%"};
+    height:${p=>p.inited ? "100%" : "90%"};
+    background-color: ${p=>p.theme.colors.blockColor};
+    border-radius: 20px;
+    overflow:hidden;
+    opacity: ${p=>p.inited ? 1 : 0.5};
+`;
+const SelectBar = styled.div`
+    display:flex;
+    background-color: ${p=>p.theme.colors.bgColor};
+    border-radius: 10px;
+    height:2em;
+    overflow:hidden;
+    margin:10px !important;
+`
+const SelectBox = styled.div<{selected:boolean}>`
+    flex:1;
+    height:100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    color:${p=>p.selected ? "white" : "gray"};
+    margin:0 !important;
+    border-radius:0 !important;
+    background-color:${p=>p.selected ? `${p.theme.colors.signatureBlue} !important`:`${p.theme.colors.bgColor} !important`};
+    cursor:pointer;
+`
 
+type Points = 10000|30000|50000|100000; 
 const Pay = () => {
     const {userInfo} = useStore();
-    const [inited, setInited] = useState<boolean>(false);
+    const [inited, setInited] = useState<boolean>(true);
     const [isChanging, setIsChanging] = useState<boolean>(false);
     const [input, setInput] = useState('');
     const router = useRouter();
-    setTimeout(() => {
-        setInited(true);
-    }, 300);
+    useEffect(()=>{
+        if(userInfo.id) setInited(true);
+        else router.push("/auth/login")
+    }, [])
+
     const mode = useRef<"confirm"|"pay">("confirm");
     const changeMode = ()=>{
         setIsChanging(true);
@@ -152,6 +184,8 @@ const Pay = () => {
             setIsChanging(false);
         }, 400);
     }
+
+    const [pointAmount, setPointAmount] = useState<Points>(10000)
     return <Adjust>
         <Container isChanging={isChanging}>
             <UserContainer inited={inited}>
@@ -171,7 +205,7 @@ const Pay = () => {
                             </NumberContainer>
                             <div style={{display:"flex", gap:"5px"}}>
                                 <span>충전할 포인트 : </span>
-                                <PrettyNumber>{fixed_point_amount}</PrettyNumber>
+                                <PrettyNumber>{pointAmount}</PrettyNumber>
                             </div>
                         </>}
                     </UserProperty>
@@ -180,10 +214,21 @@ const Pay = () => {
                 </>}
 
             </UserContainer>
+            <SelectBlock inited={inited}>
+                <SelectBar>
+                    <SelectBox onClick={()=>setPointAmount(10000)} selected={pointAmount===10000}>10000</SelectBox>
+                    <SelectBox onClick={()=>setPointAmount(30000)} selected={pointAmount===30000}>30000</SelectBox>
+
+                    <SelectBox onClick={()=>setPointAmount(50000)} selected={pointAmount===50000}>50000</SelectBox>
+
+                    <SelectBox onClick={()=>setPointAmount(100000)} selected={pointAmount===100000}>100000</SelectBox>
+
+                </SelectBar>
+            </SelectBlock>
             <PayContainer inited={inited}>
                 {mode.current === "confirm" ? <>
                     <p>다음 포인트를 충전합니다</p>
-                    <span>{inited ? fixed_point_amount : ""}</span>
+                    <span>{inited ? pointAmount : ""}</span>
                     <NextBtn onClick={changeMode}>
                         다음
                     </NextBtn>
@@ -192,7 +237,10 @@ const Pay = () => {
                         <p>센트코인 지갑 주소</p>
                          <PrettyNumber>0x2430Fb3DB4fba6391a65ffc94704042bd5Bc86a9</PrettyNumber>
                          <PrettyInput placeholder="예금주명 입력" onChange={e=>setInput(e.target.value)} value={input}/>
-                         <NextBtn onClick={()=>{requestPoint(input);router.push("/")}}>요청하기</NextBtn>
+                         <NextBtn onClick={()=>{requestPoint(input, pointAmount).then(res=>{
+                            router.push("/");
+                            toast.success("포인트 추가를 요청하였습니다.");
+                         });}}>요청하기</NextBtn>
                 </>}
             </PayContainer>
         </Container>

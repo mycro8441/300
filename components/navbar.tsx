@@ -149,7 +149,7 @@ const HoverMenuOption = styled.div`
 
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
-    const {themeMode, toggleTheme, setIsLogined, isLogined, userInfo} = useStore();
+    const {themeMode, toggleTheme, setIsLogined, isLogined, userInfo, setUserInfo} = useStore();
     const {push} = useRouter();
     return <HoverMenuAdjust onMouseEnter={()=>setMenuHover(true)} onMouseLeave={()=>setMenuHover(false)}>
 
@@ -165,6 +165,7 @@ const HoverMenu = ({active} : {active:boolean})=> {
                 <PrettyButton onClick={()=> {
                     setIsLogined(false);
                     push("/auth/login");
+                    setUserInfo({...userInfo, id:null});
                     logout()
                     
                     

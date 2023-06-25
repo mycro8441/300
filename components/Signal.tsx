@@ -6,8 +6,9 @@ import useSWR from "swr";
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import useStore from "../store";
-import {getSignal} from "@/lib/api/signal";
+import {buySignal, getBoughtSignal, getSignal} from "@/lib/api/signal";
 import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
 const Container = styled.div`
     width:100%;
@@ -193,6 +194,14 @@ function isNumMatch(mode:0|1|2|3, num:"5m"|"15m"|"30m"|"1h") {
     if(mode === 3 && num === "1h") return true;
     return false;    
 }
+interface SignalInfo {
+    id:string;
+}
+type BoughtSignal = {
+    payUser:string;
+    payTime:string;
+    coinList: SignalInfo[];
+}
 export default function Signal({
 
                                }) {
@@ -201,20 +210,37 @@ export default function Signal({
     const [mode, setMode] = useState<0|1|2|3>(0);
     const router = useRouter()
     
+   
+
     const { data, error } = useSWR<Signal[]>("/webhook/get/signal",getSignal,);
     const [finalData, setFinalData] = useState<Signal[]>([]);
+
+
+
     useEffect(()=>{
-        if(data) {
-            setFinalData(data
-                .filter(
-                    // @ts-ignore
-                    v => v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeFrame)
-                ).
-                sort(
-                (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
-            )
-            );
-        }
+            if(data) {
+                getBoughtSignal().then((res:BoughtSignal)=>{
+                    setFinalData(data
+                        .filter(
+                            // @ts-ignore
+                            (v, i) => {
+                                if(i>1) return v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeFrame);
+                                else {
+                                    res.coinList.forEach(coin=>{
+                                        if(coin.id === v.id) return true;
+                                    })
+                                    return false;
+                                }
+                            }
+                        ).
+                        sort(
+                        (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
+                    )
+                    );
+                })   
+            }            
+    
+
     },[data, curPair, mode])
     const columns = useMemo(
         () => [
@@ -260,6 +286,20 @@ export default function Signal({
     const onSelect = e => {
         setCurPair(e.value)
     }
+
+
+    const purchaseSignal = () => {
+        buySignal(curPair).then(res=>{
+            toast.success(curPair+"의 시그널을 구매하였습니다.");
+        }).catch(err=>{
+            if(err.response.status === 400) {
+                toast.error("포인트가 부족합니다.")
+            } else {
+                toast.error("오류가 발생했습니다.");
+            }
+            
+        })
+    }
     return <Adjust>
             <OptionBlock>
                 <Dropdown options={options} onChange={onSelect} value={curPair + ".P"}/>
@@ -280,7 +320,7 @@ export default function Signal({
             </OptionBlock>
             <BubbleBox>
                 <PayBtn onClick={()=>{
-                    router.push("/pay")
+                    purchaseSignal();
                 }}>현재 시그널 보기</PayBtn>
                 <PrettyTable {...getTableProps()}>
                     <thead>
