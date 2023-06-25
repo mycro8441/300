@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import useSWR, {useSWRConfig} from "swr";
-import useSWRMutation from "swr/mutation"
+import useSWRMutation from "swr"
 import {getChat, sendMessage} from "@/lib/api/chat";
 import useStore from "../store";
 

@@ -143,7 +143,7 @@ type Signal = {
     id:string;
     cryptoName:string;
     timeFrame:"5m"|"15m"|"30m"|"1h";
-    side:"sell"|"buy";
+    side:"sell"|"buy"|"-";
     closePrice:string;
     localDateTime:string;
 }
@@ -212,36 +212,47 @@ export default function Signal({
     
    
 
-    const { data, error } = useSWR<Signal[]>("/webhook/get/signal",getSignal,);
-    const [finalData, setFinalData] = useState<Signal[]>([]);
-
+    const { data, error, mutate } = useSWR<Signal[]>("/webhook/get/signal",getSignal,{refreshInterval:10000});
+    const [finalData, setFinalData] = useState<Signal[]>(null);
 
 
     useEffect(()=>{
-            if(data) {
-                getBoughtSignal().then((res:BoughtSignal)=>{
-                    setFinalData(data
-                        .filter(
-                            // @ts-ignore
-                            (v, i) => {
-                                if(i>1) return v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeFrame);
-                                else {
+        if(data) {
+            getBoughtSignal().then((res:BoughtSignal)=>{
+                setFinalData(data
+                    .filter(
+                        // @ts-ignore
+                        (v, i) => {
+                            if(v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeFrame)) {
+                                if(i<=1) {
                                     res.coinList.forEach(coin=>{
-                                        if(coin.id === v.id) return true;
+                                        if(coin.id !== v.id) {
+                                            data[i] = {
+                                                id:data[i].id,
+                                                cryptoName:data[i].cryptoName,
+                                                timeFrame:data[i].timeFrame,
+                                                side:"-",
+                                                closePrice:"-",
+                                                localDateTime:"-",
+                                            }
+                                        }
+                                        
                                     })
-                                    return false;
                                 }
-                            }
-                        ).
-                        sort(
-                        (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
-                    )
-                    );
-                })   
-            }            
-    
+                                return true;
+                            } else return false;
 
-    },[data, curPair, mode])
+                        }
+                    ).
+                    sort(
+                    (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
+                )
+                );
+            })   
+        }            
+
+
+},[data, curPair, mode])
     const columns = useMemo(
         () => [
           {
@@ -291,6 +302,7 @@ export default function Signal({
     const purchaseSignal = () => {
         buySignal(curPair).then(res=>{
             toast.success(curPair+"의 시그널을 구매하였습니다.");
+            mutate();
         }).catch(err=>{
             if(err.response.status === 400) {
                 toast.error("포인트가 부족합니다.")
@@ -322,51 +334,57 @@ export default function Signal({
                 <PayBtn onClick={()=>{
                     purchaseSignal();
                 }}>현재 시그널 보기</PayBtn>
+                {finalData ? <>
                 <PrettyTable {...getTableProps()}>
-                    <thead>
-                        {headerGroups.map(headerGroup=>(
-                            <tr {...headerGroup.getHeaderGroupProps()}>
-                                {headerGroup.headers.map(column=>(
-                                    <th {...column.getHeaderProps()}>
-                                        {column.render('Header')}
-                                    </th>
-                                ))}
-                            </tr>
-                        ))}
+                        <thead>
+                            {headerGroups.map(headerGroup=>(
+                                <tr {...headerGroup.getHeaderGroupProps()}>
+                                    {headerGroup.headers.map(column=>(
+                                        <th {...column.getHeaderProps()}>
+                                            {column.render('Header')}
+                                        </th>
+                                    ))}
+                                </tr>
+                            ))}
 
-                    </thead>
-                    <tbody {...getTableBodyProps()}>
-                        {rows
-                            ?.map((row,index)=>{
-                            if((index == 0 || index == 1)) {
-                                return(
-                                    <tr key={index} role={"row"}>
-                                        <td role={"cell"}>-</td>
-                                        <td role={"cell"}>-</td>
-                                        <td role={"cell"}>-</td>
+                        </thead>
+                        <tbody {...getTableBodyProps()}>
+                            {rows
+                                ?.map((row,index)=>{
+                                if((index == 0 || index == 1)) {
+                                    return(
+                                        <tr key={index} role={"row"}>
+                                            <td role={"cell"}>-</td>
+                                            <td role={"cell"}>-</td>
+                                            <td role={"cell"}>-</td>
+                                        </tr>
+                                    )
+                                }
+                                prepareRow(row);
+                                return (
+                                    <tr {...row.getRowProps()}>
+                                        {row.cells
+                                            .map((cell, i)=> {
+
+                                            return (
+                                                <td {...cell.getCellProps()}>
+                                                {cell.render('Cell')}
+
+                                            </td>
+                                            )
+                                        })}
+
                                     </tr>
                                 )
-                            }
-                            prepareRow(row);
-                            return (
-                                <tr {...row.getRowProps()}>
-                                    {row.cells
-                                        .map((cell, i)=> {
+                            })}
 
-                                        return (
-                                            <td {...cell.getCellProps()}>
-                                            {cell.render('Cell')}
-
-                                          </td>
-                                        )
-                                    })}
-
-                                </tr>
-                            )
-                        })}
-
-                    </tbody>
-                </PrettyTable>
+                        </tbody>
+                    </PrettyTable>                
+                </> : <>
+                    <div style={{textAlign:"center", marginTop:"1em"}}>불러오는 중입니다...</div>
+                    
+                </>}
+ 
             </BubbleBox>
     </Adjust>
 }

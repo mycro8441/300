@@ -128,25 +128,25 @@ function Home() {
             <RateContainer>
               <RateBox>
                 <div>
-                  공포/탐욕 지수 : {data && JSON.parse(data[0].sjon).longRatio}
+                  공포/탐욕 지수 : {data && data.fear}
                 </div>
-                <Progressbar tcolor={1} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).fear)}>
+                <Progressbar tcolor={1} size={data && parseFloat(data.fear)}>
                   <div/>
                 </Progressbar>
               </RateBox>
               <RateBox>
                 <div>
-                  강도지수 (RSI) : {data && JSON.parse(data[0].sjon).rsi}
+                  강도지수 (RSI) : {data && parseFloat(data.rsi)}
                 </div>
-                <Progressbar tcolor={0} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).rsi)}>
+                <Progressbar tcolor={0} size={data && parseFloat(data.rsi)}>
                   <div/>
                 </Progressbar>
               </RateBox>
               <RateBox>
                 <div>
-                  스토캐스틱 지수 : {data && JSON.parse(data[0].sjon).rsi}
+                  스토캐스틱 지수 : {data && parseFloat(data.stoch)}
                 </div>
-                <Progressbar tcolor={0} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).rsi)}>
+                <Progressbar tcolor={0} size={data && parseFloat(data.stoch)}>
                   <div/>
                 </Progressbar>
               </RateBox>
@@ -155,38 +155,25 @@ function Home() {
 
               <RateBox>
                 <div>
-                    BTC 김프 : {data && JSON.parse(data[0].sjon).stoch}
+                    BTC 김프 : {data && parseFloat(data.btcGimp)}
                 </div>
-                <Progressbar tcolor={0} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).stoch)} >
-                  <div/>
-                </Progressbar>
               </RateBox>
               <RateBox>
                 <div>
-                  ETH 김프 : {data && JSON.parse(data[0].sjon).rsi}
+                  ETH 김프 : {data && parseFloat(data.ethGimp)}
                 </div>
-                <Progressbar size={
-                  30
-                } tcolor={2}>
-                  <div/>
-                </Progressbar>
+              </RateBox>
+              <RateBox>
+                <div style={{margin:"auto"}}>
+                  XRP 김프 : {data && parseFloat(data.xrpGimp)}
+                </div>
               </RateBox>
               <RateBox>
                 <div>
-                  XRP 김프 : {data && JSON.parse(data[0].sjon).rsi}
+                  AVAX : {data && parseFloat(data.avaxGimp)}
                 </div>
                 <Progressbar size={
-                  30
-                } tcolor={2}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
-              <RateBox>
-                <div>
-                  AVAX : {data && JSON.parse(data[0].sjon).rsi}
-                </div>
-                <Progressbar size={
-                  30
+                  data && parseFloat(data.avaxGimp)
                 } tcolor={2}>
                   <div/>
                 </Progressbar>
@@ -195,21 +182,22 @@ function Home() {
             <RateContainer>
               <RateBox>
                 <div>
-                  LONG 비율 : {data && JSON.parse(data[0].sjon).longRatio}
+                  LONG 비율 : {data && parseFloat(data.longRatio)}
                 </div>
-                <Progressbar tcolor={1} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).fear)}>
+                <Progressbar tcolor={1} size={data && parseFloat(data.longRatio)}>
                   <div/>
                 </Progressbar>
               </RateBox>
               <RateBox>
                 <div>
-                  SHORT 비율 (RSI) : {data && JSON.parse(data[0].sjon).rsi}
+                  SHORT 비율 (RSI) : {data && parseFloat(data.shortRatio)}
                 </div>
-                <Progressbar tcolor={0} size={data && 100 - Math.floor(JSON.parse(data[0].sjon).rsi)}>
+                <Progressbar tcolor={0} size={data && parseFloat(data.shortRatio)}>
                   <div/>
                 </Progressbar>
               </RateBox>
             </RateContainer>
+            
             
           </MainL>
           <MainR>
