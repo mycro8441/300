@@ -164,7 +164,7 @@ const HoverMenu = ({active} : {active:boolean})=> {
                 <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={()=>{toggleTheme();localStorage.setItem("theme", themeMode === true ? "light" : "dark")}}/></HoverMenuOption>
                 <PrettyButton onClick={()=> {
                     setIsLogined(false);
-                    push("/auth/login");
+                    if(!isLogined) push("/auth/login");
                     setUserInfo({...userInfo, id:null});
                     logout()
                     

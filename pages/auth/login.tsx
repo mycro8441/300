@@ -396,6 +396,7 @@ export default function Login({}) {
                 {mode === "done" ? <>
                     <Container isChanging={isChanging}>
                         <h2>이메일 인증이 완료되었습니다!</h2>
+                        <SubmitButton onClick={()=>{changeMode()}} isDisabled={false}>로그인으로</SubmitButton>
                     </Container>
                 </>:<>
                     {mode === "login" ? <Container isChanging={isChanging}>

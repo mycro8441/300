@@ -108,7 +108,7 @@ const Widget = styled.div`
 function Home() {
   const {themeMode, curPair} = useStore();
   const [isInited, setIsInited] = useState<boolean>(false);
-  const {data} = useSWR("/get/buttom-signal",getBottomSignal, {refreshInterval:1000})
+  const {data} = useSWR("/get/buttom-signal",getBottomSignal, {refreshInterval:10000})
   useEffect(()=>{
     setIsInited(true); // 트레이딩뷰가 처음에 보이지 않아 추가함
   }, [])

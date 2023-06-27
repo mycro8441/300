@@ -75,7 +75,7 @@ export default function MyApp({
 
       
 
-  },[router])
+  },[router, isLogined])
 
 
   return (

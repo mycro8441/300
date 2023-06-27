@@ -65,8 +65,8 @@ const BubbleBox = styled.div`
     }
 `
 
-const PositionColor = styled.div<{isShort:boolean}>`
-    color:${p=>p.isShort ? p.theme.colors.signatureRed : p.theme.colors.signatureMint};
+const PositionColor = styled.div<{isShort:boolean, isSecret:boolean}>`
+    color:${p=>p.isSecret ? "white" : p.isShort ? p.theme.colors.signatureRed : p.theme.colors.signatureMint};
 `
 
 const PayBtn  =styled.div`
@@ -222,62 +222,85 @@ type BoughtSignal = {
 export default function Signal({
 
                                }) {
-    const {curPair, setCurPair, userInfo} = useStore();
+    const {curPair, setCurPair, userInfo,isLogined} = useStore();
 
     const [mode, setMode] = useState<0|1|2|3>(0);
     const router = useRouter()
     
    
 
-    const { data, error, mutate } = useSWR<Signal[]>("/webhook/get/signal",getSignal,{refreshInterval:10000});
+    const { data, error, mutate } = useSWR<Signal[]>("/webhook/get/signal",getSignal);
     const [finalData, setFinalData] = useState<Signal[]>(null);
+    const localRes = useRef(null);
+    const setFilteredData = () => {
+        const filteredData = data.filter(
+                // @ts-ignore
+                (v, i) => {
+                    if(v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeFrame)) {
 
+                        return true;
+                    } else return false;
 
+                }
+            ).
+            sort(
+            (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
+        
+        ); 
+
+        filteredData.forEach((v,i, a)=>{
+            if(i<2) {
+                if(!isLogined) {
+                    a[i] = {
+                        ...a[i],
+                        side:"-",
+                        closePrice:"-",
+                        localDateTime:"-",
+                    }
+                } else {
+                    getBoughtSignal().then((res:BoughtSignal)=>{
+                        res.coinList.forEach(coin=>{
+                            console.log(coin, v)
+                            if(coin.id !== v.id) {
+                                data[i] = {
+                                    id:data[i].id,
+                                    cryptoName:data[i].cryptoName,
+                                    timeFrame:data[i].timeFrame,
+                                    side:"-",
+                                    closePrice:"-",
+                                    localDateTime:"-",
+                                }
+                            }
+                            
+                        })       
+                    }).catch(err=>{
+                    })  
+                         
+                }
+    
+            }
+        })
+        setFinalData(filteredData);       
+    }
     useEffect(()=>{
         if(data) {
-            getBoughtSignal().then((res:BoughtSignal)=>{
-                setFinalData(data
-                    .filter(
-                        // @ts-ignore
-                        (v, i) => {
-                            if(v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeFrame)) {
-                                if(i<=1) {
-                                    res.coinList.forEach(coin=>{
-                                        if(coin.id !== v.id) {
-                                            data[i] = {
-                                                id:data[i].id,
-                                                cryptoName:data[i].cryptoName,
-                                                timeFrame:data[i].timeFrame,
-                                                side:"-",
-                                                closePrice:"-",
-                                                localDateTime:"-",
-                                            }
-                                        }
-                                        
-                                    })
-                                }
-                                return true;
-                            } else return false;
+            setFinalData(null);
 
-                        }
-                    ).
-                    sort(
-                    (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
-                )
-                );
-            }).catch(err=>{
-            })
+
+            setFilteredData();
+
+
         }            
 
 
-},[curPair, mode])
+},[curPair, mode, data, isLogined])
     const columns = useMemo(
         () => [
           {
             Header: 'Position',
             accessor: 'side',
             Cell: ({value, row}) => (
-                    <PositionColor isShort={value == "sell"}>
+                    <PositionColor isSecret={value==="-"} isShort={value == "sell"}>
                         {value.toUpperCase()}
                     </PositionColor>
             )
@@ -291,12 +314,14 @@ export default function Signal({
             accessor: 'localDateTime',
               sortType: 'datetime',
             Cell: ({value, row}) => {
+                if(value==="-") return "-";
                 const date = new Date(value);
                 const year = date.getFullYear();
                 const month = date.getMonth() + 1;
                 const day = date.getDate();
                 const hour = date.getHours();
                 const min = date.getMinutes();
+                
                 return `${year}-${month}-${day} ${hour}:${min}`
             }
           },
@@ -320,7 +345,7 @@ export default function Signal({
     const purchaseSignal = () => {
         buySignal(curPair).then(res=>{
             toast.success(curPair+"의 시그널을 구매하였습니다.");
-            mutate();
+            setFilteredData();
         }).catch(err=>{
             if(err.response.status === 400) {
                 toast.error("포인트가 부족합니다.")
@@ -349,8 +374,14 @@ export default function Signal({
                 </SelectBar>
             </OptionBlock>
             <BubbleBox>
+                
                 <PayBtn onClick={()=>{
-                    purchaseSignal();
+                    if(isLogined) {
+                        purchaseSignal();
+                    } else {
+                        router.push("/");
+                    }
+                    
                 }}>현재 시그널 보기</PayBtn>
                 {finalData ? <>
                 <PrettyTable {...getTableProps()}>
@@ -369,15 +400,15 @@ export default function Signal({
                         <tbody {...getTableBodyProps()}>
                             {rows
                                 ?.map((row,index)=>{
-                                if((index == 0 || index == 1)) {
-                                    return(
-                                        <tr key={index} role={"row"}>
-                                            <td role={"cell"}>-</td>
-                                            <td role={"cell"}>-</td>
-                                            <td role={"cell"}>-</td>
-                                        </tr>
-                                    )
-                                }
+                                // if((index == 0 || index == 1)) {
+                                //     return(
+                                //         <tr key={index} role={"row"}>
+                                //             <td role={"cell"}>-</td>
+                                //             <td role={"cell"}>-</td>
+                                //             <td role={"cell"}>-</td>
+                                //         </tr>
+                                //     )
+                                // }
                                 prepareRow(row);
                                 return (
                                     <tr {...row.getRowProps()}>
