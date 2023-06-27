@@ -154,12 +154,12 @@ function Home() {
             <RateContainer>
 
               <RateBox>
-                <div>
+                <div style={{margin:"auto"}}>
                     BTC 김프 : {data && parseFloat(data.btcGimp)}
                 </div>
               </RateBox>
               <RateBox>
-                <div>
+                <div style={{margin:"auto"}}>
                   ETH 김프 : {data && parseFloat(data.ethGimp)}
                 </div>
               </RateBox>
