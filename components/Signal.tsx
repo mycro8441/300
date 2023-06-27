@@ -260,7 +260,6 @@ export default function Signal({
                 } else {
                     getBoughtSignal().then((res:BoughtSignal)=>{
                         res.coinList.forEach(coin=>{
-                            console.log(coin, v)
                             if(coin.id !== v.id) {
                                 data[i] = {
                                     id:data[i].id,
