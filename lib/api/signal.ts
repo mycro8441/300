@@ -17,7 +17,7 @@ export const getUserSignal = async() => { // 사용자가 구매한 시그널을
 
 export const buySignal = async(coin:string) => {
     const {data} = await authClient().post("/post/pay/confirm", {
-        targetCoinName:coin
+        targetCoinName:coin+".P"
     });
     return data;
 }

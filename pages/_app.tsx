@@ -40,32 +40,37 @@ export default function MyApp({
     setThemeMode(localStorage.getItem("theme") == "dark");
   }, [themeMode])
   useEffect( ()=>{
-      if(window.localStorage.getItem("token") !== null) setIsLogined(true);
-      getUserInfo().then(res=>{
-        const {
-          id,
-          username,
-          password,
-          phoneNumber,
-          role,
-          point,
-          ban,
-          usrPw
-        } = res;
-        setUserInfo({
-          id: id,
-          email:username,
-          encryptedPw:password,
-          phoneNumber:phoneNumber,
-          role:role,
-          points:point,
-          ban:ban,
-          usrPw:usrPw,
-        });
-        if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
-      }).catch(err=>{
-        toast.error("인터넷에 연결되어있지 않습니다.");
-      })
+      if(window.localStorage.getItem("token") !== null) {
+        
+        setIsLogined(true)
+        getUserInfo().then(res=>{
+          const {
+            id,
+            username,
+            password,
+            phoneNumber,
+            role,
+            point,
+            ban,
+            usrPw
+          } = res;
+          setUserInfo({
+            id: id,
+            email:username,
+            encryptedPw:password,
+            phoneNumber:phoneNumber,
+            role:role,
+            points:point,
+            ban:ban,
+            usrPw:usrPw,
+          });
+          if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
+        }).catch(err=>{
+          toast.error("인터넷에 연결되어있지 않습니다.");
+        })      
+      };
+      
+
       if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login") router.push("/auth/login"); // 메인, 로그인 페이지 외에는 로드인 없이 접근 불가
 
       

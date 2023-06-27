@@ -196,9 +196,26 @@ function isNumMatch(mode:0|1|2|3, num:"5m"|"15m"|"30m"|"1h") {
 }
 interface SignalInfo {
     id:string;
+    cryptoName:string;
+    timeFrame:"5m"|"15m"|"30m"|"1h";
+    side:"sell"|"buy";
+    closePrice:string;
+    localDateTime:string;
+}
+interface UserInfo {
+    id:number;
+    username:string;
+    password:string;
+    phoneNumber:string;
+    role:"ROLE_USER"|"ROLE_ADMIN";
+    point:number;
+    payResult:any;
+    usrPw:string;
+    ban:boolean;
 }
 type BoughtSignal = {
-    payUser:string;
+    uuid:number;
+    payUser:UserInfo;
     payTime:string;
     coinList: SignalInfo[];
 }
@@ -252,7 +269,7 @@ export default function Signal({
         }            
 
 
-},[data, curPair, mode])
+},[curPair, mode])
     const columns = useMemo(
         () => [
           {
