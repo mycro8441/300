@@ -265,7 +265,8 @@ export default function Signal({
                     (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
                 )
                 );
-            })   
+            }).catch(err=>{
+            })
         }            
 
 
