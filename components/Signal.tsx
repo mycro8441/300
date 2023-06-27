@@ -291,6 +291,7 @@ export default function Signal({
             }
         }
         setFinalData(copied.current);  
+        console.log(1)
     }
     useEffect(()=>{
         if(data) {
@@ -302,7 +303,7 @@ export default function Signal({
         }            
 
 
-},[curPair, mode, data, isLogined])
+},[curPair, mode, isLogined])
     const columns = useMemo(
         () => [
           {
@@ -409,15 +410,15 @@ export default function Signal({
                         <tbody {...getTableBodyProps()}>
                             {rows
                                 ?.map((row,index)=>{
--                                if (finalData[index].side === "-") {
-                                    return(
-                                        <tr key={index} role={"row"}>
-                                            <td role={"cell"}>-</td>
-                                            <td role={"cell"}>-</td>
-                                            <td role={"cell"}>-</td>
-                                        </tr>
-                                    )
-                                } 
+                                    if(finalData[index].side==='-') {
+                                        return(
+                                            <tr key={index} role={"row"}>
+                                                <td role={"cell"}>-</td>
+                                                <td role={"cell"}>-</td>
+                                                <td role={"cell"}>-</td>
+                                            </tr>
+                                        )
+                                    }
                                 prepareRow(row);
                                 return (
                                     <tr {...row.getRowProps()}>
