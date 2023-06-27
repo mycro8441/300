@@ -227,11 +227,13 @@ export default function Signal({
     const [mode, setMode] = useState<0|1|2|3>(0);
     const router = useRouter()
     
-   
+    const [isInited, setIsInited] = useState<boolean>(false);
 
     const { data, error, mutate } = useSWR<Signal[]>("/webhook/get/signal",getSignal);
     const [finalData, setFinalData] = useState<Signal[]>(null);
     const localRes = useRef(null);
+
+    const copied = useRef(null);
     const setFilteredData = () => {
         const filteredData = data.filter(
                 // @ts-ignore
@@ -248,47 +250,55 @@ export default function Signal({
         
         ); 
 
-        filteredData.forEach((v,i, a)=>{
+        copied.current = filteredData;
+        for(let i = 0;i<filteredData.length;i++) {
             if(i<2) {
                 if(!isLogined) {
-                    a[i] = {
-                        ...a[i],
+                    filteredData[i] = {
+                        ...filteredData[i],
                         side:"-",
                         closePrice:"-",
                         localDateTime:"-",
                     }
                 } else {
-                    getBoughtSignal().then((res:BoughtSignal)=>{
-                        res.coinList.forEach(coin=>{
-                            if(coin.id !== v.id) {
-                                data[i] = {
-                                    id:data[i].id,
-                                    cryptoName:data[i].cryptoName,
-                                    timeFrame:data[i].timeFrame,
-                                    side:"-",
-                                    closePrice:"-",
-                                    localDateTime:"-",
-                                }
-                            }
+                    if(copied.current[i].side === "-") continue;
+                    getBoughtSignal().then((res:BoughtSignal[])=>{
+                        let flag = false;
+                        res.forEach(purchase=>{
+                            purchase.coinList.forEach(coin=>{
+                                    if(coin.id===filteredData[i].id) flag = true;                             
+                            })                            
+                        })
+
+
+                        if(!flag) {
+                            copied.current[i] = {
+                                ...copied.current[i],
+                                side:"-",
+                                closePrice:"-",
+                                localDateTime:"-",
+                            }         
+                        }
                             
-                        })       
+                        
+ 
                     }).catch(err=>{
                     })  
                          
                 }
+
     
             }
-        })
-        setFinalData(filteredData);       
+        }
+        setFinalData(copied.current);  
     }
     useEffect(()=>{
         if(data) {
-            setFinalData(null);
+            setFinalData([]);
 
 
             setFilteredData();
-
-
+            setIsInited(true);
         }            
 
 
@@ -335,7 +345,7 @@ export default function Signal({
     rows,
     prepareRow,
     //@ts-ignore
-  } = useTable({ columns, data:finalData??[] })
+  } = useTable({ columns, data:finalData??[]})
     const onSelect = e => {
         setCurPair(e.value)
     }
@@ -382,7 +392,7 @@ export default function Signal({
                     }
                     
                 }}>현재 시그널 보기</PayBtn>
-                {finalData ? <>
+                {isInited ? <>
                 <PrettyTable {...getTableProps()}>
                         <thead>
                             {headerGroups.map(headerGroup=>(
@@ -399,15 +409,15 @@ export default function Signal({
                         <tbody {...getTableBodyProps()}>
                             {rows
                                 ?.map((row,index)=>{
-                                // if((index == 0 || index == 1)) {
-                                //     return(
-                                //         <tr key={index} role={"row"}>
-                                //             <td role={"cell"}>-</td>
-                                //             <td role={"cell"}>-</td>
-                                //             <td role={"cell"}>-</td>
-                                //         </tr>
-                                //     )
-                                // }
+-                                if (finalData[index].side === "-") {
+                                    return(
+                                        <tr key={index} role={"row"}>
+                                            <td role={"cell"}>-</td>
+                                            <td role={"cell"}>-</td>
+                                            <td role={"cell"}>-</td>
+                                        </tr>
+                                    )
+                                } 
                                 prepareRow(row);
                                 return (
                                     <tr {...row.getRowProps()}>
