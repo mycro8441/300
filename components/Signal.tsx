@@ -364,6 +364,7 @@ export default function Signal({
     const purchaseSignal = () => {
         buySignal(curPair).then(res=>{
             toast.success(curPair+"의 시그널을 구매하였습니다.");
+            setIsInited(false);
             setFilteredData();
         }).catch(err=>{
             if(err.response.status === 400) {
