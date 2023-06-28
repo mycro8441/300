@@ -227,7 +227,6 @@ export default function Signal({
     const [mode, setMode] = useState<0|1|2|3>(0);
     const router = useRouter()
     
-    const [isInited, setIsInited] = useState<boolean>(false);
 
     const { data, error, mutate } = useSWR<Signal[]>("/webhook/get/signal",getSignal);
     const [finalData, setFinalData] = useState<Signal[]>(null);
@@ -249,49 +248,58 @@ export default function Signal({
             (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
         
         ); 
+        if(!isLogined) {
+            for(let i = 0;i<filteredData.length;i++) {
+                if(i<2) {
+                        filteredData[i] = {
+                            ...filteredData[i],
+                            side:"-",
+                            closePrice:"-",
+                            localDateTime:"-",
+                        }
 
-        copied.current = filteredData;
-        for(let i = 0;i<filteredData.length;i++) {
-            if(i<2) {
-                if(!isLogined) {
-                    filteredData[i] = {
-                        ...filteredData[i],
-                        side:"-",
-                        closePrice:"-",
-                        localDateTime:"-",
-                    }
-                } else {
-                    if(copied.current[i].side === "-") continue;
-                    getBoughtSignal().then((res:BoughtSignal[])=>{
+
+        
+                }
+            }        
+            setFinalData(filteredData);  
+    
+        } else {
+            getBoughtSignal().then((res:BoughtSignal[])=>{
+                for(let i = 0;i<filteredData.length;i++) {
+                    if(i<2) {
                         let flag = false;
                         res.forEach(purchase=>{
                             purchase.coinList.forEach(coin=>{
-                                    if(coin.id===filteredData[i].id) flag = true;                             
+                                    if(coin.id===filteredData[i].id) {
+                                        
+                                        flag = true; 
+                                     }                           
                             })                            
                         })
 
 
                         if(!flag) {
-                            copied.current[i] = {
-                                ...copied.current[i],
+                            filteredData[i] = {
+                                ...filteredData[i],
                                 side:"-",
                                 closePrice:"-",
                                 localDateTime:"-",
                             }         
-                        }
-                            
-                        
- 
-                    }).catch(err=>{
-                    })  
-                         
-                }
+                        }            
+                    }
+                }     
+                setFinalData(filteredData);  
 
-    
-            }
+                    
+                
+
+            }).catch(err=>{
+            })              
+
+
         }
-        setFinalData(copied.current);  
-        console.log(1)
+
     }
     useEffect(()=>{
         if(data) {
@@ -299,11 +307,10 @@ export default function Signal({
 
 
             setFilteredData();
-            setIsInited(true);
         }            
 
 
-},[curPair, mode, isLogined])
+},[curPair, mode, isLogined, data])
     const columns = useMemo(
         () => [
           {
@@ -393,9 +400,10 @@ export default function Signal({
                     }
                     
                 }}>현재 시그널 보기</PayBtn>
-                {isInited ? <>
+                {finalData?.length!==0 ? <>
                 <PrettyTable {...getTableProps()}>
                         <thead>
+                            
                             {headerGroups.map(headerGroup=>(
                                 <tr {...headerGroup.getHeaderGroupProps()}>
                                     {headerGroup.headers.map(column=>(
@@ -410,15 +418,6 @@ export default function Signal({
                         <tbody {...getTableBodyProps()}>
                             {rows
                                 ?.map((row,index)=>{
-                                    if(finalData[index].side==='-') {
-                                        return(
-                                            <tr key={index} role={"row"}>
-                                                <td role={"cell"}>-</td>
-                                                <td role={"cell"}>-</td>
-                                                <td role={"cell"}>-</td>
-                                            </tr>
-                                        )
-                                    }
                                 prepareRow(row);
                                 return (
                                     <tr {...row.getRowProps()}>
