@@ -231,7 +231,7 @@ export default function Signal({
     const { data, error, mutate } = useSWR<Signal[]>("/webhook/get/signal",getSignal);
     const [finalData, setFinalData] = useState<Signal[]>(null);
     const localRes = useRef(null);
-
+    const [isInited, setIsInited] = useState<boolean>(false);
     const copied = useRef(null);
     const setFilteredData = () => {
         const filteredData = data.filter(
@@ -262,7 +262,8 @@ export default function Signal({
         
                 }
             }        
-            setFinalData(filteredData);  
+            setFinalData(filteredData); 
+            setIsInited(true); 
     
         } else {
             getBoughtSignal().then((res:BoughtSignal[])=>{
@@ -290,7 +291,7 @@ export default function Signal({
                     }
                 }     
                 setFinalData(filteredData);  
-
+                setIsInited(true);
                     
                 
 
@@ -304,6 +305,7 @@ export default function Signal({
     useEffect(()=>{
         if(data) {
             setFinalData([]);
+            setIsInited(false);
 
 
             setFilteredData();
@@ -400,7 +402,7 @@ export default function Signal({
                     }
                     
                 }}>현재 시그널 보기</PayBtn>
-                {finalData?.length!==0 ? <>
+                {isInited ? <>
                 <PrettyTable {...getTableProps()}>
                         <thead>
                             
