@@ -99,8 +99,8 @@ const Searchbar = styled.div`
 const SubmitBtn = styled.div`
     width:4em;
     height:2em;
-    background-color: ${p=>p.theme.colors.pointColor1};
-    border-radius:5px;
+    background-color: ${p=>p.theme.colors.signatureBlue};
+    border-radius:5px !important;
     display:flex;
     align-items: center;
     justify-content: center;
@@ -483,37 +483,34 @@ const Index = () => {
 
       )
 }
+
+type PayUser = {
+  uuid:string;
+  yagunJu:string;
+  amount:number;
+}
 const PayUsers = () => {
 
   const rerender = useReducer(() => ({}), {})[1]
 
-  const columns = useMemo<ColumnDef<User>[]>(
+  const columns = useMemo<ColumnDef<PayUser>[]>(
     () => [
       {
-        header:'id',
-        accessorKey:"id",
+        header:'uuid',
+        accessorKey:"uuid",
         footer: props=>props.column.id,
       },
       {
-        header: 'Email',
-        accessorKey:'username',
+        header: 'name',
+        accessorKey:'yagunJu',
         footer: props => props.column.id,
         
       },
       {
-        header: 'Number',
-        accessorKey:"phoneNumber",
+        header: 'amount',
+        accessorKey:"amount",
         footer: props => props.column.id,
       },
-      {
-          header: 'Points',
-          accessorKey:'point',
-          footer: props => props.column.id,
-      },
-      {
-          width:300,
-          header:"Ban"
-      }
     ],
     []
   )
@@ -536,6 +533,7 @@ const PayUsers = () => {
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper()
   const table = useReactTable({
       data,
+      //@ts-ignore
       columns,
       defaultColumn,
       getCoreRowModel: getCoreRowModel(),
@@ -745,7 +743,36 @@ function Filter({
     )
   }
 
+
+const Block = styled.div`
+  width:100%;
+  height:auto;
+  padding:2em;
+  display:flex;
+  gap:1em;
+`
+const PrettyInput = styled.input`
+  width:10em;
+  padding:0.5em;
+  color:black;
+  height:100%;
+  border:none;
+  border-radius:5px;
+
+`
+const SetAmount = () => {
+  const [input, setInput] = useState('')
+
+  return <>
+    <Block>
+      <PrettyInput onChange={e=>setInput(e.target.value)} value={input} placeholder="바꿀 포인트 입력"/>
+      <SubmitBtn>변경</SubmitBtn>
+    </Block>
+  </>
+}
 Admin.navbar = false;
+
+
 export default function Admin() {
     
     
@@ -769,8 +796,11 @@ export default function Admin() {
                 <SidebarOption activated={mode[0]} onClick={()=>{curpage.current=<Index/>;curpageName.current = "DashBoard"; Select(0)}}>
                     Dashboard
                 </SidebarOption>
-                <SidebarOption activated={mode[1]} onClick={()=>{curpage.current=<PayUsers/>;curpageName.current = "Config";Select(1)}}>
+                <SidebarOption activated={mode[1]} onClick={()=>{curpage.current=<PayUsers/>;curpageName.current = "PayUsers";Select(1)}}>
                     PayUsers
+                </SidebarOption>
+                <SidebarOption activated={mode[2]} onClick={()=>{curpage.current=<SetAmount/>;curpageName.current = "Signal";Select(2)}}>
+                    Signal
                 </SidebarOption>
             </Sidebar>
             <Main>

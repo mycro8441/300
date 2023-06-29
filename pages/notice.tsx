@@ -97,7 +97,6 @@ const Block = styled.div`
 const BlockHeader = styled.div`
     top:0;
     width:100%;
-    height:50px;
     display:flex;
     align-items:center;
     gap:10px;
@@ -297,6 +296,16 @@ export default function Notice() {
     const onTopBtnClick = () => {
         topRef.current?.focus();
     }
+    const getDate = (value) => {
+        const date = new Date(value);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const hour = date.getHours().toString().padStart(2, "0");
+        const min = date.getMinutes().toString().padStart(2, "0");
+        const sec = date.getSeconds().toString().padStart(2, "0");
+        return `${year}-${month}-${day} ${hour}:${min}:${sec}`
+    }
     return <>
         {inited && <>
             <Container>
@@ -308,8 +317,13 @@ export default function Notice() {
 
                                 <Block key={i}>
                                     <BlockHeader>
-                                            {obj.user.username}
-                                            {obj.noticeDate}
+                                        <div>
+                                           {obj.user.username} 
+                                        </div>
+                                        <div>
+                                            {getDate(obj.noticeDate)}
+                                        </div>
+                                            
                                     </BlockHeader >
                                     <BlockContent >
                                         {obj.noticeContent}
