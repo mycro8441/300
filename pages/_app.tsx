@@ -67,8 +67,9 @@ export default function MyApp({
           //if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
         }).catch(err=>{
         })      
-      };
-      
+      } else {
+        setIsLogined(false);
+      }
 
       if(!isLogined && router.asPath !== "/" && router.asPath !== "/auth/login") router.push("/auth/login"); // 메인, 로그인 페이지 외에는 로드인 없이 접근 불가
 
