@@ -10,9 +10,15 @@ export const banUser = async (email:string) => {
     return data;
 }
 export const setPoint = async(email:string, points:number) => {
-    const {data} = await authClient().post("/point/set", {
+
+    const {data} = await authClient().post("/post/admin/point", {
         target:email,
         point:points,
     });
+    return data;
+}
+
+export const setSignalCost = async(amount:string) => {
+    const {data} = await authClient().get("/pay/set/point?point="+amount);
     return data;
 }

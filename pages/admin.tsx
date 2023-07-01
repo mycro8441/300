@@ -14,7 +14,7 @@ import {
   } from '@tanstack/react-table';
 import Switch from "@/components/switch";
 import { toast } from "react-toastify";
-import { banUser, getUserList, setPoint } from "@/lib/api/admin";
+import { banUser, getUserList, setPoint, setSignalCost } from "@/lib/api/admin";
 import { getPayUsers } from "@/lib/api/pay";
 
 const Container = styled.div`
@@ -104,6 +104,7 @@ const SubmitBtn = styled.div`
     display:flex;
     align-items: center;
     justify-content: center;
+    cursor:pointer;
 `
 const PrettyTable = styled.table`
     width:100%;
@@ -234,7 +235,8 @@ const defaultColumn: Partial<ColumnDef<User>> = {
       const onBlur = () => {
         if(id == "point") {
           // @ts-ignore
-          setPoint(original.username, original.point).then(res=>{
+          
+          setPoint(original.username, value).then(res=>{
             // @ts-ignore
             toast.success(`${original.username}의 포인트를 변경하였습니다.`)
           }).catch(err=>{
@@ -361,7 +363,7 @@ const Index = () => {
       return (
         <>
             <BubbleBox>
-              {data&&<>
+              {data?<>
               <PrettyTable>
                 
                   <thead>
@@ -475,6 +477,8 @@ const Index = () => {
                       <PrettyButton onClick={() => mutate()}>Refresh Data</PrettyButton>
                   </div>            
               </ButtonPlate>              
+              </>:<>
+                    <div style={{margin:"auto"}}>불러오는 중입니다...</div>
               </>}
 
             </BubbleBox>     
@@ -566,7 +570,7 @@ const PayUsers = () => {
     return (
       <>
           <BubbleBox>
-            {data&&<>
+            {data?<>
             <PrettyTable>
               
                 <thead>
@@ -680,6 +684,8 @@ const PayUsers = () => {
                     <PrettyButton onClick={() => mutate()}>Refresh Data</PrettyButton>
                 </div>            
             </ButtonPlate>              
+            </>:<>
+                  <div style={{margin:"auto"}}>불러오는 중입니다...</div>
             </>}
 
           </BubbleBox>     
@@ -766,7 +772,12 @@ const SetAmount = () => {
   return <>
     <Block>
       <PrettyInput onChange={e=>setInput(e.target.value)} value={input} placeholder="바꿀 포인트 입력"/>
-      <SubmitBtn>변경</SubmitBtn>
+      <SubmitBtn onClick={()=>setSignalCost(input).then(res=>{
+        toast.success(`포인트가 ${input}으로 변경되었습니다.`)
+      }).catch(err=>{
+        console.log(err)
+        toast.error("포인트를 변경하는 데 오류가 발생하였습니다.")
+      })}>변경</SubmitBtn>
     </Block>
   </>
 }
