@@ -362,7 +362,7 @@ export default function Signal({
 
 
     const purchaseSignal = () => {
-        buySignal(curPair).then(res=>{
+        buySignal(curPair, mode).then(res=>{
             toast.success(curPair+"의 시그널을 구매하였습니다.");
             setIsInited(false);
             setFilteredData();

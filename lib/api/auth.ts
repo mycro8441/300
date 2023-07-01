@@ -10,6 +10,7 @@ export const getEmailAuthCode = async (targetEmail: string) => {
     return data;
 }
 export const verifyEmailAuthCode = async (targetEmail: string, authCode: string, username:string, password:string, phoneNumber:string) => {
+
     const {data} = await userEmailAuth().post("/api/post/valid", {
         targetEmail: targetEmail,
         authCode: authCode,

@@ -229,9 +229,9 @@ export default function Login({}) {
     const onSubmit = (e) => {
         e.preventDefault();
         if(mode === 'login') {
-            if(validate['email'](input.email) && validate['password'](input.password)) {
-                submitLogin();
-            }
+
+            submitLogin();
+
         } else {
             if(validate['email'](input.email) && validate['password'](input.password) && validate['passwordConfirm'](input.passwordConfirm) && validate['phoneNumber'](input.phoneNumber)) {
                 // signup
@@ -313,8 +313,13 @@ export default function Login({}) {
                 
             }, 400);
         }).catch(err=>{
+            if(err.response.status === 400) {
+                toast.error("인증번호가 일치하지 않습니다.")
+            } else {
+                toast.error("회원가입을 하는 데 오류가 발생하였습니다.");
+            }
 
-            toast.error("회원가입을 하는 데 오류가 발생하였습니다.");
+            
 
         }).finally(()=>{
             loadingMsg.current = 0;
@@ -342,17 +347,20 @@ export default function Login({}) {
     const submitLogin = () => {
         setIsSubmitting(true);
         login(input.email, input.password).then(res=>{
-            if(res) {
-                toast.success("로그인 성공!");
-                setIsLogined(true);
-                router.push('/');                
-            }
-            else {
-                toast.error("이메일 또는 비밀번호가 일치하지 않습니다.");
-            }
+
+            toast.success("로그인 성공!");
+            setIsLogined(true);
+            router.push('/');                
+
+
         }).
         catch(err=>{
-            toast.error("로그인을 하는데 오류가 발생했습니다.");
+            if(err.response.status === 400) {
+                toast.error("아이디와 비밀번호가 일치하지 않습니다.")
+            } else {
+                toast.error("로그인을 하는데 오류가 발생했습니다.");
+            }
+            
         }).finally(()=>setIsSubmitting(false));
     }
 
