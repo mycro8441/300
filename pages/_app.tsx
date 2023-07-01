@@ -63,6 +63,7 @@ export default function MyApp({
             points:point,
             ban:ban,
             usrPw:usrPw,
+            update:false,
           });
           //if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
         }).catch(err=>{
@@ -75,7 +76,7 @@ export default function MyApp({
 
       
 
-  },[router, isLogined])
+  },[router, isLogined, userInfo.update])
 
 
   return (

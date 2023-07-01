@@ -222,7 +222,7 @@ type BoughtSignal = {
 export default function Signal({
 
                                }) {
-    const {curPair, setCurPair, userInfo,isLogined} = useStore();
+    const {curPair, setCurPair, userInfo,isLogined, setUserInfo} = useStore();
 
     const [mode, setMode] = useState<0|1|2|3>(0);
     const router = useRouter()
@@ -267,13 +267,13 @@ export default function Signal({
     
         } else {
             getBoughtSignal().then((res:BoughtSignal[])=>{
+                console.log(res)
                 for(let i = 0;i<filteredData.length;i++) {
                     if(i<2) {
                         let flag = false;
                         res.forEach(purchase=>{
                             purchase.coinList.forEach(coin=>{
-                                    if(coin.id===filteredData[i].id) {
-                                        
+                                    if(coin.id===filteredData[i].id && filteredData[i].id !== undefined) {
                                         flag = true; 
                                      }                           
                             })                            
@@ -364,6 +364,10 @@ export default function Signal({
     const purchaseSignal = () => {
         buySignal(curPair, mode).then(res=>{
             toast.success(curPair+"의 시그널을 구매하였습니다.");
+            setUserInfo({
+                ...userInfo,
+                update:!userInfo.update,
+            })
             setIsInited(false);
             setFilteredData();
         }).catch(err=>{

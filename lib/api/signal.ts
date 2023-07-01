@@ -22,7 +22,7 @@ export const buySignal = async(coin:string, mode:0|1|2|3) => {
             tf = "5m"
             break;
         case 1:
-            tf = "10m"
+            tf = "15m"
             break;
         case 2:
             tf = "30m"

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useSession } from 'next-auth/react'
 import {AdvancedRealTimeChart, TechnicalAnalysis, MarketData} from "react-ts-tradingview-widgets";
 import useStore from '../store';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import Chat from '@/components/Chat';
 import Signal from '@/components/Signal';
@@ -112,18 +112,24 @@ function Home() {
   useEffect(()=>{
     setIsInited(true); // 트레이딩뷰가 처음에 보이지 않아 추가함
   }, [])
+
+  const TradingView = useCallback(()=>{
+    return <>
+      <AdvancedRealTimeChart autosize symbol={curPair} theme={themeMode ? "dark" : "light"}/>
+      <MediaHidden>
+        <TechnicalAnalysis autosize symbol={curPair} colorTheme={themeMode ? "dark" : "light"}/>
+      </MediaHidden>    
+    </> 
+    
+
+  }, [])
   return (
     <>
       <Container>
         <Adjuster>
           <MainL>
             <Widget>
-              {isInited && <>
-                <AdvancedRealTimeChart autosize symbol={curPair} theme={themeMode ? "dark" : "light"}/>
-                <MediaHidden>
-                  <TechnicalAnalysis autosize symbol={curPair} colorTheme={themeMode ? "dark" : "light"}/>
-                </MediaHidden>
-              </>}
+              {isInited && <TradingView/>}
             </Widget>
             <RateContainer>
               <RateBox>

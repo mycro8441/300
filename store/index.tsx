@@ -9,6 +9,7 @@ type User = {
     points:number;
     ban:boolean;
     usrPw:string;
+    update:boolean;
 }
 interface serviceI {
     themeMode:boolean;
@@ -40,6 +41,7 @@ const useStore = create<serviceI>(set=>({
         usrPw:"",
         encryptedPw:"",
         points:0,
+        update:false // toggle하여 컴포넌트 업데이트 위함
     },
     setUserInfo:(info:User)=>set(()=>({userInfo:info})),
 }))
