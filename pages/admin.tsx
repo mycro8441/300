@@ -321,7 +321,6 @@ const Index = () => {
         setData(res);
       }).catch(err=>{
         toast.error("사용자 목록을 가져오는 데 실패했습니다.")
-        console.log(err)
       })
     }
 
@@ -527,7 +526,6 @@ const PayUsers = () => {
       setData(res);
     }).catch(err=>{
       toast.error("사용자 목록을 가져오는 데 실패했습니다.")
-      console.log(err)
     })
   }
 
@@ -775,7 +773,6 @@ const SetAmount = () => {
       <SubmitBtn onClick={()=>setSignalCost(input).then(res=>{
         toast.success(`포인트가 ${input}으로 변경되었습니다.`)
       }).catch(err=>{
-        console.log(err)
         toast.error("포인트를 변경하는 데 오류가 발생하였습니다.")
       })}>변경</SubmitBtn>
     </Block>

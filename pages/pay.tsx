@@ -243,9 +243,8 @@ const Pay = () => {
                             router.push("/");
                             toast.success("포인트 추가를 요청하였습니다.");
                          }).catch(err=>{
-                            console.log(err)
                             if(err.response.status === 500) {
-                                toast.error("")
+                                toast.error("포인트 추가에 실패하였습니다.")
                             }
                          })
                          

@@ -5,6 +5,7 @@ import useSWR, {useSWRConfig} from "swr";
 import useSWRMutation from "swr"
 import {getChat, sendMessage} from "@/lib/api/chat";
 import useStore from "../store";
+import { toast } from "react-toastify";
 
 const InputContainer = styled.form`
     width:100%;
@@ -112,7 +113,7 @@ const Chat = () => {
             )
             setInput('');
         } catch (error) {
-            console.error('메시지 전송 중 오류 발생:', error);
+            toast.error("메시지 전송에 실패하였습니다.")
         }
     };
     const onChange = e => {

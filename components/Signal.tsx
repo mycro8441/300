@@ -267,7 +267,6 @@ export default function Signal({
     
         } else {
             getBoughtSignal().then((res:BoughtSignal[])=>{
-                console.log(res)
                 for(let i = 0;i<filteredData.length;i++) {
                     if(i<2) {
                         let flag = false;
