@@ -4,6 +4,7 @@ import Image from "next/image";
 import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 import {getNotice, sendNotice} from "@/lib/api/notice";
+import useStore from "../store";
 
 type sliderType = 0|1;
 const abs = (n:number) => n < 0 ? -n : n;
@@ -226,7 +227,7 @@ const AdminInput = ({getFreshData}) => {
             <AdminContainer>
                 <input type="text" value={noticeTitle} onChange={e => setNoticeTitle(e.target.value)} placeholder={"제목을 입력해주세요"} />
                 <textarea placeholder="내용을 입력해주세요." value={input} onChange={e=>setInput(e.target.value)}/>
-                <button onClick={onSubmit}>Send</button>
+                <button style={{color:"white"}} onClick={onSubmit}>Send</button>
             </AdminContainer>
         </Block>
     </>
@@ -235,49 +236,46 @@ const AdminInput = ({getFreshData}) => {
 Notice.navbar=true;
 export default function Notice() {
 
-    const SliderComponent =() => { // 모드가 변함에 따라 업데이트해주기 때문에 state를 밖으로 뺌
-        const content = ["new", "old"];
-        const [mode, setMode] = useState<sliderType>(0); // localStorage에 마지막 모드 저장 후 불러오기
-        // mode state를 바깥으로 뺄 경우 transition 적용 안됨 버그..
-        // 이 블럭에서 외부 state 변경 함수를 실행하는 것으로 해결 예정
-        const [isSliderVisible, setIsSliderVisible] = useState<boolean>(true);
-        let lastScrollY = 0;
-        let lastDir : boolean = false;
-        useEffect(()=>{
-            addEventListener("mousewheel", (e:WheelEvent) => {
-                //@ts-ignore
-                if(e.target.tagname === "TEXTAREA") return;
-                const dir = e.deltaY > 0;
+    // const SliderComponent =() => { // 모드가 변함에 따라 업데이트해주기 때문에 state를 밖으로 뺌
+    //     // mode state를 바깥으로 뺄 경우 transition 적용 안됨 버그..
+    //     // 이 블럭에서 외부 state 변경 함수를 실행하는 것으로 해결 예정
+    //     const [isSliderVisible, setIsSliderVisible] = useState<boolean>(true);
+    //     let lastScrollY = 0;
+    //     let lastDir : boolean = false;
+    //     useEffect(()=>{
+    //         addEventListener("mousewheel", (e:WheelEvent) => {
+    //             //@ts-ignore
+    //             if(e.target.tagname === "TEXTAREA") return;
+    //             const dir = e.deltaY > 0;
 
-                if(dir == lastDir) return;
-                lastDir = dir;
+    //             if(dir == lastDir) return;
+    //             lastDir = dir;
 
-                if(dir) {
+    //             if(dir) {
 
-                    setIsSliderVisible(false);
-                } else {
-                    setIsSliderVisible(true);
-                }
+    //                 setIsSliderVisible(false);
+    //             } else {
+    //                 setIsSliderVisible(true);
+    //             }
 
-              });
-        }, [])
-        return <>
-            <Slider active={isSliderVisible}>
-                {[...Array(2)].map((v, i:sliderType)=>(
-                    <HiddenSliderButton key={i} mode={mode} index={i} onClick={()=>setMode(i)}>
-                        {content[i]}
-                    </HiddenSliderButton>
-                ))}
-                <SliderPicker mode={mode}>
-                    {content[mode]}
-                </SliderPicker>
-            </Slider>
-        </>
-    }
+    //           });
+    //     }, [])
+    //     return <>
+    //         <Slider active={isSliderVisible}>
+    //             {[...Array(2)].map((v, i:sliderType)=>(
+    //                 <HiddenSliderButton key={i} mode={mode} index={i} onClick={()=>setMode(i)}>
+    //                     {content[i]}
+    //                 </HiddenSliderButton>
+    //             ))}
+    //             <SliderPicker mode={mode}>
+    //                 {content[mode]}
+    //             </SliderPicker>
+    //         </Slider>
+    //     </>
+    // }
 
     const [data, setData] = useState([]);
-
-    const isAdmin = useRef<boolean>(false);
+    const {userInfo} = useStore();
     const [inited, setInited] = useState(false); // hydration 오류 해결
 
     const getFreshData = async () => {
@@ -285,7 +283,7 @@ export default function Notice() {
         setData(data);
     }
     useEffect(()=>{
-        isAdmin.current =true;
+        
         getFreshData().then(res=>{
             setInited(true);
         })
@@ -307,12 +305,11 @@ export default function Notice() {
         return `${year}-${month}-${day} ${hour}:${min}:${sec}`
     }
     return <>
-        {inited && <>
+        {inited ? <>
             <Container>
-                <SliderComponent/>
                 <BlockAdjuster>
                     <BlockSlider ref={topRef}>
-                        <AdminInput getFreshData={()=>getFreshData()}/>
+                        {userInfo.role === "ROLE_ADMIN" && <AdminInput getFreshData={()=>getFreshData()}/>}
                         {data?.map((obj, i)=>(
 
                                 <Block key={i}>
@@ -343,6 +340,8 @@ export default function Notice() {
                     <ArrowUpward/>
                 </TopButton>
             </TopButtonAdjust>
+        </>:<>
+            <div style={{margin:"auto"}}>불러오는 중입니다...</div>
         </>}
 
     </>

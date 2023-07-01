@@ -85,6 +85,10 @@ const   HoverMenuContainer = styled.div<{active:boolean}>`
     box-shadow: 0 0 10px 2px #888;
     opacity:${p=>p.active ? 1 : 0};
     padding:10px 20px;
+
+    display:flex;
+    flex-direction: column;
+    justify-content: space-around;
     div {
         text-align:center;
         padding:10px;
@@ -102,7 +106,7 @@ const AvatarContainer = styled.div`
 const PrettyButton = styled.div`
     width:auto;
     height:2em;
-    border-radius: 0.2em;
+    border-radius: 0.5em;
     background-color: ${p=>p.theme.colors.signatureRed};
     display: flex;
     justify-content: center;
@@ -144,9 +148,20 @@ const HoverMenuOption = styled.div`
     align-items: center;
     justify-content: space-between;
 
-
+    div:nth-child(2) {
+        color:${p=>p.theme.colors.signatureBlue};
+    }
 `
-
+const PrettyNumber = styled.div`
+    font-size:1em;
+    height:1.2em;
+    padding:0 10px;
+    transition: 0.3s ease;
+    border-radius: 10px;
+    background-color: ${p=>p.theme.colors.bgColor};
+    color:${p=>p.theme.colors.signatureBlue};
+    font-weight: bold;
+`
 const HoverMenu = ({active} : {active:boolean})=> {
     const [menuHover, setMenuHover] = useState<boolean>(false);
     const {themeMode, toggleTheme, setIsLogined, isLogined, userInfo, setUserInfo} = useStore();
@@ -156,12 +171,12 @@ const HoverMenu = ({active} : {active:boolean})=> {
             <HoverMenuContainer  active={active || menuHover}>
                 {isLogined ? <>
                     <div>반갑습니다, {userInfo.email || "loading..."}님</div>
-                    <HoverMenuOption><div>Point:</div><div>{userInfo.points}</div></HoverMenuOption>                  
+                    <HoverMenuOption><div>포인트</div><div>{userInfo.points}</div></HoverMenuOption>                  
                 </>:<>
                     <div>로그인 해주세요.</div>
                 </>}
 
-                <HoverMenuOption><div>테마 :</div><PrettySwitch state={themeMode} setfunc={()=>{toggleTheme();localStorage.setItem("theme", themeMode === true ? "light" : "dark")}}/></HoverMenuOption>
+                <HoverMenuOption><div>다크테마 활성화</div><PrettySwitch state={themeMode} setfunc={()=>{toggleTheme();localStorage.setItem("theme", themeMode === true ? "light" : "dark")}}/></HoverMenuOption>
                 <PrettyButton onClick={()=> {
                     setIsLogined(false);
                     if(!isLogined) push("/auth/login");

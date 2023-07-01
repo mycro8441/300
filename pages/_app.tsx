@@ -64,7 +64,7 @@ export default function MyApp({
             ban:ban,
             usrPw:usrPw,
           });
-          if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
+          //if(res.role === "ROLE_USER" && router.asPath === "/admin") router.push("/"); // 일반 유저 admin 페이지 접근 방지
         }).catch(err=>{
         })      
       };

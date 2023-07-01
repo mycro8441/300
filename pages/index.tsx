@@ -128,7 +128,7 @@ function Home() {
             <RateContainer>
               <RateBox>
                 <div>
-                  공포/탐욕 지수 : {data && data.fear}
+                  공포/탐욕 지수 : {data ? data.fear : "데이터가 없습니다."}
                 </div>
                 <Progressbar tcolor={1} size={data && parseFloat(data.fear)}>
                   <div/>
@@ -136,7 +136,7 @@ function Home() {
               </RateBox>
               <RateBox>
                 <div>
-                  강도지수 (RSI) : {data && parseFloat(data.rsi)}
+                  강도지수 (RSI) : {data ? parseFloat(data.rsi) : "데이터가 없습니다."}
                 </div>
                 <Progressbar tcolor={0} size={data && parseFloat(data.rsi)}>
                   <div/>
@@ -144,7 +144,7 @@ function Home() {
               </RateBox>
               <RateBox>
                 <div>
-                  스토캐스틱 지수 : {data && parseFloat(data.stoch)}
+                  스토캐스틱 지수 : {data ? parseFloat(data.stoch) : "데이터가 없습니다."}
                 </div>
                 <Progressbar tcolor={0} size={data && parseFloat(data.stoch)}>
                   <div/>
@@ -155,22 +155,22 @@ function Home() {
 
               <RateBox>
                 <div style={{margin:"auto"}}>
-                    BTC 김프 : {data && parseFloat(data.btcGimp)}
+                    BTC 김프 : {data ? parseFloat(data.btcGimp) : "데이터가 없습니다."}
                 </div>
               </RateBox>
               <RateBox>
                 <div style={{margin:"auto"}}>
-                  ETH 김프 : {data && parseFloat(data.ethGimp)}
+                  ETH 김프 : {data ? parseFloat(data.ethGimp) : "데이터가 없습니다."}
                 </div>
               </RateBox>
               <RateBox>
                 <div style={{margin:"auto"}}>
-                  XRP 김프 : {data && parseFloat(data.xrpGimp)}
+                  XRP 김프 : {data ? parseFloat(data.xrpGimp) : "데이터가 없습니다."}
                 </div>
               </RateBox>
               <RateBox>
                 <div>
-                  AVAX : {data && parseFloat(data.avaxGimp)}
+                  AVAX : {data ? parseFloat(data.avaxGimp) : "데이터가 없습니다."}
                 </div>
                 <Progressbar size={
                   data && parseFloat(data.avaxGimp)

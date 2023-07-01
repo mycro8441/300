@@ -1,6 +1,6 @@
 import Pay_point from "@/components/payments/Paybtn"
 import { requestPoint } from "@/lib/api/pay"
-import { ArrowBack, Backspace, Router } from "@mui/icons-material"
+import { ArrowBack, Backspace, Home, Router } from "@mui/icons-material"
 import { Avatar } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
 import styled, { css, keyframes } from "styled-components"
@@ -124,9 +124,9 @@ const NumberContainer = styled.div`
 `
 
 const PrettyInput = styled.input`
-    
-    width:90%;
-    height:100%;
+    height:2em;
+    width:100%;
+    margin-top:5px;
     border-radius: 10px;
     border:none;
     background:${p=>p.theme.colors.bgColor};
@@ -227,6 +227,8 @@ const Pay = () => {
             </SelectBlock>
             <PayContainer inited={inited}>
                 {mode.current === "confirm" ? <>
+                    <BackBtn onClick={()=>router.push("/")}><Home/>홈으로</BackBtn>
+
                     <p>다음 포인트를 충전합니다</p>
                     <span>{inited ? pointAmount : ""}</span>
                     <NextBtn onClick={changeMode}>
@@ -240,7 +242,15 @@ const Pay = () => {
                          <NextBtn onClick={()=>{requestPoint(input, pointAmount).then(res=>{
                             router.push("/");
                             toast.success("포인트 추가를 요청하였습니다.");
-                         });}}>요청하기</NextBtn>
+                         }).catch(err=>{
+                            console.log(err)
+                            if(err.response.status === 500) {
+                                toast.error("")
+                            }
+                         })
+                         
+                         
+                         }}>요청하기</NextBtn>
                 </>}
             </PayContainer>
         </Container>

@@ -19,6 +19,10 @@ const Block = styled.div`
     align-items: center;
     border-radius: 20px;
     background-color: ${p=>p.theme.colors.blockColor};
+
+    h4 {
+        margin:0;
+    }
 `
 const PrettyNumber = styled.div`
     font-size:1em;
