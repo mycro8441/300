@@ -16,16 +16,20 @@ export const getUserSignal = async() => { // 사용자가 구매한 시그널을
 }
 
 export const buySignal = async(coin:string, mode:0|1|2|3) => {
-    let tf;
+    let tf:string;
     switch (mode) {
         case 0:
             tf = "5m"
+            break;
         case 1:
             tf = "10m"
+            break;
         case 2:
             tf = "30m"
+            break;
         case 3:
             tf = "1h"
+            break;
     }
     const {data} = await authClient().post("/post/pay/confirm", {
         targetCoinName:`${coin}.P`,
