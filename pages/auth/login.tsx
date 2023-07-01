@@ -316,7 +316,7 @@ export default function Login({}) {
             if(err.response.status === 400) {
                 toast.error("인증번호가 일치하지 않습니다.")
             } else {
-                toast.error("회원가입을 하는 데 오류가 발생하였습니다.");
+                toast.error("이미 가입된 이메일입니다.");
             }
 
             
