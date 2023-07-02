@@ -65,6 +65,7 @@ const ChatContainer = styled.div`
 const RateContainer = styled.div`
   height:80px;
   display:flex;
+  justify-content: space-between;
   gap:10px;
 `
 const Progressbar = styled.div<{tcolor:number, size:number}>`
@@ -132,22 +133,25 @@ function Home() {
               {isInited && <TradingView/>}
             </Widget>
             <RateContainer>
-              <RateBox>
-                <div>
-                  공포/탐욕 지수 : {data ? data.fear : "불러오는 중입니다..."}
-                </div>
-                <Progressbar tcolor={1} size={data && parseFloat(data.fear)}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
-              <RateBox>
-                <div>
-                  강도지수 (RSI) : {data ? parseFloat(data.rsi) : "불러오는 중입니다..."}
-                </div>
-                <Progressbar tcolor={0} size={data && parseFloat(data.rsi)}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
+              <div>
+                <RateBox>
+                  <div>
+                    공포/탐욕 지수 : {data ? data.fear : "불러오는 중입니다..."}
+                  </div>
+                  <Progressbar tcolor={1} size={data && parseFloat(data.fear)}>
+                    <div/>
+                  </Progressbar>
+                </RateBox>
+                <RateBox>
+                  <div>
+                    강도지수 (RSI) : {data ? parseFloat(data.rsi) : "불러오는 중입니다..."}
+                  </div>
+                  <Progressbar tcolor={0} size={data && parseFloat(data.rsi)}>
+                    <div/>
+                  </Progressbar>
+                </RateBox>                
+              </div>
+
               <RateBox>
                 <div style={{margin:"auto"}}>
                     BTC 김프 : {data ? parseFloat(data.btcGimp) : "불러오는 중입니다..."}
@@ -160,7 +164,7 @@ function Home() {
               </RateBox>
             </RateContainer>
             <RateContainer>
-              <RateBox style={{flex:2}}>
+              <RateBox style={{flexGrow:2}}>
                 <div>
                   스토캐스틱 지수 : {data ? parseFloat(data.stoch) : "불러오는 중입니다..."}
                 </div>
@@ -169,16 +173,26 @@ function Home() {
                 </Progressbar>
               </RateBox>
 
-              <RateBox>
+
+              <RateBox style={{flexGrow:1}}>
                 <div style={{margin:"auto"}}>
                   XRP 김프 : {data ? parseFloat(data.xrpGimp) : "불러오는 중입니다..."}
                 </div>
               </RateBox>
-              <RateBox>
+              <RateBox style={{flexGrow:1}}>
                 <div style={{margin:"auto"}}>
-                  AVAX 김프 : {data ? parseFloat(data.avaxGimp) : "불러오는 중입니다..."}
+                  XRP 김프 : {data ? parseFloat(data.xrpGimp) : "불러오는 중입니다..."}
                 </div>
-              </RateBox>
+              </RateBox>                         
+
+
+                {/* <RateBox>
+                  <div style={{margin:"auto"}}>
+                    AVAX 김프 : {data ? parseFloat(data.avaxGimp) : "불러오는 중입니다..."}
+                  </div>
+                </RateBox>                 */}
+
+
 
 
 
