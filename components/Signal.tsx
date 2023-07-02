@@ -340,7 +340,7 @@ export default function Signal({
                 const hour = date.getHours();
                 const min = date.getMinutes();
                 
-                return `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`
+                return `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`
             }
           },
         ],
