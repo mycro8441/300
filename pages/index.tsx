@@ -149,17 +149,6 @@ function Home() {
                 </Progressbar>
               </RateBox>
               <RateBox>
-                <div>
-                  스토캐스틱 지수 : {data ? parseFloat(data.stoch) : "불러오는 중입니다..."}
-                </div>
-                <Progressbar tcolor={0} size={data && parseFloat(data.stoch)}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
-            </RateContainer>
-            <RateContainer>
-
-              <RateBox>
                 <div style={{margin:"auto"}}>
                     BTC 김프 : {data ? parseFloat(data.btcGimp) : "불러오는 중입니다..."}
                 </div>
@@ -169,21 +158,30 @@ function Home() {
                   ETH 김프 : {data ? parseFloat(data.ethGimp) : "불러오는 중입니다..."}
                 </div>
               </RateBox>
+            </RateContainer>
+            <RateContainer>
+              <RateBox style={{flex:2}}>
+                <div>
+                  스토캐스틱 지수 : {data ? parseFloat(data.stoch) : "불러오는 중입니다..."}
+                </div>
+                <Progressbar tcolor={0} size={data && parseFloat(data.stoch)}>
+                  <div/>
+                </Progressbar>
+              </RateBox>
+
               <RateBox>
                 <div style={{margin:"auto"}}>
                   XRP 김프 : {data ? parseFloat(data.xrpGimp) : "불러오는 중입니다..."}
                 </div>
               </RateBox>
               <RateBox>
-                <div>
-                  AVAX : {data ? parseFloat(data.avaxGimp) : "불러오는 중입니다..."}
+                <div style={{margin:"auto"}}>
+                  AVAX 김프 : {data ? parseFloat(data.avaxGimp) : "불러오는 중입니다..."}
                 </div>
-                <Progressbar size={
-                  data && parseFloat(data.avaxGimp)
-                } tcolor={2}>
-                  <div/>
-                </Progressbar>
               </RateBox>
+
+
+
             </RateContainer>
             <RateContainer>
               <RateBox>

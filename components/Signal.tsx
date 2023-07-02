@@ -268,7 +268,7 @@ export default function Signal({
         } else {
             getBoughtSignal().then((res:BoughtSignal[])=>{
                 for(let i = 0;i<filteredData.length;i++) {
-                    if(i<2) {
+                    if(i==0) {
                         let flag = false;
                         res.forEach(purchase=>{
                             purchase.coinList.forEach(coin=>{
