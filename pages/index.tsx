@@ -19,7 +19,14 @@ const Container = styled.div`
 const Adjuster = styled.div`
   width:100%;
   height:100%;
-  display:flex;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr); 
+  grid-template-rows: repeat(4, 1fr); 
+  grid-template-areas: 
+  "g g h"
+  "g g h"
+  "g g h"
+  "i i j";
   justify-content: center;
   padding:30px;
   gap:10px;
@@ -63,10 +70,18 @@ const ChatContainer = styled.div`
   border-radius:20px;
 `
 const RateContainer = styled.div`
-  height:80px;
-  display:flex;
-  justify-content: space-between;
-  gap:10px;
+
+display:grid;
+width:100%;
+  grid-template-columns: repeat(4, 1fr); 
+  grid-template-rows: repeat(3, 1fr); 
+  grid-template-areas: 
+  "a b d d"
+  "c c d d"
+  "e e f f";
+  gap: 10px;
+
+
 `
 const Progressbar = styled.div<{tcolor:number, size:number}>`
   background-color: ${p=>p.theme.colors.bgColor};
@@ -123,18 +138,16 @@ function Home() {
     </> 
     
 
-  }, [])
+  }, [themeMode])
   return (
     <>
       <Container>
         <Adjuster>
-          <MainL>
-            <Widget>
+            <Widget style={{gridArea:"g"}}>
               {isInited && <TradingView/>}
             </Widget>
-            <RateContainer>
-              <div>
-                <RateBox>
+            <RateContainer style={{gridArea:"i"}}>
+                <RateBox style={{gridArea:"a"}}>
                   <div>
                     공포/탐욕 지수 : {data ? data.fear : "불러오는 중입니다..."}
                   </div>
@@ -142,7 +155,7 @@ function Home() {
                     <div/>
                   </Progressbar>
                 </RateBox>
-                <RateBox>
+                <RateBox style={{gridArea:"b"}}>
                   <div>
                     강도지수 (RSI) : {data ? parseFloat(data.rsi) : "불러오는 중입니다..."}
                   </div>
@@ -150,82 +163,63 @@ function Home() {
                     <div/>
                   </Progressbar>
                 </RateBox>                
-              </div>
-
-              <RateBox>
-                <div style={{margin:"auto"}}>
-                    BTC 김프 : {data ? parseFloat(data.btcGimp) : "불러오는 중입니다..."}
-                </div>
-              </RateBox>
-              <RateBox>
-                <div style={{margin:"auto"}}>
-                  ETH 김프 : {data ? parseFloat(data.ethGimp) : "불러오는 중입니다..."}
-                </div>
-              </RateBox>
-            </RateContainer>
-            <RateContainer>
-              <RateBox style={{flexGrow:2}}>
-                <div>
-                  스토캐스틱 지수 : {data ? parseFloat(data.stoch) : "불러오는 중입니다..."}
-                </div>
-                <Progressbar tcolor={0} size={data && parseFloat(data.stoch)}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
-
-
-              <RateBox style={{flexGrow:1}}>
-                <div style={{margin:"auto"}}>
-                  XRP 김프 : {data ? parseFloat(data.xrpGimp) : "불러오는 중입니다..."}
-                </div>
-              </RateBox>
-              <RateBox style={{flexGrow:1}}>
-                <div style={{margin:"auto"}}>
-                  XRP 김프 : {data ? parseFloat(data.xrpGimp) : "불러오는 중입니다..."}
-                </div>
-              </RateBox>                         
-
-
-                {/* <RateBox>
-                  <div style={{margin:"auto"}}>
-                    AVAX 김프 : {data ? parseFloat(data.avaxGimp) : "불러오는 중입니다..."}
+                <RateBox style={{gridArea:"c"}}>
+                  <div>
+                    스토캐스틱 지수 : {data ? parseFloat(data.stoch) : "불러오는 중입니다..."}
                   </div>
-                </RateBox>                 */}
-
-
-
-
-
-            </RateContainer>
-            <RateContainer>
-              <RateBox>
-                <div>
-                  LONG 비율 : {data && parseFloat(data.longRatio)}
+                  <Progressbar tcolor={0} size={data && parseFloat(data.stoch)}>
+                    <div/>
+                  </Progressbar>
+                </RateBox>
+                <div style={{gridArea:"d", display:"flex", gap:"10px"}}>
+                  <RateBox>
+                    <div style={{margin:"auto"}}>
+                        BTC 김프<br/>{data ? parseFloat(data.btcGimp) : "불러오는 중입니다..."}
+                    </div>
+                  </RateBox>
+                  <RateBox>
+                    <div style={{margin:"auto"}}>
+                      ETH 김프<br/> {data ? parseFloat(data.ethGimp) : "불러오는 중입니다..."}
+                    </div>
+                  </RateBox>
+                  <RateBox>
+                    <div style={{margin:"auto"}}>
+                      XRP 김프<br/> {data ? parseFloat(data.xrpGimp) : "불러오는 중입니다..."}
+                    </div>
+                  </RateBox>      
+                  <RateBox>
+                    <div style={{margin:"auto"}}>
+                      AVAX 김프<br/> {data ? parseFloat(data.avaxGimp) : "불러오는 중입니다..."}
+                    </div>
+                  </RateBox>    
                 </div>
-                <Progressbar tcolor={1} size={data && parseFloat(data.longRatio)}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
-              <RateBox>
-                <div>
-                  SHORT 비율 (RSI) : {data && parseFloat(data.shortRatio)}
-                </div>
-                <Progressbar tcolor={0} size={data && parseFloat(data.shortRatio)}>
-                  <div/>
-                </Progressbar>
-              </RateBox>
+
+                  <RateBox style={{gridArea:"e"}}>
+                    <div>
+                      LONG 비율 : {data && parseFloat(data.longRatio)}
+                    </div>
+                    <Progressbar tcolor={1} size={data && parseFloat(data.longRatio)}>
+                      <div/>
+                    </Progressbar>
+                  </RateBox>
+                  <RateBox style={{gridArea:"f"}}>
+                    <div>
+                      SHORT 비율 (RSI) : {data && parseFloat(data.shortRatio)}
+                    </div>
+                    <Progressbar tcolor={0} size={data && parseFloat(data.shortRatio)}>
+                      <div/>
+                    </Progressbar>
+                  </RateBox>
+
             </RateContainer>
             
             
-          </MainL>
-          <MainR>
-            <Sidebar>
+            <Sidebar style={{gridArea:"h"}}>
               <Signal/>
             </Sidebar>
-            <ChatContainer>
+            <ChatContainer style={{gridArea:"j"}}>
               <Chat/>
             </ChatContainer>
-          </MainR>
         </Adjuster>
       </Container>
     </>

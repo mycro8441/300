@@ -176,7 +176,11 @@ const HoverMenu = ({active} : {active:boolean})=> {
                     <div>로그인 해주세요.</div>
                 </>}
 
-                <HoverMenuOption><div>다크테마 활성화</div><PrettySwitch state={themeMode} setfunc={()=>{toggleTheme();localStorage.setItem("theme", themeMode === true ? "light" : "dark")}}/></HoverMenuOption>
+                <HoverMenuOption><div>다크테마 활성화</div><PrettySwitch state={themeMode} setfunc={()=>{
+                    toggleTheme();
+                    localStorage.setItem("theme", themeMode === true ? "light" : "dark");
+                }   
+                }/></HoverMenuOption>
                 <PrettyButton onClick={()=> {
                     setIsLogined(false);
                     if(!isLogined) push("/auth/login");
