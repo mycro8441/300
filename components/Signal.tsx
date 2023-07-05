@@ -238,7 +238,6 @@ export default function Signal({
                 // @ts-ignore
                 (v, i) => {
                     if(v.cryptoName.replace(".P","") == curPair && isNumMatch(mode, v.timeFrame)) {
-
                         return true;
                     } else return false;
 
@@ -248,23 +247,17 @@ export default function Signal({
             (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
         
         ); 
-        if(!isLogined) {
-            for(let i = 0;i<filteredData.length;i++) {
-                if(i<2) {
-                        filteredData[i] = {
-                            ...filteredData[i],
-                            side:"-",
-                            closePrice:"-",
-                            localDateTime:"-",
-                        }
-
-
-        
-                }
-            }        
-            setFinalData(filteredData); 
+        const preData = [...filteredData];
+        preData[0] = {
+            ...preData[0],
+            side:"-",
+            closePrice:"-",
+            localDateTime:"-",
+        }
+        setFinalData(preData); // 로딩 속도 느려서 일단 필터 안된거 보여주고 바꿈
+        if(!isLogined) {   
+            //setFinalData(filteredData); 
             setIsInited(true); 
-    
         } else {
             getBoughtSignal().then((res:BoughtSignal[])=>{
                 for(let i = 0;i<filteredData.length;i++) {

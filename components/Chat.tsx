@@ -84,10 +84,18 @@ const DisplayContainer = styled.div`
 `
 const Chat = () => {
     const { mutate } = useSWRConfig();
-    const { data, error} = useSWR<Chat[]>("/get/chat",getChat);
+    const [data, setData] = useState(null);
+    //const { data, error} = useSWR<Chat[]>("/get/chat",getChat);
     const [input, setInput] = useState<string>('');
     const {userInfo} = useStore()
     const bottomRef = useRef<HTMLDivElement>(null);
+
+    const getFreshData = () => {
+        getChat().then(res=>{
+            setData(res);
+            bottomRef.current?.scrollIntoView();
+        })
+    }
     const onSubmit = async (e) => {
         e.preventDefault();
 
@@ -99,18 +107,11 @@ const Chat = () => {
         };
 
         try {
-            await mutate(
-                "/get/chat",
-                 sendMessage(input),
-                {
-                    optimisticData:data => [
-                        ...data,
-                        newChat,
-                    ],
-                    rollbackOnError: !userInfo.ban || true,
-
-                }
-            )
+            setData([
+                ...data,
+                newChat,
+            ])
+            getFreshData();
             setInput('');
         } catch (error) {
             toast.error("메시지 전송에 실패하였습니다.")
@@ -119,10 +120,11 @@ const Chat = () => {
     const onChange = e => {
         setInput(e.target.value)
     }
-
+    
     useEffect(()=>{
-        bottomRef.current?.scrollIntoView();
-    }, [data]);
+        getFreshData()
+    }, [])
+
     return (<Adjuster>
             <DisplayContainer>
                 {data?.sort(
