@@ -27,6 +27,7 @@ const InputContainer = styled.form`
 const InputSubmitBtn = styled.button`
     width:5em;
     border:none;
+    color:white;
     height:100%;
     border-radius: 12px;
     background-color:${p=>p.theme.colors.signatureBlue};
@@ -93,7 +94,6 @@ const Chat = () => {
     const getFreshData = () => {
         getChat().then(res=>{
             setData(res);
-            bottomRef.current?.scrollIntoView();
         })
     }
     const onSubmit = async (e) => {
@@ -105,14 +105,14 @@ const Chat = () => {
             chatDate: new Date().toISOString(),
             chatSender: null,
         };
-
         try {
             setData([
                 ...data,
                 newChat,
             ])
-            getFreshData();
             setInput('');
+            await sendMessage(input);
+            getFreshData();
         } catch (error) {
             toast.error("메시지 전송에 실패하였습니다.")
         }
@@ -120,7 +120,9 @@ const Chat = () => {
     const onChange = e => {
         setInput(e.target.value)
     }
-    
+    useEffect(()=>{
+        bottomRef.current?.scrollIntoView();
+    }, [data])
     useEffect(()=>{
         getFreshData()
     }, [])
@@ -152,7 +154,6 @@ const Chat = () => {
 const Adjuster = styled.div`
     display:flex;
     flex-direction: column;
-    justify-content: space-between;
     width:100%;
     height:100%;
 `

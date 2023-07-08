@@ -171,7 +171,7 @@ function Home() {
                     <div/>
                   </Progressbar>
                 </RateBox>
-                <div style={{gridArea:"d", display:"flex", gap:"10px"}}>
+                <div style={{gridArea:"d",fontSize:"1.2em", display:"flex", gap:"10px"}}>
                   <RateBox>
                     <div style={{margin:"auto"}}>
                         BTC 김프<br/>{data ? parseFloat(data.btcGimp) : "불러오는 중입니다..."}

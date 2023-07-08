@@ -66,7 +66,7 @@ const BubbleBox = styled.div`
 `
 
 const PositionColor = styled.div<{isShort:boolean, isSecret:boolean}>`
-    color:${p=>p.isSecret ? "white" : p.isShort ? p.theme.colors.signatureRed : p.theme.colors.signatureMint};
+    color:${p=>p.isSecret ? p.theme.colors.textMild : p.isShort ? p.theme.colors.signatureRed : p.theme.colors.signatureMint};
 `
 
 const PayBtn  =styled.div`
@@ -143,7 +143,7 @@ type Signal = {
     id:string;
     cryptoName:string;
     timeFrame:"5m"|"15m"|"30m"|"1h";
-    side:"sell"|"buy"|"-";
+    side:"sell"|"buy"|"-"|"불러오는 중...";
     closePrice:string;
     localDateTime:string;
 }
@@ -198,7 +198,7 @@ interface SignalInfo {
     id:string;
     cryptoName:string;
     timeFrame:"5m"|"15m"|"30m"|"1h";
-    side:"sell"|"buy";
+    side:"sell"|"buy"|"불러오는 중...";
     closePrice:string;
     localDateTime:string;
 }
@@ -233,6 +233,8 @@ export default function Signal({
     const localRes = useRef(null);
     const [isInited, setIsInited] = useState<boolean>(false);
     const copied = useRef(null);
+
+    const [boughtSignal, setBoughtSignal] = useState(null);
     const setFilteredData = () => {
         const filteredData = data.filter(
                 // @ts-ignore
@@ -247,27 +249,41 @@ export default function Signal({
             (a,b) => new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime()
         
         ); 
-        const preData = [...filteredData];
-        preData[0] = {
-            ...preData[0],
-            side:"-",
-            closePrice:"-",
-            localDateTime:"-",
+        if(filteredData.length === 0) {
+            setFinalData(filteredData);
+            setIsInited(true);
+            return;
         }
-        setFinalData(preData); // 로딩 속도 느려서 일단 필터 안된거 보여주고 바꿈
-        if(!isLogined) {   
-            //setFinalData(filteredData); 
-            setIsInited(true); 
+        const preData = [...filteredData];
+        if(isLogined) {
+            preData[0] = {
+                ...preData[0],
+                side:"불러오는 중...",
+                closePrice:"불러오는 중...",
+                localDateTime:"불러오는 중...",
+            }            
         } else {
-            getBoughtSignal().then((res:BoughtSignal[])=>{
+            preData[0] = {
+                ...preData[0],
+                side:"-",
+                closePrice:"-",
+                localDateTime:"-",
+            }
+        }
+
+        setFinalData(preData); // 로딩 속도 느려서 일단 필터 안된거 보여주고 바꿈
+        setIsInited(true)
+
+        if (isLogined) {
+            if(boughtSignal){
                 for(let i = 0;i<filteredData.length;i++) {
                     if(i==0) {
                         let flag = false;
-                        res.forEach(purchase=>{
+                        boughtSignal.forEach(purchase=>{
                             purchase.coinList.forEach(coin=>{
                                     if(coin.id===filteredData[i].id && filteredData[i].id !== undefined) {
                                         flag = true; 
-                                     }                           
+                                        }                           
                             })                            
                         })
 
@@ -282,18 +298,26 @@ export default function Signal({
                         }            
                     }
                 }     
-                setFinalData(filteredData);  
-                setIsInited(true);
-                    
+                setFinalData(filteredData);      
+            } else {
+                setFinalData(preData); // 로딩 속도 느려서 일단 필터 안된거 보여주고 바꿈
+                setIsInited(true)
+            }
                 
+            
 
-            }).catch(err=>{
-            })              
 
 
         }
 
     }
+    useEffect(()=>{
+        if(isLogined) {
+            getBoughtSignal().then((res:BoughtSignal[])=>{
+                setBoughtSignal(res);
+            }) 
+        }
+    }, [isLogined, userInfo])
     useEffect(()=>{
         if(data) {
             setFinalData([]);
@@ -304,14 +328,14 @@ export default function Signal({
         }            
 
 
-},[curPair, mode, isLogined, data])
+},[curPair, mode, isLogined, data, boughtSignal])
     const columns = useMemo(
         () => [
           {
             Header: 'Position',
             accessor: 'side',
             Cell: ({value, row}) => (
-                    <PositionColor isSecret={value==="-"} isShort={value == "sell"}>
+                    <PositionColor isSecret={value==="-" || value==="불러오는 중..."} isShort={value == "sell"}>
                         {value.toUpperCase()}
                     </PositionColor>
             )
@@ -326,6 +350,7 @@ export default function Signal({
               sortType: 'datetime',
             Cell: ({value, row}) => {
                 if(value==="-") return "-";
+                else if(value==="불러오는 중...") return "불러오는 중...";
                 const date = new Date(value);
                 const year = date.getFullYear();
                 const month = date.getMonth() + 1;
@@ -360,6 +385,7 @@ export default function Signal({
                 ...userInfo,
                 update:!userInfo.update,
             })
+            setFinalData([])
             setIsInited(false);
             setFilteredData();
         }).catch(err=>{
